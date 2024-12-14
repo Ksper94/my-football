@@ -1,36 +1,36 @@
 // pages/login.js
-import { useState } from 'react'
-import { useRouter } from 'next/router'
-import { supabase } from '../utils/supabaseClient'
-import { useAuth } from '../context/AuthContext'
+import { useState } from 'react';
+import { useRouter } from 'next/router';
+import { supabaseClient } from '../utils/supabaseClient';
+import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
-  const router = useRouter()
-  const { user } = useAuth()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState(null)
+  const router = useRouter();
+  const { user } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
 
   const handleLogin = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
       email,
       password,
-    })
+    });
 
     if (error) {
-      setError(error.message)
+      setError(error.message);
     } else {
-      console.log('Utilisateur connecté:', data.user)
-      router.push('/dashboard')
+      console.log('Utilisateur connecté:', data.user);
+      router.push('/dashboard');
     }
-  }
+  };
 
   // Rediriger si l'utilisateur est déjà connecté
   if (user) {
-    router.push('/dashboard')
-    return null
+    router.push('/dashboard');
+    return null;
   }
 
   return (
@@ -74,5 +74,5 @@ export default function Login() {
         </p>
       </form>
     </div>
-  )
+  );
 }
