@@ -1,6 +1,8 @@
 // pages/api/create-checkout-session.js
+
 import { supabaseService } from '../../utils/supabaseService';
 import Stripe from 'stripe';
+import { supabaseClient } from '../../utils/supabaseClient';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2022-11-15',
@@ -18,6 +20,14 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Missing priceId' });
     }
 
+    // Récupérer l'utilisateur actuel
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+
+    if (authError || !user) {
+      console.error('Utilisateur non authentifié');
+      return res.status(401).json({ error: 'Utilisateur non authentifié' });
+    }
+
     try {
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
@@ -31,8 +41,7 @@ export default async function handler(req, res) {
         success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cancel`,
         metadata: {
-          // Ajoutez des métadonnées si nécessaire
-          // user_id: 'id_utilisateur',
+          user_id: user.id, // Ajoutez l'ID utilisateur ici
         },
       });
 
