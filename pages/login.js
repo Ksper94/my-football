@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { supabaseClient } from '../utils/supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import Link from 'next/link';
 
 export default function Login() {
   const router = useRouter();
@@ -68,9 +69,9 @@ export default function Login() {
         </button>
         <p className="mt-4 text-center">
           Pas encore de compte ?{' '}
-          <a href="/signup" className="text-blue-500 hover:underline">
+          <Link href="/signup" className="text-blue-500 hover:underline">
             Inscrivez-vous
-          </a>
+          </Link>
         </p>
       </form>
     </div>

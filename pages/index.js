@@ -26,12 +26,12 @@ export default function Home() {
             <h1 className="text-4xl font-bold">Football Predictions</h1>
             <nav>
               {user ? (
-                <Link href="/pricing">
-                  <a className="text-blue-500 hover:underline">Tarifs</a>
+                <Link href="/pricing" className="text-blue-500 hover:underline">
+                  Tarifs
                 </Link>
               ) : (
-                <Link href="/login">
-                  <a className="text-blue-500 hover:underline">Connexion</a>
+                <Link href="/login" className="text-blue-500 hover:underline">
+                  Connexion
                 </Link>
               )}
             </nav>
@@ -65,10 +65,11 @@ export default function Home() {
                   </li>
                 </ul>
               </div>
-              <Link href="/pricing">
-                <a className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
-                  Découvrez nos formules
-                </a>
+              <Link
+                href="/pricing"
+                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+              >
+                Découvrez nos formules
               </Link>
             </div>
           </main>

@@ -9,7 +9,7 @@ export default function Hero() {
       animate={{ opacity: 1 }}
       transition={{ duration: 1 }}
       className="relative bg-cover bg-center h-screen flex items-center justify-center"
-      style={{ backgroundImage: `url('/football-bg.jpg')` }}
+      style={{ backgroundImage: `url('/football-bg.jpg')` }} // Assurez-vous d'avoir cette image dans le dossier public
     >
       {/* Overlay sombre */}
       <div className="absolute inset-0 bg-black opacity-50"></div>
@@ -27,14 +27,11 @@ export default function Hero() {
         <p className="text-xl md:text-2xl mb-6">
           Prédictions précises pour vos paris sportifs de football
         </p>
-        <Link href="/signup">
-          <motion.a
-            className="bg-primary hover:bg-secondary text-white font-bold py-3 px-6 rounded transition duration-300"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Commencez Maintenant
-          </motion.a>
+        <Link
+          href="/signup"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded transition duration-300"
+        >
+          Commencez Maintenant
         </Link>
       </motion.div>
     </motion.section>
