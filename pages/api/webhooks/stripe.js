@@ -1,7 +1,7 @@
 // pages/api/webhooks/stripe.js
 import { buffer } from 'micro'
 import Stripe from 'stripe'
-import { supabase } from '../../utils/supabaseClient'
+import { supabase } from '../../../utils/supabaseClient'
 
 export const config = {
   api: {
