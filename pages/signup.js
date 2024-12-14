@@ -1,20 +1,20 @@
-// pages/login.js
+// pages/signup.js
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { supabase } from '../utils/supabaseClient'
 import { useAuth } from '../context/AuthContext'
 
-export default function Login() {
+export default function Signup() {
   const router = useRouter()
   const { user } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
 
-  const handleLogin = async (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault()
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
     })
@@ -22,7 +22,7 @@ export default function Login() {
     if (error) {
       setError(error.message)
     } else {
-      console.log('Utilisateur connecté:', data.user)
+      console.log('Utilisateur inscrit:', data.user)
       router.push('/dashboard')
     }
   }
@@ -35,8 +35,8 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-8">
-      <form onSubmit={handleLogin} className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-semibold mb-4">Connexion</h2>
+      <form onSubmit={handleSignup} className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+        <h2 className="text-2xl font-semibold mb-4">Inscription</h2>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <div className="mb-4">
           <label htmlFor="email" className="block text-gray-700">Email</label>
@@ -64,12 +64,12 @@ export default function Login() {
           type="submit"
           className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
         >
-          Se connecter
+          S'inscrire
         </button>
         <p className="mt-4 text-center">
-          Pas encore de compte ?{' '}
-          <a href="/signup" className="text-blue-500 hover:underline">
-            Inscrivez-vous
+          Déjà un compte ?{' '}
+          <a href="/login" className="text-blue-500 hover:underline">
+            Connectez-vous
           </a>
         </p>
       </form>
