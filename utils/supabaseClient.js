@@ -1,12 +1,16 @@
 // utils/supabaseClient.js
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+// URL de votre instance Supabase
+const supabaseUrl = 'https://ekoagfbqgowuxumvixib.supabase.co';
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+// Clé de service (Service Role Key) depuis les variables d'environnement
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+// Initialisation du client Supabase avec la Service Role Key
+export const supabase = createClient(supabaseUrl, supabaseServiceRoleKey, {
   auth: {
     persistSession: true,
     detectSessionInUrl: true,
   },
-})
+});

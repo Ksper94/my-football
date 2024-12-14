@@ -1,27 +1,28 @@
 // pages/pricing.js
-import { useAuth } from '../context/AuthContext'
-import { useState } from 'react'
-import { supabase } from '../utils/supabaseClient'
-import { useRouter } from 'next/router'
+import { useAuth } from '../context/AuthContext';
+import { useState } from 'react';
+import { supabase } from '../utils/supabaseClient';
+import { useRouter } from 'next/router';
+import Stripe from 'stripe'; // Assurez-vous que Stripe est importé correctement
 
 export default function Pricing() {
-  const { user } = useAuth()
-  const router = useRouter()
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const { user } = useAuth();
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   if (!user) {
     if (typeof window !== 'undefined') {
-      router.push('/login')
+      router.push('/login');
     }
-    return null
+    return null;
   }
 
   const pricingPlans = [
     {
       name: 'Mensuel',
       price: '10€',
-      priceId: 'price_monthly', // Remplacez par votre propre price_id Stripe
+      priceId: 'price_1QUlyhHd1CTS1QCeLJfFF9Kj', // Remplacez par votre propre price_id Stripe
       features: [
         'Accès complet aux prédictions',
         'Mises à jour quotidiennes',
@@ -30,7 +31,7 @@ export default function Pricing() {
     },
     {
       name: 'Trimestriel',
-      price: '27€',
+      price: 'price_1QUlzrHd1CTS1QCebhWYJdYv',
       priceId: 'price_quarterly', // Remplacez par votre propre price_id Stripe
       features: [
         'Accès complet aux prédictions',
@@ -42,7 +43,7 @@ export default function Pricing() {
     {
       name: 'Annuel',
       price: '100€',
-      priceId: 'price_yearly', // Remplacez par votre propre price_id Stripe
+      priceId: 'price_1QUm0YHd1CTS1QCeSrmFSzI7', // Remplacez par votre propre price_id Stripe
       features: [
         'Accès complet aux prédictions',
         'Mises à jour quotidiennes',
@@ -51,33 +52,36 @@ export default function Pricing() {
         'Accès anticipé aux nouvelles fonctionnalités',
       ],
     },
-  ]
+  ];
 
   const handleSubscribe = async (priceId) => {
-    setLoading(true)
-    setError('')
+    setLoading(true);
+    setError('');
 
     try {
       const res = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Inclure les cookies dans la requête
         body: JSON.stringify({ priceId }),
-      })
+      });
 
-      const data = await res.json()
+      const data = await res.json();
 
-      if (data.url) {
-        window.location.href = data.url
+      if (res.ok && data.sessionId) {
+        // Initialiser Stripe avec votre clé publique
+        const stripe = Stripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+        await stripe.redirectToCheckout({ sessionId: data.sessionId });
       } else {
-        setError('Erreur lors de la création de la session de paiement.')
+        setError(data.error || 'Erreur lors de la création de la session de paiement.');
       }
     } catch (err) {
-      console.error('Erreur lors de la création de la session de paiement:', err)
-      setError('Erreur lors de la création de la session de paiement.')
+      console.error('Erreur lors de la création de la session de paiement:', err);
+      setError('Erreur lors de la création de la session de paiement.');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -109,11 +113,11 @@ export default function Pricing() {
               className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 disabled:bg-blue-300"
               disabled={loading}
             >
-              {loading ? 'Chargement...' : 'S\'abonner'}
+              {loading ? 'Chargement...' : "S'abonner"}
             </button>
           </div>
         ))}
       </div>
     </div>
-  )
+  );
 }
