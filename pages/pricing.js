@@ -1,9 +1,9 @@
 // pages/pricing.js
 import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
-import { supabase } from '../utils/supabaseClient';
 import { useRouter } from 'next/router';
-import Stripe from 'stripe'; // Assurez-vous que Stripe est importé correctement
+import Stripe from 'stripe'; // Assurez-vous que Stripe est installé: npm install @stripe/stripe-js
+import { loadStripe } from '@stripe/stripe-js';
 
 export default function Pricing() {
   const { user } = useAuth();
@@ -31,8 +31,8 @@ export default function Pricing() {
     },
     {
       name: 'Trimestriel',
-      price: 'price_1QUlzrHd1CTS1QCebhWYJdYv',
-      priceId: 'price_quarterly', // Remplacez par votre propre price_id Stripe
+      price: '27€',
+      priceId: 'price_1QUlzrHd1CTS1QCebhWYJdYv', // Remplacez par votre propre price_id Stripe
       features: [
         'Accès complet aux prédictions',
         'Mises à jour quotidiennes',
@@ -62,7 +62,7 @@ export default function Pricing() {
       const res = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // Inclure les cookies dans la requête
+        credentials: 'include', // <-- Inclure les cookies dans la requête
         body: JSON.stringify({ priceId }),
       });
 
@@ -70,7 +70,8 @@ export default function Pricing() {
 
       if (res.ok && data.sessionId) {
         // Initialiser Stripe avec votre clé publique
-        const stripe = Stripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+        const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+        const stripe = await stripePromise;
         await stripe.redirectToCheckout({ sessionId: data.sessionId });
       } else {
         setError(data.error || 'Erreur lors de la création de la session de paiement.');
