@@ -2,6 +2,7 @@
 
 import { supabase } from '../../utils/supabaseClient'
 import Stripe from 'stripe'
+import cookie from 'cookie'
 
 // Initialiser Stripe avec votre clé secrète
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
@@ -14,11 +15,19 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Récupérer l'utilisateur authentifié à partir des en-têtes de la requête
-    const { data: { user }, error: userError } = await supabase.auth.getUser(req)
+    // Parse les cookies de la requête
+    const cookies = req.headers.cookie ? cookie.parse(req.headers.cookie) : {}
+    const token = cookies['sb-access-token'] || ''
+
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized: No token provided' })
+    }
+
+    // Récupérer l'utilisateur authentifié à partir du token
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token)
 
     if (userError || !user) {
-      return res.status(401).json({ error: 'Unauthorized' })
+      return res.status(401).json({ error: 'Unauthorized: Invalid token' })
     }
 
     // Récupérer les données de la requête (par exemple, l'ID du produit)
