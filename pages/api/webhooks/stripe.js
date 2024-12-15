@@ -4,16 +4,13 @@ import { supabaseAdmin } from '../../../utils/supabaseClient'
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    // Logique pour gérer le webhook Stripe
-    // Exemple : Créer ou mettre à jour des données dans Supabase
-
     try {
       const event = req.body
 
       // Traitez l'événement Stripe ici
-      // Par exemple, si vous recevez un événement de création de paiement
+      // Exemple : Si vous recevez un événement de création de paiement
 
-      // Exemple d'utilisation de supabaseAdmin pour insérer des données
+      // Utiliser supabaseAdmin pour insérer des données
       const { data, error } = await supabaseAdmin
         .from('payments')
         .insert([
@@ -24,7 +21,7 @@ export default async function handler(req, res) {
             created_at: new Date().toISOString()
           },
         ])
-
+      
       if (error) {
         console.error('Erreur lors de l\'insertion dans Supabase :', error)
         return res.status(500).json({ error: 'Erreur interne du serveur' })

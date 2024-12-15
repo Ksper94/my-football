@@ -1,10 +1,14 @@
-// utils/supabaseService.js
+// pages/subapageService.js
 
-import { createClient } from '@supabase/supabase-js';
+import React from 'react'
 
-const supabaseService = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+const SubapageService = () => {
+  return (
+    <div>
+      <h1>Service de Sous-Page</h1>
+      <p>Bienvenue sur la sous-page service de votre application.</p>
+    </div>
+  )
+}
 
-export { supabaseService };
+export default SubapageService
