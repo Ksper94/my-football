@@ -1,40 +1,35 @@
 // context/AuthContext.js
-import { createContext, useContext, useEffect, useState } from 'react';
-import { supabaseClient } from '../utils/supabaseClient';
 
-const AuthContext = createContext({ user: null });
+import { createContext, useState, useEffect, useContext } from 'react'
+import { supabaseClient } from '../utils/supabaseClient'
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+const AuthContext = createContext()
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null)
 
   useEffect(() => {
-    const getSession = async () => {
-      const { data, error } = await supabaseClient.auth.getSession();
-      if (error) {
-        console.error('Erreur lors de l\'obtention de la session:', error.message);
-        return;
+    const session = supabaseClient.auth.session()
+    setUser(session?.user ?? null)
+
+    const { data: listener } = supabaseClient.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null)
       }
-      setUser(data.session?.user ?? null);
-    };
-
-    getSession();
-
-    const { data: authListener } = supabaseClient.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-    });
+    )
 
     return () => {
-      authListener.subscription.unsubscribe();
-    };
-  }, []);
+      listener?.unsubscribe()
+    }
+  }, [])
 
   return (
     <AuthContext.Provider value={{ user }}>
       {children}
     </AuthContext.Provider>
-  );
+  )
 }
 
 export const useAuth = () => {
-  return useContext(AuthContext);
-};
+  return useContext(AuthContext)
+}

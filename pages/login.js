@@ -1,79 +1,58 @@
-// pages/login.js
-import { useState } from 'react';
-import { useRouter } from 'next/router';
-import { supabaseClient } from '../utils/supabaseClient';
-import { useAuth } from '../context/AuthContext';
-import Link from 'next/link';
+// components/Login.js
 
-export default function Login() {
-  const router = useRouter();
-  const { user } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
+import { useState } from 'react'
+import { supabaseClient } from '../utils/supabaseClient'
+
+const Login = () => {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState(null)
+  const [message, setMessage] = useState(null)
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
+    try {
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-    const { data, error } = await supabaseClient.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      setError(error.message);
-    } else {
-      console.log('Utilisateur connecté:', data.user);
-      router.push('/dashboard');
+      if (error) {
+        setError(error.message)
+        setMessage(null)
+      } else {
+        setMessage('Connexion réussie!')
+        setError(null)
+        // Rediriger ou mettre à jour l'état de l'utilisateur
+      }
+    } catch (err) {
+      console.error('Erreur lors de la connexion:', err)
+      setError('Une erreur inattendue est survenue.')
+      setMessage(null)
     }
-  };
-
-  // Rediriger si l'utilisateur est déjà connecté
-  if (user) {
-    router.push('/dashboard');
-    return null;
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-8">
-      <form onSubmit={handleLogin} className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-semibold mb-4">Connexion</h2>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-gray-700">Email</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-          />
-        </div>
-        <div className="mb-6">
-          <label htmlFor="password" className="block text-gray-700">Mot de passe</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-          />
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-        >
-          Se connecter
-        </button>
-        <p className="mt-4 text-center">
-          Pas encore de compte ?{' '}
-          <Link href="/signup" className="text-blue-500 hover:underline">
-            Inscrivez-vous
-          </Link>
-        </p>
-      </form>
-    </div>
-  );
+    <form onSubmit={handleLogin}>
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+      />
+      <input
+        type="password"
+        placeholder="Mot de passe"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required
+      />
+      <button type="submit">Se connecter</button>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {message && <p style={{ color: 'green' }}>{message}</p>}
+    </form>
+  )
 }
+
+export default Login
