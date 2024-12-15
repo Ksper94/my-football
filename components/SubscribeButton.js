@@ -1,7 +1,7 @@
 // components/SubscribeButton.js
 
 import { useState } from 'react';
-import { supabase } from '../utils/supabaseClient'; // Assurez-vous que supabaseClient est correctement configuré
+import { supabaseClient } from '../utils/supabaseClient'; // Utilisez supabaseClient
 
 export default function SubscribeButton() {
   const [loading, setLoading] = useState(false);
@@ -13,7 +13,7 @@ export default function SubscribeButton() {
 
     try {
       // Obtenir la session actuelle de Supabase
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
 
       if (sessionError || !session) {
         setError('Utilisateur non authentifié.');

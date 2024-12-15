@@ -1,11 +1,11 @@
 // utils/supabaseService.js
+
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+// Initialisez le client Supabase avec les clés de service
+const supabaseService = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
-if (!supabaseUrl || !supabaseServiceRoleKey) {
-  throw new Error('Supabase URL et Service Role Key sont requis.');
-}
-
-export const supabaseService = createClient(supabaseUrl, supabaseServiceRoleKey);
+export { supabaseService };

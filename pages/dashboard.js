@@ -1,22 +1,29 @@
 // pages/dashboard.js
 
 import { useEffect, useState } from 'react';
-import { supabase } from '../utils/supabaseClient';
+import { supabaseClient } from '../utils/supabaseClient'; // Utilisez supabaseClient
 import SubscribeButton from '../components/SubscribeButton';
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const session = supabase.auth.session();
-    setUser(session?.user ?? null);
+    const fetchUser = async () => {
+      const { data: { session }, error } = await supabaseClient.auth.getSession();
+      if (session && session.user) {
+        setUser(session.user);
+      }
+    };
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+    fetchUser();
+
+    // Écouter les changements d'état d'authentification
+    const { data: authListener } = supabaseClient.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
 
     return () => {
-      authListener.unsubscribe();
+      authListener.subscription.unsubscribe();
     };
   }, []);
 
@@ -32,4 +39,3 @@ export default function Dashboard() {
     </div>
   );
 }
-

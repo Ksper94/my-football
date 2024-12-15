@@ -1,29 +1,23 @@
 // pages/api/create-checkout-session.js
 
-import { supabaseService } from '../../utils/supabaseService';
+import { supabaseService } from '../../utils/supabaseService'; // Utilisez supabaseService
 import Stripe from 'stripe';
-import jwt from 'jsonwebtoken';
 
+// Initialisation de Stripe avec la clé secrète
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2022-11-15',
 });
 
+// Activer le body parser pour JSON
 export const config = {
   api: {
-    bodyParser: false,
+    bodyParser: true,
   },
 };
-
-const jwtSecret = process.env.JWT_SECRET;
-
-if (!jwtSecret) {
-  throw new Error('JWT_SECRET est requis.');
-}
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     console.log('Requête POST reçue');
-    console.log('Corps de la requête:', req.body);
 
     const { priceId } = req.body;
 
@@ -32,6 +26,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Missing priceId' });
     }
 
+    // Extraire le token d'authentification depuis l'en-tête Authorization
     const authHeader = req.headers.authorization;
     console.log('En-tête Authorization:', authHeader);
 
@@ -44,15 +39,22 @@ export default async function handler(req, res) {
     console.log('Token extrait:', token);
 
     try {
-      const decoded = jwt.verify(token, jwtSecret);
-      console.log('Token décodé:', decoded);
-      const userId = decoded.userId;
+      // Utiliser Supabase pour obtenir l'utilisateur à partir du token
+      const { data: { user }, error: userError } = await supabaseService.auth.getUser(token);
+
+      if (userError || !user) {
+        console.error('Utilisateur non trouvé ou erreur lors de la récupération de l\'utilisateur');
+        return res.status(401).json({ error: 'Utilisateur non authentifié' });
+      }
+
+      const userId = user.id; // Récupérer l'ID utilisateur
 
       if (!userId) {
         console.error('user_id manquant dans le token');
         return res.status(400).json({ error: 'ID utilisateur manquant dans le token.' });
       }
 
+      // Créer la session de checkout avec les métadonnées utilisateur
       const sessionStripe = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: [
@@ -65,7 +67,7 @@ export default async function handler(req, res) {
         success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cancel`,
         metadata: {
-          user_id: userId,
+          user_id: userId, // Ajouter l'ID utilisateur aux métadonnées
         },
       });
 
