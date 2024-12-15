@@ -1,29 +1,37 @@
 // components/Navbar.js
 import Link from 'next/link'
 import { useAuth } from '../context/AuthContext'
+import { supabaseClient } from '../utils/supabaseClient'
+import { useRouter } from 'next/router'
 
 export default function Navbar() {
   const { user } = useAuth()
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push('/login')
+  }
 
   return (
-    <nav className="bg-white shadow">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <Link href="/" className="text-xl font-bold text-blue-500">
-          Football Predictions
+    <nav className="bg-blue-500 p-4">
+      <div className="container mx-auto flex justify-between items-center">
+        <Link href="/">
+          <a className="text-white text-xl font-bold">Football Predictions</a>
         </Link>
         <div>
           {user ? (
-            <Link href="/dashboard" className="text-gray-700 hover:text-blue-500 mr-4">
-              Dashboard
-            </Link>
+            <>
+              <Link href="/pricing">
+                <a className="text-white mr-4">Tarifs</a>
+              </Link>
+              <button onClick={handleLogout} className="text-white">Déconnexion</button>
+            </>
           ) : (
-            <Link href="/login" className="text-gray-700 hover:text-blue-500 mr-4">
-              Connexion
+            <Link href="/login">
+              <a className="text-white">Connexion</a>
             </Link>
           )}
-          <Link href="/pricing" className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
-            Tarifs
-          </Link>
         </div>
       </div>
     </nav>

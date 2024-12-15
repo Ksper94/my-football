@@ -1,7 +1,6 @@
 // pages/success.js
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { supabase } from '../utils/supabaseClient'
 
 export default function Success() {
   const router = useRouter()
