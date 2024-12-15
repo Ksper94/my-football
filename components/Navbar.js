@@ -1,39 +1,42 @@
 // components/Navbar.js
-import Link from 'next/link'
-import { useAuth } from '../context/AuthContext'
-import { supabaseClient } from '../utils/supabaseClient'
-import { useRouter } from 'next/router'
 
-export default function Navbar() {
-  const { user } = useAuth()
-  const router = useRouter()
+import { supabaseClient } from '../utils/supabaseClient';
+import { useEffect, useState } from 'react';
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
-    router.push('/login')
-  }
+const Navbar = () => {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { session }, error } = await supabaseClient.auth.getSession();
+      if (session && session.user) {
+        setUser(session.user);
+      }
+    };
+
+    fetchUser();
+
+    const { data: authListener } = supabaseClient.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
 
   return (
-    <nav className="bg-blue-500 p-4">
-      <div className="container mx-auto flex justify-between items-center">
-        <Link href="/">
-          <a className="text-white text-xl font-bold">Football Predictions</a>
-        </Link>
-        <div>
-          {user ? (
-            <>
-              <Link href="/pricing">
-                <a className="text-white mr-4">Tarifs</a>
-              </Link>
-              <button onClick={handleLogout} className="text-white">Déconnexion</button>
-            </>
-          ) : (
-            <Link href="/login">
-              <a className="text-white">Connexion</a>
-            </Link>
-          )}
-        </div>
+    <nav className="bg-white shadow-md p-4 flex justify-between items-center">
+      <h1 className="text-xl font-bold">Mon Application</h1>
+      <div>
+        {user ? (
+          <p>Bienvenue, {user.email}</p>
+        ) : (
+          <a href="/login" className="text-blue-500">Se connecter</a>
+        )}
       </div>
     </nav>
-  )
-}
+  );
+};
+
+export default Navbar;

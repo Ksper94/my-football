@@ -1,78 +1,69 @@
 // pages/login.js
-import { useState } from 'react'
-import { supabaseClient } from '../utils/supabaseClient'
-import { useRouter } from 'next/router'
 
-export default function Login() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [isLogin, setIsLogin] = useState(true)
-  const [message, setMessage] = useState('')
-  const router = useRouter()
+import { supabaseClient } from '../utils/supabaseClient';
+import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useRouter } from 'next/router';
 
-  const handleAuth = async (e) => {
-    e.preventDefault()
-    setMessage('')
+const Login = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  
+  const [error, setError] = useState(null);
+  const [message, setMessage] = useState(null);
+  const { setUser } = useAuth();
+  const router = useRouter();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setMessage(null);
+
     try {
-      let { user, error } = isLogin
-        ? await supabase.auth.signIn({ email, password })
-        : await supabase.auth.signUp({ email, password })
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-      if (error) throw error
-
-      setMessage(isLogin ? 'Connexion réussie !' : 'Inscription réussie !')
-
-      if (isLogin) {
-        router.push('/pricing')
+      if (error) {
+        setError(error.message);
+      } else {
+        setMessage('Connexion réussie !');
+        setUser(data.user);
+        router.push('/dashboard'); // Redirigez l'utilisateur vers le dashboard
       }
-    } catch (error) {
-      setMessage(error.error_description || error.message)
+    } catch (err) {
+      console.error('Erreur lors de la connexion:', err);
+      setError('Une erreur inattendue est survenue.');
     }
-  }
+  };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 space-y-3 rounded-xl bg-white shadow-lg">
-        <h1 className="text-2xl font-bold text-center">{isLogin ? 'Connexion' : 'Inscription'}</h1>
-        <form className="space-y-6" onSubmit={handleAuth}>
-          <div>
-            <label className="block mb-1 text-sm">Email</label>
-            <input
-              type="email"
-              required
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div>
-            <label className="block mb-1 text-sm">Mot de passe</label>
-            <input
-              type="password"
-              required
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full px-4 py-2 font-semibold text-white bg-blue-500 rounded-md hover:bg-blue-600"
-          >
-            {isLogin ? 'Se connecter' : 'S\'inscrire'}
-          </button>
-        </form>
-        <p className="text-sm text-center">
-          {isLogin ? "Pas encore de compte ?" : "Déjà un compte ?"}{' '}
-          <button
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-blue-500 hover:underline"
-          >
-            {isLogin ? 'Inscrivez-vous' : 'Connectez-vous'}
-          </button>
-        </p>
-        {message && <p className={`text-center ${isLogin ? 'text-green-500' : 'text-red-500'}`}>{message}</p>}
-      </div>
-    </div>
-  )
-}
+    <form onSubmit={handleLogin} className="max-w-md mx-auto p-4">
+      <h2 className="text-2xl font-bold mb-4">Se connecter</h2>
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+        className="w-full p-2 mb-4 border rounded"
+      />
+      <input
+        type="password"
+        placeholder="Mot de passe"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required
+        className="w-full p-2 mb-4 border rounded"
+      />
+      <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
+        Se connecter
+      </button>
+      {error && <p className="text-red-500 mt-2">{error}</p>}
+      {message && <p className="text-green-500 mt-2">{message}</p>}
+    </form>
+  );
+};
+
+export default Login;
