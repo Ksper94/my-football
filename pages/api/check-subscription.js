@@ -52,7 +52,7 @@ export default async function handler(req, res) {
 
     // Vérifier dans la table subscription si l'utilisateur a un abonnement premium valide
     const { data, error: subscriptionError } = await supabaseService
-      .from('subscription')
+      .from('subscriptions')
       .select('plan, token')
       .eq('user_id', userId)
       .single();

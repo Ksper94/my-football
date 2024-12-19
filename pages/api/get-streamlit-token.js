@@ -27,7 +27,7 @@ export default async function handler(req, res) {
 
     // Récupérer l'abonnement de l'utilisateur
     const { data, error } = await supabaseService
-      .from('subscription')
+      .from('subscriptions')
       .select('token, plan')
       .eq('user_id', user.id)
       .single();
