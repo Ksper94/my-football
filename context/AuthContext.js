@@ -11,17 +11,26 @@ export const AuthProvider = ({ children }) => {
   const [authError, setAuthError] = useState(null);
 
   useEffect(() => {
-    // Récupération de la session actuelle
-    const session = supabase.auth.session();
-    setUser(session?.user || null);
-    setLoading(false);
+    let mounted = true;
+    const getInitialSession = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        setAuthError(error);
+      }
+      if (mounted) {
+        setUser(session?.user || null);
+        setLoading(false);
+      }
+    };
+    getInitialSession();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null);
     });
 
     return () => {
-      authListener?.unsubscribe();
+      mounted = false;
+      subscription.unsubscribe();
     };
   }, []);
 
@@ -35,13 +44,14 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const signIn = useCallback(async (email, password) => {
-    const { data, error } = await supabase.auth.signIn({ email, password });
+    // Utiliser signInWithPassword pour la v2
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       setAuthError(error);
       throw error;
     }
 
-    // Utilisateur connecté. On insère le profil si non existant.
+    // Vérifier si le profil existe, sinon le créer
     const { data: existingProfile, error: profileSelectError } = await supabase
       .from('profiles')
       .select('id')
@@ -49,7 +59,7 @@ export const AuthProvider = ({ children }) => {
       .single();
 
     if (profileSelectError && profileSelectError.details?.includes('No rows')) {
-      // Pas de profil, on le crée
+      // Profil non existant, on le crée
       const { error: profileInsertError } = await supabase
         .from('profiles')
         .insert([{ id: data.user.id, email: data.user.email }]);
