@@ -29,18 +29,24 @@ export default async function handler(req, res) {
     return res.status(400).send(`Webhook Error: ${err.message}`)
   }
 
+  // Traiter l'événement
   switch (event.type) {
-    case 'payment_intent.succeeded':
-      const paymentIntent = event.data.object
+    case 'checkout.session.completed':
+      const session = event.data.object
+
+      // Utiliser supabaseService pour enregistrer les informations dans Supabase
       const { error } = await supabaseService
-        .from('payments')
-        .insert([{ payment_intent_id: paymentIntent.id, status: paymentIntent.status }])
+        .from('subscriptions')
+        .update({ status: 'active' })
+        .eq('session_id', session.id)
       
       if (error) {
         console.error('Erreur lors de l\'insertion dans Supabase :', error.message)
         return res.status(500).send('Erreur interne')
       }
+
       break
+    // Traitez d'autres types d'événements si nécessaire
     default:
       console.warn(`Événement non traité : ${event.type}`)
   }

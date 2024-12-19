@@ -32,6 +32,7 @@ const SubscribeButton = ({ priceId }) => {
 
       const stripe = await loadStripe(stripePublicKey);
 
+      // Récupération de la session d'auth Supabase
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       if (sessionError || !session?.access_token) {
         throw new Error('Utilisateur non authentifié.');

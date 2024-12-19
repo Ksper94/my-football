@@ -48,8 +48,6 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // context/AuthContext.js
-  // ... (Code précédent)
   const signIn = useCallback(async (email, password) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
@@ -60,35 +58,19 @@ export const AuthProvider = ({ children }) => {
 
     console.log('User signed in:', data.user);
 
-    // Vérifier si le profil existe, sinon le créer
-    const { data: existingProfile, error: profileSelectError } = await supabase
+    // Utiliser upsert pour insérer le profil s'il n'existe pas
+    const { error: profileUpsertError } = await supabase
       .from('profiles')
-      .select('id')
-      .eq('id', data.user.id)
-      .single();
+      .upsert([{ id: data.user.id, email: data.user.email }], { onConflict: 'id' });
 
-    if (profileSelectError) {
-      if (profileSelectError.code === 'PGRST116') { // No rows found
-        console.log('Profile not found, creating profile');
-        const { error: profileInsertError } = await supabase
-          .from('profiles')
-          .insert([{ id: data.user.id, email: data.user.email }]);
-        if (profileInsertError) {
-          console.error('Erreur lors de la création du profil:', profileInsertError.message);
-        } else {
-          console.log('Profile created successfully for user:', data.user.id);
-        }
-      } else {
-        console.error('Error selecting profile:', profileSelectError.message);
-      }
+    if (profileUpsertError) {
+      console.error('Erreur lors de l\'insertion/upsert du profil:', profileUpsertError.message);
     } else {
-      console.log('Profile already exists for user:', existingProfile.id);
+      console.log('Profile upserted successfully for user:', data.user.id);
     }
 
     return data;
   }, []);
-  // ... (Suite du code)
-
 
   const signUp = useCallback(async (email, password) => {
     const { data, error } = await supabase.auth.signUp({ email, password });
