@@ -23,18 +23,20 @@ export default function Dashboard() {
           .from('profiles')
           .select('id, email, username, full_name, avatar_url')
           .eq('id', user.id)
-          .single()
-
+          .single();
+        
         if (profileError) {
-          console.error('Erreur lors de la récupération du profil :', profileError.message)
-          setError(profileError.message)
+          console.error('Erreur lors de la récupération du profil :', profileError.message);
         } else {
-          setProfile(profileData)
+          setProfile(profileData);
         }
       }
+    };
+    if (!loading && user) {
+      fetchProfile();
     }
-    if (user) fetchProfile()
-  }, [user])
+  }, [user, loading]);
+  
 
   if (loading) return <div>Chargement...</div>
   if (error) return <div className="text-red-500">{error}</div>
