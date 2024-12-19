@@ -29,4 +29,9 @@ if (!supabaseClientInstance) {
 /**
  * Client Supabase exporté pour utilisation dans l'application
  */
-export const supabaseClient = supabaseClientInstance
+export const supabase = supabaseClientInstance
+
+// (Facultatif) Vérification des propTypes si nécessaire
+supabase.propTypes = {
+  auth: PropTypes.object,
+}
