@@ -1,18 +1,22 @@
 import React, { createContext, useState, useEffect, useContext, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { supabaseClient } from '../utils/supabaseClient';
+import { supabase } from '../utils/supabaseClient'; // Utiliser { supabase } et non { supabaseClient }
+import { useRouter } from 'next/router';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const router = useRouter();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState(null);
 
   const getSession = useCallback(async () => {
     try {
-      const { data, error } = await supabaseClient.auth.getSession();
+      // Récupération de la session actuelle
+      const { data, error } = await supabase.auth.getSession();
       if (error) throw error;
+
       if (data.session?.user) {
         setUser(data.session.user);
       }
@@ -31,7 +35,8 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     getSession();
 
-    const { data: authListener } = supabaseClient.auth.onAuthStateChange(handleAuthStateChange);
+    // Écoute les changements d'état d'auth
+    const { data: authListener } = supabase.auth.onAuthStateChange(handleAuthStateChange);
 
     return () => {
       authListener.subscription.unsubscribe();
@@ -40,7 +45,7 @@ export const AuthProvider = ({ children }) => {
 
   const signOut = useCallback(async () => {
     try {
-      const { error } = await supabaseClient.auth.signOut();
+      const { error } = await supabase.auth.signOut();
       if (error) throw error;
       setUser(null);
     } catch (error) {
@@ -51,7 +56,7 @@ export const AuthProvider = ({ children }) => {
 
   const signIn = useCallback(async (email, password) => {
     try {
-      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       setUser(data.user);
       return data;
@@ -64,17 +69,17 @@ export const AuthProvider = ({ children }) => {
 
   const signUp = useCallback(async (email, password) => {
     try {
-      const { data, error } = await supabaseClient.auth.signUp({ email, password });
+      const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) throw error;
       setUser(data.user);
-  
-      // Créer un profil pour l'utilisateur
-      const { error: profileError } = await supabaseClient
+
+      // Insertion du profil dans la table profiles
+      const { error: profileError } = await supabase
         .from('profiles')
         .insert([{ id: data.user.id, email: data.user.email }]);
       if (profileError) throw profileError;
-  
-      // Rediriger vers le tableau de bord après l'inscription
+
+      // Redirection vers le dashboard
       router.push('/dashboard');
       return data;
     } catch (error) {
@@ -82,8 +87,7 @@ export const AuthProvider = ({ children }) => {
       setAuthError(error);
       throw error;
     }
-  }, []);
-  
+  }, [router]);
 
   const contextValue = useMemo(
     () => ({

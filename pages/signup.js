@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { supabase } from '../utils/supabaseClient'
 import Link from 'next/link'
 
+console.log("Supabase instance:", supabase)
+
 export default function SignUp() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
