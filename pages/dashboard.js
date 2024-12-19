@@ -12,6 +12,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!loading && !user) {
+      console.log('User not logged in, redirecting to login')
       router.push('/login')
     }
   }, [user, loading, router])
@@ -19,6 +20,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchProfile = async () => {
       if (!loading && user) {
+        console.log('Fetching profile for user:', user.id)
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('id, email, username, full_name, avatar_url')
@@ -29,6 +31,7 @@ export default function Dashboard() {
           console.error('Erreur lors de la récupération du profil :', profileError.message);
           setError(profileError.message)
         } else {
+          console.log('Profile fetched:', profileData)
           setProfile(profileData);
         }
       }

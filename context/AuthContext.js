@@ -12,25 +12,28 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     let mounted = true;
-    const getInitialSession = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
+
+    const getSession = async () => {
+      const { data, error } = await supabase.auth.getSession();
       if (error) {
         setAuthError(error);
+        console.log('Error getting session:', error);
       }
       if (mounted) {
-        setUser(session?.user || null);
+        setUser(data.session?.user || null);
         setLoading(false);
       }
     };
-    getInitialSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    getSession();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null);
     });
 
     return () => {
       mounted = false;
-      subscription.unsubscribe();
+      authListener.subscription.unsubscribe();
     };
   }, []);
 
@@ -38,18 +41,24 @@ export const AuthProvider = ({ children }) => {
     const { error } = await supabase.auth.signOut();
     if (error) {
       setAuthError(error);
+      console.log('Error signing out:', error);
     } else {
       setUser(null);
+      console.log('User signed out');
     }
   }, []);
 
+  // context/AuthContext.js
+  // ... (Code précédent)
   const signIn = useCallback(async (email, password) => {
-    // Utiliser signInWithPassword pour la v2
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       setAuthError(error);
+      console.log('Error signing in:', error);
       throw error;
     }
+
+    console.log('User signed in:', data.user);
 
     // Vérifier si le profil existe, sinon le créer
     const { data: existingProfile, error: profileSelectError } = await supabase
@@ -58,25 +67,37 @@ export const AuthProvider = ({ children }) => {
       .eq('id', data.user.id)
       .single();
 
-    if (profileSelectError && profileSelectError.details?.includes('No rows')) {
-      // Profil non existant, on le crée
-      const { error: profileInsertError } = await supabase
-        .from('profiles')
-        .insert([{ id: data.user.id, email: data.user.email }]);
-      if (profileInsertError) {
-        console.error('Erreur lors de la création du profil:', profileInsertError.message);
+    if (profileSelectError) {
+      if (profileSelectError.code === 'PGRST116') { // No rows found
+        console.log('Profile not found, creating profile');
+        const { error: profileInsertError } = await supabase
+          .from('profiles')
+          .insert([{ id: data.user.id, email: data.user.email }]);
+        if (profileInsertError) {
+          console.error('Erreur lors de la création du profil:', profileInsertError.message);
+        } else {
+          console.log('Profile created successfully for user:', data.user.id);
+        }
+      } else {
+        console.error('Error selecting profile:', profileSelectError.message);
       }
+    } else {
+      console.log('Profile already exists for user:', existingProfile.id);
     }
 
     return data;
   }, []);
+  // ... (Suite du code)
+
 
   const signUp = useCallback(async (email, password) => {
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) {
       setAuthError(error);
+      console.log('Error signing up:', error);
       throw error;
     }
+    console.log('User signed up:', data.user);
     // Email de confirmation envoyé. Pas de création de profil ici.
     return data;
   }, []);
