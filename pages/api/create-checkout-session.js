@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import { supabaseService } from '../../utils/supabaseService';
+import { supabaseService } from '../../utils/supabaseService'; // Client avec service_role
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2022-11-15',
@@ -17,7 +17,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Vérifier si l'utilisateur existe et est authentifié via le token d'accès fourni
     const { data: { user }, error: userError } = await supabaseService.auth.getUser(token);
     if (userError || !user) {
       console.error('Erreur d\'authentification:', userError?.message);
@@ -29,7 +28,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'priceId est requis.' });
     }
 
-    // Créer la session Checkout Stripe
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       customer_email: user.email,
@@ -45,7 +43,7 @@ export default async function handler(req, res) {
       metadata: { user_id: user.id, price_id: priceId },
     });
 
-    // Insérer la session dans la table subscriptions
+    // Insertion dans subscriptions
     const { error: insertError } = await supabaseService
       .from('subscriptions')
       .upsert([
@@ -53,14 +51,15 @@ export default async function handler(req, res) {
           user_id: user.id,
           session_id: session.id,
           price_id: priceId,
-          plan: priceId,     // Optionnel, selon votre logique métier
+          plan: priceId,
           status: 'pending',
           updated_at: new Date().toISOString(),
         },
       ]);
 
+    // Affichage du message d’erreur exact dans la console
     if (insertError) {
-      console.error('Erreur lors de l\'insertion dans la table subscriptions:', insertError.message);
+      console.error('Erreur lors de l\'insertion dans subscriptions:', insertError.message);
       return res.status(500).json({ error: 'Erreur lors de l\'enregistrement de l\'abonnement.' });
     }
 
