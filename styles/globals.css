@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Définition des variables CSS pour le thème clair et sombre */
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -14,8 +15,22 @@
   }
 }
 
+/* Styles globaux pour le body */
 body {
   color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--background);
+  font-family: 'Inter', sans-serif; /* Utilisation d'une police moderne */
+  transition: background-color 0.3s, color 0.3s; /* Transition douce pour les changements de thème */
+}
+
+/* Styles globaux pour les liens */
+a {
+  color: #1d4ed8; /* Bleu Tailwind par défaut */
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+a:hover {
+  color: #2563eb; /* Bleu Tailwind plus foncé */
+  text-decoration: underline;
 }

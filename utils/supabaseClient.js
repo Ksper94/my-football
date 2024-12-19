@@ -1,12 +1,15 @@
 // utils/supabaseClient.js
 
 import { createClient } from '@supabase/supabase-js'
+import PropTypes from 'prop-types'
 
-// Récupérer les variables d'environnement
+/**
+ * Configuration Supabase
+ */
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-// Vérifier que les variables d'environnement sont définies
+// Vérifie que les variables d'environnement sont définies
 if (!SUPABASE_URL) {
   throw new Error('NEXT_PUBLIC_SUPABASE_URL n\'est pas défini dans les variables d\'environnement.')
 }
@@ -14,5 +17,16 @@ if (!SUPABASE_ANON_KEY) {
   throw new Error('NEXT_PUBLIC_SUPABASE_ANON_KEY n\'est pas défini dans les variables d\'environnement.')
 }
 
-// Client Supabase pour le frontend
-export const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+/**
+ * Création d'une instance unique de SupabaseClient (Singleton)
+ */
+let supabaseClientInstance
+
+if (!supabaseClientInstance) {
+  supabaseClientInstance = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+}
+
+/**
+ * Client Supabase exporté pour utilisation dans l'application
+ */
+export const supabaseClient = supabaseClientInstance

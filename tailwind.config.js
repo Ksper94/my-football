@@ -1,18 +1,21 @@
-/** @type {import('tailwindcss').Config} */
 // tailwind.config.js
+
 module.exports = {
+  content: [
+    './pages/**/*.{js,jsx,ts,tsx}',
+    './components/**/*.{js,jsx,ts,tsx}',
+  ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'Arial', 'Helvetica', 'sans-serif'],
+      },
       colors: {
-        primary: '#1E3A8A', // Bleu foncé
-        secondary: '#3B82F6', // Bleu clair
-        accent: '#F59E0B', // Jaune
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
       },
     },
+    darkMode: 'media', // Ou 'class' selon votre préférence
   },
-  content: [
-    "./pages/**/*.{js,ts,jsx,tsx}",
-    "./components/**/*.{js,ts,jsx,tsx}",
-  ],
   plugins: [],
 }

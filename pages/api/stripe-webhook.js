@@ -1,5 +1,3 @@
-// pages/api/stripe-webhook.js
-
 import { buffer } from 'micro';
 import { supabaseService } from '../../utils/supabaseService';
 import Stripe from 'stripe';
@@ -10,9 +8,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 export const config = {
-  api: {
-    bodyParser: false,
-  },
+  api: { bodyParser: false },
 };
 
 const jwtSecret = process.env.JWT_SECRET;
@@ -22,119 +18,126 @@ if (!jwtSecret) {
 }
 
 export default async function handler(req, res) {
-  if (req.method === 'POST') {
-    const buf = await buffer(req);
-    const sig = req.headers['stripe-signature'];
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST');
+    return res.status(405).json({ error: 'Méthode non autorisée' });
+  }
 
-    let event;
+  const buf = await buffer(req);
+  const sig = req.headers['stripe-signature'];
 
-    try {
-      event = stripe.webhooks.constructEvent(buf.toString(), sig, process.env.STRIPE_WEBHOOK_SECRET);
-      console.log(`Webhook event ${event.type} reçu.`);
-    } catch (err) {
-      console.error('Erreur de signature du webhook:', err.message);
-      return res.status(400).send(`Webhook Error: ${err.message}`);
-    }
+  let event;
 
-    // Gérer l'événement
+  try {
+    event = stripe.webhooks.constructEvent(buf.toString(), sig, process.env.STRIPE_WEBHOOK_SECRET);
+    console.log(`Webhook Stripe reçu: ${event.type}`);
+  } catch (err) {
+    console.error('Erreur de signature du webhook:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  // Gestion des événements Stripe
+  try {
     switch (event.type) {
       case 'checkout.session.completed':
         await handleCheckoutSessionCompleted(event.data.object);
         break;
-      case 'customer.subscription.created':
       case 'customer.subscription.updated':
       case 'customer.subscription.deleted':
         await handleSubscriptionEvent(event.data.object);
         break;
-      // Ajouter d'autres cas si nécessaire
       default:
         console.warn(`Événement non géré: ${event.type}`);
     }
 
-    res.json({ received: true });
-  } else {
-    res.setHeader('Allow', 'POST');
-    res.status(405).end('Méthode non autorisée');
+    res.status(200).json({ received: true });
+  } catch (error) {
+    console.error('Erreur lors du traitement de l\'événement:', error.message);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 }
 
 async function handleCheckoutSessionCompleted(session) {
   console.log('Session de checkout complétée:', session.id);
 
-  const userId = session.metadata.user_id;
+  // Assure-toi que user_id est présent dans les métadonnées
+  const userId = session.metadata?.user_id;
 
   if (!userId) {
-    console.error('user_id manquant dans la session metadata');
+    console.error('user_id manquant dans les métadonnées de la session Stripe');
     return;
   }
 
   try {
-    // Générer un token (JWT)
+    // Générer un token JWT
     const token = jwt.sign({ userId }, jwtSecret, { expiresIn: '30d' });
-    console.log(`Token généré pour l'utilisateur ${userId}: ${token}`);
+    console.log(`Token JWT généré pour l'utilisateur ${userId}`);
 
-    // Insérer ou mettre à jour la table subscription avec le token
-    const { data, error } = await supabaseService
-      .from('subscription')
-      .upsert(
-        { user_id: userId, plan: 'premium', updated_at: new Date(), token: token },
-        { onConflict: 'user_id' }
-      );
+    // Upsert dans la table 'subscriptions'
+    const { error } = await supabaseService
+      .from('subscriptions')
+      .upsert([
+        {
+          user_id: userId,
+          session_id: session.id,
+          plan: 'premium',
+          token: token,
+          status: 'active',
+          updated_at: new Date(),
+        },
+      ], { onConflict: 'user_id' });
 
-    if (error) {
-      console.error('Erreur lors de l\'upsert dans subscription:', error.message);
-      throw error;
-    }
+    if (error) throw error;
 
-    console.log('Abonnement mis à jour pour l\'utilisateur:', userId, 'Token:', token);
+    console.log(`Abonnement inséré/activé avec succès pour l'utilisateur ${userId}`);
   } catch (error) {
-    console.error('Erreur lors de la mise à jour de l\'abonnement:', error.message);
+    console.error('Erreur lors de l\'insertion dans Supabase:', error.message);
+    throw error;
   }
 }
 
 async function handleSubscriptionEvent(subscription) {
   console.log('Événement de subscription:', subscription.id);
 
-  const userId = subscription.metadata.user_id;
+  const userId = subscription.metadata?.user_id;
 
   if (!userId) {
-    console.error('user_id manquant dans la subscription metadata');
+    console.error('user_id manquant dans les métadonnées de la subscription');
     return;
   }
 
   try {
     let plan = 'free';
-    if (subscription.status === 'active') {
+    let status = subscription.status;
+
+    if (status === 'active') {
       plan = 'premium';
-    } else if (subscription.status === 'canceled' || subscription.status === 'past_due') {
+    } else if (status === 'canceled' || status === 'past_due') {
       plan = 'canceled';
     }
 
-    let token = null;
-    if (plan === 'premium') {
-      // Générer un token pour les utilisateurs premium
-      token = jwt.sign({ userId }, jwtSecret, { expiresIn: '30d' });
-      console.log(`Token généré pour l'utilisateur ${userId}: ${token}`);
-    }
+    // Générer un token uniquement pour les utilisateurs actifs
+    const token = status === 'active' ? jwt.sign({ userId }, jwtSecret, { expiresIn: '30d' }) : null;
 
-    // Mettre à jour la table subscription
-    const { data, error } = await supabaseService
-      .from('subscription')
-      .upsert(
-        { user_id: userId, plan: plan, updated_at: new Date(), token: token },
-        { onConflict: 'user_id' }
-      );
+    // Mettre à jour dans Supabase
+    const { error } = await supabaseService
+      .from('subscriptions')
+      .upsert([
+        {
+          user_id: userId,
+          session_id: subscription.id,
+          plan: plan,
+          token: token,
+          status: status,
+          updated_at: new Date(),
+        },
+      ], { onConflict: 'user_id' });
 
-    if (error) {
-      console.error('Erreur lors de l\'upsert dans subscription:', error.message);
-      throw error;
-    }
+    if (error) throw error;
 
-    console.log('Abonnement mis à jour pour l\'utilisateur:', userId, 'Plan:', plan);
-    if (token) {
-      console.log('Token généré:', token);
-    }
+    console.log(`Abonnement mis à jour pour l'utilisateur ${userId}: Plan ${plan}, Status ${status}`);
   } catch (error) {
     console.error('Erreur lors de la mise à jour de l\'abonnement:', error.message);
+    throw error;
   }
 }

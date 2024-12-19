@@ -1,49 +1,59 @@
-// components/SubscribeButton.js
-
+import { useAuth } from '../context/AuthContext';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
-import { supabaseClient } from '../utils/supabaseClient'; // Utilisez supabaseClient
+import { loadStripe } from '@stripe/stripe-js';
+import { supabaseClient } from '../utils/supabaseClient';
+import PropTypes from 'prop-types';
 
-export default function SubscribeButton() {
+const SubscribeButton = ({ priceId }) => {
+  const { user } = useAuth();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const handleSubscribe = async () => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+
+    if (!priceId) {
+      setError('priceId est manquant.');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      // Obtenir la session actuelle de Supabase
-      const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+      const stripePublicKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+      if (!stripePublicKey) throw new Error('Clé publique Stripe manquante.');
 
-      if (sessionError || !session) {
-        setError('Utilisateur non authentifié.');
-        setLoading(false);
-        return;
+      const stripe = await loadStripe(stripePublicKey);
+
+      const { data: session, error: sessionError } = await supabaseClient.auth.getSession();
+      if (sessionError || !session?.session?.access_token) {
+        throw new Error('Utilisateur non authentifié.');
       }
 
-      const token = session.access_token;
-
-      // Créer une session de checkout en envoyant le token dans les en-têtes
       const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Inclure le token JWT ici
+          Authorization: `Bearer ${session.session.access_token}`,
         },
-        body: JSON.stringify({ priceId: 'price_1QUlyhHd1CTS1QCeLJfFF9Kj' }),
+        body: JSON.stringify({ priceId }),
       });
 
       const data = await response.json();
 
-      if (response.ok) {
-        // Rediriger l'utilisateur vers Stripe Checkout
-        window.location.href = data.url;
-      } else {
-        setError(data.error || 'Erreur lors de la création de la session de checkout.');
-      }
+      if (!response.ok) throw new Error(data.error || 'Erreur lors de la création de la session.');
+
+      const { sessionId } = data;
+      await stripe.redirectToCheckout({ sessionId });
     } catch (err) {
-      console.error('Erreur lors de la requête:', err);
-      setError('Erreur lors de la création de la session de checkout.');
+      console.error('Erreur lors de l\'abonnement:', err.message);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -53,12 +63,18 @@ export default function SubscribeButton() {
     <div>
       <button
         onClick={handleSubscribe}
+        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 disabled:opacity-50"
         disabled={loading}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
       >
         {loading ? 'Chargement...' : 'S\'abonner'}
       </button>
       {error && <p className="text-red-500 mt-2">{error}</p>}
     </div>
   );
-}
+};
+
+SubscribeButton.propTypes = {
+  priceId: PropTypes.string.isRequired,
+};
+
+export default SubscribeButton;

@@ -1,15 +1,36 @@
-// pages/_app.js
-import '../styles/globals.css'
-import { AuthProvider } from '../context/AuthContext'
-import Navbar from '../components/Navbar'
+import '../styles/globals.css';
+import { AuthProvider } from '../context/AuthContext';
+import Layout from '../components/Layout';
+import ErrorBoundary from '../components/ErrorBoundary';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import React from 'react';
 
 function MyApp({ Component, pageProps }) {
+  const router = useRouter();
+
+  // Routes où le Layout (Navbar et Footer) ne doit pas être affiché
+  const noLayoutRoutes = ['/login', '/signup', '/success'];
+
+  // Vérifie si le Layout doit être utilisé pour la route actuelle
+  const shouldUseLayout = !noLayoutRoutes.includes(router.pathname);
+
   return (
     <AuthProvider>
-      <Navbar />
-      <Component {...pageProps} />
+      <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
+      <ErrorBoundary>
+        {shouldUseLayout ? (
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        ) : (
+          <Component {...pageProps} />
+        )}
+      </ErrorBoundary>
     </AuthProvider>
-  )
+  );
 }
 
-export default MyApp
+export default MyApp;

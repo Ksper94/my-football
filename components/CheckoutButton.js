@@ -3,7 +3,10 @@
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-import Stripe from 'stripe';
+import { loadStripe } from '@stripe/stripe-js';
+
+// Initialiser Stripe en dehors du composant pour éviter de le recharger à chaque rendu
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
 export default function CheckoutButton({ productId }) {
   const { user } = useAuth();
@@ -25,15 +28,23 @@ export default function CheckoutButton({ productId }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include', // Inclure les cookies dans la requête
-        body: JSON.stringify({ productId }),
+        body: JSON.stringify({ priceId: productId, email: user.email }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        // Initialiser Stripe avec votre clé publique
-        const stripe = Stripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
-        await stripe.redirectToCheckout({ sessionId: data.sessionId });
+        // Obtenir l'instance Stripe
+        const stripe = await stripePromise;
+        if (!stripe) {
+          throw new Error('Stripe failed to initialize.');
+        }
+        // Rediriger vers la page de paiement Stripe
+        const { error: stripeError } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
+        if (stripeError) {
+          console.error('Erreur lors de la redirection vers Checkout:', stripeError);
+          setError(stripeError.message);
+        }
       } else {
         console.error('Erreur lors de la création de la session de paiement:', data.error);
         setError(data.error);
