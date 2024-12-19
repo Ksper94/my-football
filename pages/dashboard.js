@@ -1,10 +1,8 @@
 // pages/dashboard.js
 
 import { useAuth } from '../context/AuthContext';
-import SubscribeButton from '../components/SubscribeButton';
-import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import { useRouter } from 'next/router';
 
 export default function Dashboard() {
   const { user, loading, authError } = useAuth();
@@ -42,8 +40,14 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
-      <p className="mb-4">Bienvenue, <strong>{user.email}</strong>!</p>
-      <SubscribeButton />
+      <p className="mb-4">Bienvenue, <strong>{user && user.email}</strong>!</p>
+      <p className="mb-4">Vous n’avez pas d’abonnement actif.</p>
+      <button
+        onClick={() => router.push('/pricing')}
+        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+      >
+        Choisir une formule
+      </button>
       {/* Autres contenus du dashboard */}
     </div>
   );
@@ -77,7 +81,3 @@ function Spinner() {
     </svg>
   );
 }
-
-Spinner.propTypes = {};
-
-SubscribeButton.propTypes = {};
