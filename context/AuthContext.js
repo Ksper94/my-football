@@ -1,6 +1,7 @@
+// context/AuthContext.js
 import React, { createContext, useState, useEffect, useContext, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { supabase } from '../utils/supabaseClient'; // Utiliser { supabase } et non { supabaseClient }
+import { supabase } from '../utils/supabaseClient';
 import { useRouter } from 'next/router';
 
 const AuthContext = createContext();
@@ -12,20 +13,14 @@ export const AuthProvider = ({ children }) => {
   const [authError, setAuthError] = useState(null);
 
   const getSession = useCallback(async () => {
-    try {
-      // Récupération de la session actuelle
-      const { data, error } = await supabase.auth.getSession();
-      if (error) throw error;
-
-      if (data.session?.user) {
-        setUser(data.session.user);
-      }
-    } catch (error) {
-      console.error('Error fetching session:', error.message);
+    const { data, error } = await supabase.auth.getSession();
+    if (error) {
       setAuthError(error);
-    } finally {
-      setLoading(false);
     }
+    if (data?.session?.user) {
+      setUser(data.session.user);
+    }
+    setLoading(false);
   }, []);
 
   const handleAuthStateChange = useCallback((_event, session) => {
@@ -34,71 +29,63 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     getSession();
-
-    // Écoute les changements d'état d'auth
     const { data: authListener } = supabase.auth.onAuthStateChange(handleAuthStateChange);
-
     return () => {
       authListener.subscription.unsubscribe();
     };
   }, [getSession, handleAuthStateChange]);
 
   const signOut = useCallback(async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      setUser(null);
-    } catch (error) {
-      console.error('Error signing out:', error.message);
+    const { error } = await supabase.auth.signOut();
+    if (error) {
       setAuthError(error);
     }
+    setUser(null);
   }, []);
 
   const signIn = useCallback(async (email, password) => {
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-      setUser(data.user);
-      return data;
-    } catch (error) {
-      console.error('Error signing in:', error.message);
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
       setAuthError(error);
       throw error;
     }
+
+    // L'utilisateur est maintenant authentifié si l'email est confirmé.
+    // On peut insérer le profil si besoin (uniquement si ce n'est pas déjà fait).
+    // Par exemple, on peut tenter une insertion, si duplicate, ce n'est pas grave.
+    const { error: profileError } = await supabase.from('profiles')
+      .insert([{ id: data.user.id, email: data.user.email }])
+      .select(); // select() pour vérifier l'insertion
+
+    if (profileError && !profileError.message.includes('duplicate key')) {
+      // Si c'est une autre erreur que la clé dupliquée, on la log.
+      console.error('Erreur lors de la création du profil:', profileError.message);
+    }
+
+    return data;
   }, []);
 
   const signUp = useCallback(async (email, password) => {
-    try {
-      const { data, error } = await supabase.auth.signUp({ email, password });
-      if (error) throw error;
-      setUser(data.user);
-
-      // Insertion du profil dans la table profiles
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert([{ id: data.user.id, email: data.user.email }]);
-      if (profileError) throw profileError;
-
-      // Redirection vers le dashboard
-      router.push('/dashboard');
-      return data;
-    } catch (error) {
-      console.error('Error signing up:', error.message);
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (error) {
       setAuthError(error);
       throw error;
     }
-  }, [router]);
+    // A ce stade, un email de confirmation a été envoyé.
+    // Pas de création de profil, on attend la confirmation et la connexion.
+    return data;
+  }, []);
 
   const contextValue = useMemo(
     () => ({
       user,
       loading,
       authError,
-      signIn,
       signUp,
+      signIn,
       signOut,
     }),
-    [user, loading, authError, signIn, signUp, signOut]
+    [user, loading, authError, signUp, signIn, signOut]
   );
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;

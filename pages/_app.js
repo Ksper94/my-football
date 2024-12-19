@@ -1,3 +1,4 @@
+// pages/_app.js
 import '../styles/globals.css';
 import { AuthProvider } from '../context/AuthContext';
 import Layout from '../components/Layout';
@@ -8,11 +9,7 @@ import React from 'react';
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
-
-  // Routes où le Layout (Navbar et Footer) ne doit pas être affiché
   const noLayoutRoutes = ['/login', '/signup', '/success'];
-
-  // Vérifie si le Layout doit être utilisé pour la route actuelle
   const shouldUseLayout = !noLayoutRoutes.includes(router.pathname);
 
   return (

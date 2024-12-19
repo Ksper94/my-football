@@ -1,5 +1,6 @@
+// pages/signup.js
 import { useState } from 'react'
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext'
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('')
@@ -17,7 +18,7 @@ export default function SignUpPage() {
     }
     try {
       await signUp(email, password)
-      // Si nous sommes ici, pas d'erreur → email de confirmation envoyé.
+      // Si pas d’erreur, email de confirmation envoyé.
       setSuccessMsg("Un email de confirmation vous a été envoyé. Veuillez confirmer votre adresse avant de vous connecter.")
     } catch (error) {
       setErrorMsg(error.message)

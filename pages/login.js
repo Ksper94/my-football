@@ -1,61 +1,68 @@
 // pages/login.js
+import { useState } from 'react'
+import { useAuth } from '../context/AuthContext'
+import { useRouter } from 'next/router'
 
-import { useState } from 'react';
-import { useRouter } from 'next/router';
-import { useAuth } from '../context/AuthContext';
+export default function LoginPage() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [errorMsg, setErrorMsg] = useState('')
+  const { signIn } = useAuth()
+  const router = useRouter()
 
-export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const router = useRouter();
-  const { user, loading, authError, signIn } = useAuth();
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-
-    try {
-      const { data, error } = await signIn(email, password);
-      if (error) {
-        alert(error.message);
-      } else {
-        router.push('/');
-      }
-    } catch (error) {
-      alert('Erreur lors de la connexion. Veuillez réessayer.');
+  const handleLogin = async () => {
+    setErrorMsg('')
+    if (!email || !password) {
+      setErrorMsg("Veuillez saisir votre email et mot de passe.")
+      return
     }
-  };
-
-  // Si l'utilisateur est déjà connecté, rediriger vers la page d'accueil
-  if (!loading && user) {
-    router.push('/');
-    return <p>Redirection en cours...</p>;
+    try {
+      await signIn(email, password)
+      // Une fois connecté, le profil est créé dans signIn (si non déjà existant).
+      router.push('/dashboard')
+    } catch (error) {
+      setErrorMsg(error.message)
+    }
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <form onSubmit={handleLogin} className="bg-white p-6 rounded shadow-md">
-        <h2 className="text-2xl mb-4">Connexion</h2>
-        <input
-          type="email"
-          placeholder="Email"
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <div className="bg-white rounded-md shadow-md p-8 max-w-md w-full">
+        <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">Se connecter</h1>
+
+        {errorMsg && (
+          <div className="bg-red-100 border border-red-400 text-red-700 p-3 rounded mb-4">
+            {errorMsg}
+          </div>
+        )}
+
+        <label className="block mb-2 font-semibold text-gray-700" htmlFor="email">Adresse Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          className="w-full border border-gray-300 rounded p-2 mb-4 focus:outline-none focus:border-blue-500" 
+          placeholder="Votre email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          required
-          className="w-full p-2 mb-4 border rounded"
         />
-        <input
-          type="password"
-          placeholder="Mot de passe"
+
+        <label className="block mb-2 font-semibold text-gray-700" htmlFor="password">Mot de passe</label>
+        <input 
+          type="password" 
+          id="password"
+          className="w-full border border-gray-300 rounded p-2 mb-6 focus:outline-none focus:border-blue-500"
+          placeholder="••••••••"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          required
-          className="w-full p-2 mb-4 border rounded"
         />
-        <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
+
+        <button
+          onClick={handleLogin}
+          className="w-full py-2 px-4 rounded text-white font-semibold bg-blue-500 hover:bg-blue-600 transition-colors"
+        >
           Se connecter
         </button>
-      </form>
-      {authError && <p className="text-red-500 mt-4">{authError.message}</p>}
+      </div>
     </div>
-  );
+  )
 }
