@@ -18,7 +18,6 @@ export default function LoginPage() {
     }
     try {
       await signIn(email, password)
-      // Une fois connecté, le profil est créé dans signIn (si non déjà existant).
       router.push('/dashboard')
     } catch (error) {
       setErrorMsg(error.message)
@@ -30,11 +29,7 @@ export default function LoginPage() {
       <div className="bg-white rounded-md shadow-md p-8 max-w-md w-full">
         <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">Se connecter</h1>
 
-        {errorMsg && (
-          <div className="bg-red-100 border border-red-400 text-red-700 p-3 rounded mb-4">
-            {errorMsg}
-          </div>
-        )}
+        {errorMsg && <div className="bg-red-100 border border-red-400 text-red-700 p-3 rounded mb-4">{errorMsg}</div>}
 
         <label className="block mb-2 font-semibold text-gray-700" htmlFor="email">Adresse Email</label>
         <input 

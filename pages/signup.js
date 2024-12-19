@@ -18,7 +18,6 @@ export default function SignUpPage() {
     }
     try {
       await signUp(email, password)
-      // Si pas d’erreur, email de confirmation envoyé.
       setSuccessMsg("Un email de confirmation vous a été envoyé. Veuillez confirmer votre adresse avant de vous connecter.")
     } catch (error) {
       setErrorMsg(error.message)
@@ -30,23 +29,15 @@ export default function SignUpPage() {
       <div className="bg-white rounded-md shadow-md p-8 max-w-md w-full">
         <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">Créer un compte</h1>
 
-        {errorMsg && (
-          <div className="bg-red-100 border border-red-400 text-red-700 p-3 rounded mb-4">
-            {errorMsg}
-          </div>
-        )}
-        {successMsg && (
-          <div className="bg-green-100 border border-green-400 text-green-700 p-3 rounded mb-4">
-            {successMsg}
-          </div>
-        )}
+        {errorMsg && <div className="bg-red-100 border border-red-400 text-red-700 p-3 rounded mb-4">{errorMsg}</div>}
+        {successMsg && <div className="bg-green-100 border border-green-400 text-green-700 p-3 rounded mb-4">{successMsg}</div>}
 
         <label className="block mb-2 font-semibold text-gray-700" htmlFor="email">Adresse Email</label>
         <input 
           type="email" 
           id="email" 
           className="w-full border border-gray-300 rounded p-2 mb-4 focus:outline-none focus:border-blue-500" 
-          placeholder="exemple@email.com"
+          placeholder="votre email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />

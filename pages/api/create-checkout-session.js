@@ -1,5 +1,6 @@
+// pages/api/create-checkout-session.js
 import Stripe from 'stripe';
-import { supabaseService } from '../../utils/supabaseService'; // Client avec service_role
+import { supabaseService } from '../../utils/supabaseService';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2022-11-15',
@@ -43,21 +44,17 @@ export default async function handler(req, res) {
       metadata: { user_id: user.id, price_id: priceId },
     });
 
-    // Insertion dans subscriptions
     const { error: insertError } = await supabaseService
       .from('subscriptions')
-      .upsert([
-        {
-          user_id: user.id,
-          session_id: session.id,
-          price_id: priceId,
-          plan: priceId,
-          status: 'pending',
-          updated_at: new Date().toISOString(),
-        },
-      ]);
+      .insert([{
+        user_id: user.id,
+        session_id: session.id,
+        price_id: priceId,
+        plan: priceId,
+        status: 'pending',
+        updated_at: new Date().toISOString(),
+      }]);
 
-    // Affichage du message d’erreur exact dans la console
     if (insertError) {
       console.error('Erreur lors de l\'insertion dans subscriptions:', insertError.message);
       return res.status(500).json({ error: 'Erreur lors de l\'enregistrement de l\'abonnement.' });
@@ -69,4 +66,3 @@ export default async function handler(req, res) {
     res.status(500).json({ error: 'Erreur interne du serveur.' });
   }
 }
-

@@ -18,7 +18,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      if (user) {
+      if (!loading && user) {
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('id, email, username, full_name, avatar_url')
@@ -27,16 +27,14 @@ export default function Dashboard() {
         
         if (profileError) {
           console.error('Erreur lors de la récupération du profil :', profileError.message);
+          setError(profileError.message)
         } else {
           setProfile(profileData);
         }
       }
     };
-    if (!loading && user) {
-      fetchProfile();
-    }
+    fetchProfile();
   }, [user, loading]);
-  
 
   if (loading) return <div>Chargement...</div>
   if (error) return <div className="text-red-500">{error}</div>
