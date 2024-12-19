@@ -12,13 +12,12 @@ export default async function handler(req, res) {
   }
 
   const token = req.headers.authorization?.replace('Bearer ', '');
-
   if (!token) {
     return res.status(401).json({ error: 'Token utilisateur manquant.' });
   }
 
   try {
-    // Vérifier et récupérer l'utilisateur via Supabase
+    // Vérifier si l'utilisateur existe et est authentifié via le token d'accès fourni
     const { data: { user }, error: userError } = await supabaseService.auth.getUser(token);
     if (userError || !user) {
       console.error('Erreur d\'authentification:', userError?.message);
@@ -26,44 +25,43 @@ export default async function handler(req, res) {
     }
 
     const { priceId } = req.body;
-
     if (!priceId) {
       return res.status(400).json({ error: 'priceId est requis.' });
     }
 
-    // Créer une session Stripe Checkout
+    // Créer la session Checkout Stripe
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       customer_email: user.email,
       line_items: [
         {
-          price: priceId, // Utiliser l'ID de prix Stripe
+          price: priceId,
           quantity: 1,
         },
       ],
       mode: 'subscription',
       success_url: `${req.headers.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.origin}/pricing`,
-      metadata: { user_id: user.id, price_id: priceId }, // Mettre priceId dans les métadonnées
+      metadata: { user_id: user.id, price_id: priceId },
     });
 
-    // Insérer la session dans Supabase
+    // Insérer la session dans la table subscriptions
     const { error: insertError } = await supabaseService
       .from('subscriptions')
       .upsert([
         {
           user_id: user.id,
           session_id: session.id,
-          price_id: priceId, // Assurez-vous que cette colonne existe dans votre table Supabase
-          plan: priceId,     // Optionnel : Dupliquer dans 'plan' si nécessaire
+          price_id: priceId,
+          plan: priceId,     // Optionnel, selon votre logique métier
           status: 'pending',
-          updated_at: new Date(),
+          updated_at: new Date().toISOString(),
         },
       ]);
 
     if (insertError) {
-      console.error('Erreur lors de l\'insertion dans Supabase:', insertError.message);
-      throw new Error('Erreur lors de l\'enregistrement de l\'abonnement.');
+      console.error('Erreur lors de l\'insertion dans la table subscriptions:', insertError.message);
+      return res.status(500).json({ error: 'Erreur lors de l\'enregistrement de l\'abonnement.' });
     }
 
     res.status(200).json({ sessionId: session.id });
