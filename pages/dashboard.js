@@ -1,13 +1,14 @@
 // pages/dashboard.js
-
 import { useAuth } from '../context/AuthContext';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { supabase } from '../utils/supabaseClient';
 
 export default function Dashboard() {
   const { user, loading, authError } = useAuth();
   const router = useRouter();
   const [error, setError] = useState('');
+  const [profile, setProfile] = useState(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -21,26 +22,42 @@ export default function Dashboard() {
     }
   }, [authError]);
 
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (user) {
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('id, email, username, full_name, avatar_url')
+          .eq('id', user.id)
+          .single();
+        
+        if (profileError) {
+          console.error('Erreur lors de la récupération du profil :', profileError.message);
+        } else {
+          setProfile(profileData);
+        }
+      }
+    };
+
+    fetchProfile();
+  }, [user]);
+
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <Spinner />
-      </div>
-    );
+    return <div>Chargement...</div>;
   }
 
   if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <p className="text-red-500">{error}</p>
-      </div>
-    );
+    return <div className="text-red-500">{error}</div>;
   }
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
-      <p className="mb-4">Bienvenue, <strong>{user && user.email}</strong>!</p>
+      {profile ? (
+        <p className="mb-4">Bienvenue, <strong>{profile.email}</strong>!</p>
+      ) : (
+        <p className="mb-4">Bienvenue, {user && user.email}</p>
+      )}
       <p className="mb-4">Vous n’avez pas d’abonnement actif.</p>
       <button
         onClick={() => router.push('/pricing')}
@@ -48,36 +65,6 @@ export default function Dashboard() {
       >
         Choisir une formule
       </button>
-      {/* Autres contenus du dashboard */}
     </div>
-  );
-}
-
-/**
- * Composant Spinner pour l'indicateur de chargement
- */
-function Spinner() {
-  return (
-    <svg
-      className="animate-spin h-10 w-10 text-blue-500"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      aria-label="Chargement"
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      ></circle>
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8v8H4z"
-      ></path>
-    </svg>
   );
 }
