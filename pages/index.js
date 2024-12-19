@@ -1,8 +1,10 @@
+// pages/index.js
 import Head from 'next/head';
 import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
 import Testimonial from '../components/Testimonial';
 import Hero from '../components/Hero';
+import LoginForm from '../components/LoginForm'; // Importer le formulaire de connexion
 
 export default function Home() {
   const { user, loading, authError } = useAuth();
@@ -12,7 +14,11 @@ export default function Home() {
   console.log('Auth Error in Home:', authError);
 
   if (loading) {
-    return <p>Chargement...</p>; // Affiche un état de chargement tant que les données ne sont pas prêtes
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <p>Chargement...</p>
+      </div>
+    );
   }
 
   return (
@@ -70,11 +76,11 @@ export default function Home() {
                 <p className="mb-6">
                   Inscrivez-vous pour bénéficier de nos analyses détaillées sur le football.
                 </p>
-                <Link href="/signup">
-                  <span className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 cursor-pointer">
-                    Commencez Maintenant
-                  </span>
-                </Link>
+                {/* Formulaire de connexion */}
+                <LoginForm />
+                <div className="mt-4">
+                  <p>Vous n'avez pas de compte ? <Link href="/signup"><span className="text-blue-500 hover:underline cursor-pointer">Inscrivez-vous ici</span></Link></p>
+                </div>
               </>
             )}
           </main>
