@@ -2,7 +2,7 @@ import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
-import { supabaseClient } from '../utils/supabaseClient';
+import { supabase } from '../utils/supabaseClient'; // Utilisez supabase et non supabaseClient
 import PropTypes from 'prop-types';
 
 const SubscribeButton = ({ priceId }) => {
@@ -31,8 +31,9 @@ const SubscribeButton = ({ priceId }) => {
 
       const stripe = await loadStripe(stripePublicKey);
 
-      const { data: session, error: sessionError } = await supabaseClient.auth.getSession();
-      if (sessionError || !session?.session?.access_token) {
+      // Récupération de la session d'auth Supabase
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session?.access_token) {
         throw new Error('Utilisateur non authentifié.');
       }
 
@@ -40,7 +41,7 @@ const SubscribeButton = ({ priceId }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.session.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({ priceId }),
       });
