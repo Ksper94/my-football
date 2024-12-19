@@ -1,6 +1,6 @@
 // pages/api/webhooks/stripe.js
 
-import { supabaseAdmin } from '../../../utils/supabaseAdmin'
+import { supabaseService } from '../../../utils/supabaseService'
 import { buffer } from 'micro'
 import Stripe from 'stripe'
 
@@ -30,8 +30,8 @@ const webhookHandler = async (req, res) => {
     switch (event.type) {
       case 'payment_intent.succeeded':
         const paymentIntent = event.data.object
-        // Utiliser supabaseAdmin pour enregistrer les informations dans Supabase
-        const { error } = await supabaseAdmin
+        // Utiliser supabaseService pour enregistrer les informations dans Supabase
+        const { error } = await supabaseService
           .from('payments')
           .insert([{ payment_intent_id: paymentIntent.id, status: paymentIntent.status }])
         
