@@ -6,6 +6,13 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2022-11-15',
 });
 
+// Mapping price_id → nom de plan
+const planMapping = {
+  'price_1QUlyhHd1CTS1QCeLJfFF9Kj': 'mensuel',
+  'price_1QUlzrHd1CTS1QCebhWYJdYv': 'trimestriel',
+  'price_1QUm0YHd1CTS1QCeSrmFSzI7': 'annuel'
+};
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -44,13 +51,15 @@ export default async function handler(req, res) {
       metadata: { user_id: user.id, price_id: priceId },
     });
 
+    const planName = planMapping[priceId] || 'mensuel'; // Par défaut mensuel si non trouvé
+
     const { error: insertError } = await supabaseService
       .from('subscriptions')
       .insert([{
         user_id: user.id,
         session_id: session.id,
         price_id: priceId,
-        plan: priceId,
+        plan: planName,
         status: 'pending',
         updated_at: new Date().toISOString(),
       }]);

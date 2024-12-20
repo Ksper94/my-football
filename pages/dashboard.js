@@ -1,4 +1,4 @@
-// pages/dashboard.js
+// pages/dashboard.js (déjà fourni auparavant, inchangé)
 import { useAuth } from '../context/AuthContext'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
@@ -14,7 +14,6 @@ export default function Dashboard() {
   const [timeRemaining, setTimeRemaining] = useState('')
 
   useEffect(() => {
-    // Redirection si l'utilisateur n'est pas connecté et que ce n'est plus en loading
     if (!loading && !user) {
       router.push('/login')
     }
@@ -53,7 +52,6 @@ export default function Dashboard() {
           console.error('Erreur lors de la récupération de l\'abonnement :', subError.message);
           setSubscription(null)
         } else if (!subData) {
-          // Aucune ligne trouvée = pas d'abonnement
           setSubscription(null)
         } else {
           setSubscription(subData);
@@ -75,7 +73,8 @@ export default function Dashboard() {
     } else if (plan === 'annuel') {
       endDate = new Date(startDate.getTime() + 365 * 24 * 60 * 60 * 1000);
     } else {
-      endDate = startDate; // pas de plan défini ?
+      // Si pour une raison quelconque le plan n'est pas reconnu, on met par défaut mensuel
+      endDate = new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000);
     }
 
     const now = new Date();
