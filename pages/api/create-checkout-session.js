@@ -1,6 +1,7 @@
 // pages/api/create-checkout-session.js
 import Stripe from 'stripe';
 import { supabaseService } from '../../utils/supabaseService';
+import jwt from 'jsonwebtoken';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2022-11-15',
@@ -12,6 +13,11 @@ const planMapping = {
   'price_1QUlzrHd1CTS1QCebhWYJdYv': 'trimestriel',
   'price_1QUm0YHd1CTS1QCeSrmFSzI7': 'annuel'
 };
+
+const jwtSecret = process.env.JWT_SECRET;
+if (!jwtSecret) {
+  throw new Error('JWT_SECRET est requis.');
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -51,7 +57,12 @@ export default async function handler(req, res) {
       metadata: { user_id: user.id, price_id: priceId },
     });
 
-    const planName = planMapping[priceId] || 'mensuel'; // Par défaut mensuel si non trouvé
+    // Déterminer le nom du plan à partir du price_id
+    const planName = planMapping[priceId] || 'mensuel';
+
+    // Générer le token immédiatement
+    const userId = user.id;
+    const generatedToken = jwt.sign({ userId }, jwtSecret, { expiresIn: '30d' });
 
     const { error: insertError } = await supabaseService
       .from('subscriptions')
@@ -60,6 +71,7 @@ export default async function handler(req, res) {
         session_id: session.id,
         price_id: priceId,
         plan: planName,
+        token: generatedToken,
         status: 'pending',
         updated_at: new Date().toISOString(),
       }]);
