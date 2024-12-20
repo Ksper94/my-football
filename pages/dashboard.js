@@ -2,6 +2,7 @@
 import { useAuth } from '../context/AuthContext'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
 import { supabase } from '../utils/supabaseClient'
 
 export default function Dashboard() {
@@ -13,6 +14,7 @@ export default function Dashboard() {
   const [timeRemaining, setTimeRemaining] = useState('')
 
   useEffect(() => {
+    // Redirection si l'utilisateur n'est pas connecté et que ce n'est plus en loading
     if (!loading && !user) {
       router.push('/login')
     }
@@ -51,7 +53,7 @@ export default function Dashboard() {
           console.error('Erreur lors de la récupération de l\'abonnement :', subError.message);
           setSubscription(null)
         } else if (!subData) {
-          // Aucune ligne trouvée
+          // Aucune ligne trouvée = pas d'abonnement
           setSubscription(null)
         } else {
           setSubscription(subData);
@@ -73,7 +75,7 @@ export default function Dashboard() {
     } else if (plan === 'annuel') {
       endDate = new Date(startDate.getTime() + 365 * 24 * 60 * 60 * 1000);
     } else {
-      endDate = startDate;
+      endDate = startDate; // pas de plan défini ?
     }
 
     const now = new Date();
@@ -120,9 +122,11 @@ export default function Dashboard() {
       ) : (
         <div className="bg-white p-6 rounded-lg shadow-md mb-4 max-w-md">
           <p>Vous n'avez pas d'abonnement actif.</p>
-          <a href="/pricing" className="text-blue-500 hover:underline">
-            Découvrez nos formules
-          </a>
+          <Link href="/pricing">
+            <span className="text-blue-500 hover:underline cursor-pointer">
+              Découvrez nos formules
+            </span>
+          </Link>
         </div>
       )}
     </div>

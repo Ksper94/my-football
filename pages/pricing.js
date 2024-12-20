@@ -1,18 +1,19 @@
 // pages/pricing.js
-import { useAuth } from '../context/AuthContext'
-import { useEffect } from 'react'
-import { useRouter } from 'next/router'
-import SubscribeButton from '../components/SubscribeButton' // Assurez-vous que ce composant existe
+import { useAuth } from '../context/AuthContext';
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
+import SubscribeButton from '../components/SubscribeButton';
 
 export default function Pricing() {
-  const { user } = useAuth()
-  const router = useRouter()
+  const { user } = useAuth();
+  const router = useRouter();
 
-  useEffect(() => {
-    if (!user) {
-      router.push('/login')
-    }
-  }, [user, router])
+  // Si vous ne voulez plus rediriger vers /login si non connecté, commentez le useEffect :
+  // useEffect(() => {
+  //   if (!user) {
+  //     router.push('/login');
+  //   }
+  // }, [user, router]);
 
   const pricingPlans = [
     {
@@ -48,9 +49,9 @@ export default function Pricing() {
         'Accès anticipé aux nouvelles fonctionnalités',
       ],
     },
-  ]
+  ];
 
-  if (!user) return null // Retourne rien en attendant la redirection
+  // Si vous tenez à bloquer l'accès si pas connecté, laissez le useEffect précédent, mais sinon l'utilisateur peut voir les formules et se connecter avant d'acheter.
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -63,8 +64,8 @@ export default function Pricing() {
             <ul className="mb-6">
               {plan.features.map((feature, index) => (
                 <li key={index} className="flex items-center mb-2">
-                  <svg className="w-6 h-6 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  <svg className="w-6 h-6 text-green-500 mr-2" fill="none" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                   </svg>
                   <span>{feature}</span>
                 </li>
@@ -75,5 +76,5 @@ export default function Pricing() {
         ))}
       </div>
     </div>
-  )
+  );
 }
