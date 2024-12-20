@@ -1,6 +1,6 @@
 // pages/api/webhooks/stripe.js
 import { buffer } from 'micro';
-import { supabaseService } from '../../utils/supabaseService';
+import { supabaseService } from '../../../utils/supabaseService';
 import Stripe from 'stripe';
 import jwt from 'jsonwebtoken';
 
