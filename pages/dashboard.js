@@ -45,7 +45,7 @@ export default function Dashboard() {
           .from('subscriptions')
           .select('plan, status, token, updated_at')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
         if (subError) {
           console.error('Erreur lors de la récupération de l\'abonnement :', subError.message);
