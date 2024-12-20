@@ -1,27 +1,28 @@
-// pages/index.js
-import Head from 'next/head'
-import Link from 'next/link'
-import { useAuth } from '../context/AuthContext'
-import Testimonial from '../components/Testimonial' // Assurez-vous que ce composant existe
-import Hero from '../components/Hero' // Assurez-vous que ce composant existe
-import LoginForm from '../components/LoginForm' // Assurez-vous que ce composant existe
+import Head from 'next/head';
+import Link from 'next/link';
+import { useAuth } from '../context/AuthContext';
+import Testimonial from '../components/Testimonial';
+import Hero from '../components/Hero';
 
 export default function Home() {
-  const { user, loading } = useAuth()
+  const { user, loading } = useAuth();
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <p>Chargement...</p>
       </div>
-    )
+    );
   }
 
   return (
     <>
       <Head>
         <title>Football Predictions</title>
-        <meta name="description" content="Prédictions précises pour vos paris sportifs de football" />
+        <meta
+          name="description"
+          content="Prédictions précises pour vos paris sportifs de football"
+        />
       </Head>
 
       <div>
@@ -34,15 +35,17 @@ export default function Home() {
             <h1 className="text-4xl font-bold">Football Predictions</h1>
             <nav className="mt-4 md:mt-0" aria-label="Navigation principale">
               {user ? (
+                // Si l'utilisateur est connecté, bouton vers dashboard
                 <Link href="/dashboard">
                   <span className="text-blue-500 hover:underline cursor-pointer">
                     Accéder au tableau de bord
                   </span>
                 </Link>
               ) : (
-                <Link href="/signup">
+                // Si l'utilisateur n'est pas connecté, bouton vers login
+                <Link href="/login">
                   <span className="text-blue-500 hover:underline cursor-pointer">
-                    Commencez Maintenant
+                    Se connecter
                   </span>
                 </Link>
               )}
@@ -72,15 +75,11 @@ export default function Home() {
                 <p className="mb-6">
                   Inscrivez-vous pour bénéficier de nos analyses détaillées sur le football.
                 </p>
-                <LoginForm />
-                <p className="mt-4">
-                  Pas encore inscrit ?{' '}
-                  <Link href="/signup">
-                    <span className="text-blue-500 hover:underline cursor-pointer">
-                      Créez un compte
-                    </span>
-                  </Link>
-                </p>
+                <Link href="/signup">
+                  <span className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 cursor-pointer">
+                    Créer un compte
+                  </span>
+                </Link>
               </>
             )}
           </main>
@@ -111,5 +110,5 @@ export default function Home() {
         </div>
       </div>
     </>
-  )
+  );
 }
