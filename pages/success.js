@@ -2,8 +2,8 @@
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import { supabase } from '../utils/supabaseClient' // Assurez-vous que ce fichier est correct
-import Spinner from '../components/Spinner' // Assurez-vous que ce composant existe
+import { supabase } from '../utils/supabaseClient' // Utilisez supabase à la place de supabaseClient
+import Spinner from '../components/Spinner'
 
 export default function Success() {
   const router = useRouter()
@@ -21,18 +21,20 @@ export default function Success() {
       }
 
       try {
-        const { data, error: fetchError } = await supabase
-          .from('subscriptions') // Ajustez le nom de la table si nécessaire
+        const { data, error } = await supabase
+          .from('subscriptions')
           .select('*')
           .eq('session_id', session_id)
-          .single()
+          .maybeSingle()
 
-        if (fetchError || !data) {
-          console.error('Erreur lors de la récupération de la session :', fetchError)
+        if (error) {
+          console.error('Erreur lors de la récupération de la session :', error)
           setErrorMsg('Erreur lors de la récupération des détails de l\'abonnement.')
+        } else if (!data) {
+          // Aucun abonnement trouvé pour cette session_id
+          setErrorMsg('Aucun abonnement trouvé pour cette session. Veuillez réessayer.')
         } else {
           setMessage('Votre abonnement a été créé avec succès !')
-          // Actions supplémentaires si besoin
         }
       } catch (err) {
         console.error('Erreur inattendue lors de la récupération de la session:', err)
@@ -86,6 +88,4 @@ export default function Success() {
   )
 }
 
-Success.propTypes = {
-  // Pas nécessairement utile si aucun prop n'est passé
-}
+Success.propTypes = {}
