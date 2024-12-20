@@ -2,7 +2,7 @@
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import { supabaseClient } from '../utils/supabaseClient' // Assurez-vous que ce fichier est correct
+import { supabase } from '../utils/supabaseClient' // Assurez-vous que ce fichier est correct
 import Spinner from '../components/Spinner' // Assurez-vous que ce composant existe
 
 export default function Success() {
@@ -21,7 +21,7 @@ export default function Success() {
       }
 
       try {
-        const { data, error: fetchError } = await supabaseClient
+        const { data, error: fetchError } = await supabase
           .from('subscriptions') // Ajustez le nom de la table si nécessaire
           .select('*')
           .eq('session_id', session_id)
