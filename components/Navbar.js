@@ -1,10 +1,8 @@
 // components/Navbar.js
-
 import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-import { supabaseClient } from '../utils/supabaseClient';
 
 const Navbar = () => {
   const { user, loading, signOut, authError } = useAuth();
@@ -21,17 +19,12 @@ const Navbar = () => {
   };
 
   if (loading) {
-    return null; // Optionnel : Afficher un indicateur de chargement
+    return null; // Afficher un loader si nécessaire
   }
 
   return (
     <nav className="bg-white shadow-md p-4 flex justify-between items-center">
-      {/* Logo et Titre */}
-      <Link href="/" className="text-xl font-bold">
-        Football Predictions
-      </Link>
-
-      {/* Bouton de menu mobile */}
+      <Link href="/" className="text-xl font-bold">Football Predictions</Link>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="md:hidden text-gray-700 focus:outline-none"
@@ -42,27 +35,21 @@ const Navbar = () => {
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
         </svg>
       </button>
 
-      {/* Menu de navigation */}
       <div className={`md:flex items-center ${isOpen ? 'block' : 'hidden'}`}>
         <div className="flex flex-col md:flex-row md:space-x-6">
-          <Link href="/pricing" className="text-blue-500 hover:underline">
-            Tarifs
-          </Link>
-          <Link href="/about" className="text-blue-500 hover:underline">
-            À propos
-          </Link>
+          <Link href="/pricing" className="text-blue-500 hover:underline">Tarifs</Link>
+          <Link href="/about" className="text-blue-500 hover:underline">À propos</Link>
           {user ? (
-            <div className="flex items-center space-x-4 mt-4 md:mt-0">
+            <div className="flex flex-col md:flex-row md:items-center md:space-x-4 mt-4 md:mt-0">
               <span className="text-gray-700">Bienvenue, {user.email}</span>
               <button
                 onClick={handleLogout}
-                className="text-blue-500 hover:underline focus:outline-none"
+                className="text-blue-500 hover:underline focus:outline-none mt-2 md:mt-0"
                 aria-label="Se déconnecter"
               >
                 Se déconnecter

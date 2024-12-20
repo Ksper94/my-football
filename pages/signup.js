@@ -7,20 +7,23 @@ export default function SignUpPage() {
   const [password, setPassword] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
   const [successMsg, setSuccessMsg] = useState('')
-  const { signUp } = useAuth()
+  const { signUp } = useAuth() // Assurez-vous que signUp est correctement défini dans AuthContext
 
   const handleSignUp = async () => {
     setErrorMsg('')
     setSuccessMsg('')
+
     if (!email || !password) {
       setErrorMsg("Veuillez renseigner un email et un mot de passe.")
       return
     }
+
     try {
       await signUp(email, password)
       setSuccessMsg("Un email de confirmation vous a été envoyé. Veuillez confirmer votre adresse avant de vous connecter.")
     } catch (error) {
-      setErrorMsg(error.message)
+      console.error('Erreur lors de l\'inscription :', error)
+      setErrorMsg(error.message || "Une erreur est survenue lors de l'inscription.")
     }
   }
 

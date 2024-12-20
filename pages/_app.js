@@ -1,8 +1,8 @@
 // pages/_app.js
 import '../styles/globals.css';
 import { AuthProvider } from '../context/AuthContext';
-import Layout from '../components/Layout';
-import ErrorBoundary from '../components/ErrorBoundary';
+import Layout from '../components/Layout'; // Assurez-vous que ce composant existe
+import ErrorBoundary from '../components/ErrorBoundary'; // Assurez-vous que ce composant existe
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';

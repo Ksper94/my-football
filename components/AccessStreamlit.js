@@ -1,5 +1,4 @@
 // components/AccessStreamlit.js
-
 import { useState } from 'react';
 import axios from 'axios';
 
@@ -15,11 +14,15 @@ export default function AccessStreamlit() {
       const response = await axios.get('/api/get-streamlit-token');
       const { token } = response.data;
 
+      if (!token) {
+        throw new Error("Aucun token reçu du serveur.");
+      }
+
       // Rediriger vers Streamlit avec le token
-      window.location.href = `https://your-streamlit-app.com/?token=${token}`;
+      window.location.href = `https://footballgit-bdx4ln4gduabscvzmzgnyk.streamlit.app/?token=${encodeURIComponent(token)}`;
     } catch (err) {
       console.error('Erreur lors de la récupération du token:', err);
-      setError('Impossible d\'accéder à Streamlit. Veuillez réessayer.');
+      setError("Impossible d'accéder à Streamlit. Veuillez réessayer.");
     } finally {
       setLoading(false);
     }
@@ -30,7 +33,7 @@ export default function AccessStreamlit() {
       <button
         onClick={handleAccess}
         disabled={loading}
-        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
       >
         {loading ? 'Accès en cours...' : 'Accéder à Streamlit'}
       </button>

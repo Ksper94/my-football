@@ -8,12 +8,12 @@ export default function ProtectedRoute({ children }) {
   const router = useRouter()
 
   useEffect(() => {
-    if (user === null) { // Vérifiez si user est null
+    if (user === null) {
       router.push('/login')
     }
   }, [user, router])
 
-  if (user === null) { // Renvoyez null si l'utilisateur n'est pas connecté
+  if (user === null) {
     return null
   }
 

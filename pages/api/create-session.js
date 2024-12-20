@@ -1,9 +1,6 @@
 // pages/api/create-session.js
-
-import { NextApiRequest, NextApiResponse } from 'next';
 import Stripe from 'stripe';
 
-// Assurez-vous que la clé est bien définie
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
 if (!stripeSecretKey) {
@@ -11,13 +8,12 @@ if (!stripeSecretKey) {
 }
 
 const stripe = new Stripe(stripeSecretKey, {
-  apiVersion: '2023-08-16', // Utilisez la version API appropriée
+  apiVersion: '2023-08-16',
 });
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     try {
-      // Exemple de création d'une session de paiement
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: [
@@ -27,7 +23,7 @@ export default async function handler(req, res) {
               product_data: {
                 name: 'T-shirt',
               },
-              unit_amount: 2000, // 20.00 USD
+              unit_amount: 2000,
             },
             quantity: 1,
           },

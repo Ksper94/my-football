@@ -16,11 +16,13 @@ export default function LoginPage() {
       setErrorMsg("Veuillez saisir votre email et mot de passe.")
       return
     }
+
     try {
       await signIn(email, password)
       router.push('/dashboard')
     } catch (error) {
-      setErrorMsg(error.message)
+      console.error('Erreur de connexion:', error)
+      setErrorMsg(error.message || "Une erreur est survenue lors de la connexion.")
     }
   }
 
@@ -35,7 +37,7 @@ export default function LoginPage() {
         <input 
           type="email" 
           id="email" 
-          className="w-full border border-gray-300 rounded p-2 mb-4 focus:outline-none focus:border-blue-500" 
+          className="w-full border border-gray-300 rounded p-2 mb-4 focus:outline-none focus:border-blue-500"
           placeholder="Votre email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}

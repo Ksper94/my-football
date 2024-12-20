@@ -1,8 +1,7 @@
 // pages/subapageService.js
-
 import React from 'react'
 
-const SubapageService = () => {
+export default function SubapageService() {
   return (
     <div>
       <h1>Service de Sous-Page</h1>
@@ -10,5 +9,3 @@ const SubapageService = () => {
     </div>
   )
 }
-
-export default SubapageService

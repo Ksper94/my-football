@@ -1,24 +1,20 @@
 // pages/index.js
-import Head from 'next/head';
-import Link from 'next/link';
-import { useAuth } from '../context/AuthContext';
-import Testimonial from '../components/Testimonial';
-import Hero from '../components/Hero';
-import LoginForm from '../components/LoginForm';
+import Head from 'next/head'
+import Link from 'next/link'
+import { useAuth } from '../context/AuthContext'
+import Testimonial from '../components/Testimonial' // Assurez-vous que ce composant existe
+import Hero from '../components/Hero' // Assurez-vous que ce composant existe
+import LoginForm from '../components/LoginForm' // Assurez-vous que ce composant existe
 
 export default function Home() {
-  const { user, loading, authError } = useAuth();
-
-  console.log('User in Home:', user);
-  console.log('Loading in Home:', loading);
-  console.log('Auth Error in Home:', authError);
+  const { user, loading } = useAuth()
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <p>Chargement...</p>
       </div>
-    ); // Affiche un état de chargement tant que les données ne sont pas prêtes
+    )
   }
 
   return (
@@ -76,9 +72,7 @@ export default function Home() {
                 <p className="mb-6">
                   Inscrivez-vous pour bénéficier de nos analyses détaillées sur le football.
                 </p>
-                {/* Intégration du formulaire de connexion */}
                 <LoginForm />
-                {/* Optionnel : Lien vers la page d'inscription si l'utilisateur n'a pas de compte */}
                 <p className="mt-4">
                   Pas encore inscrit ?{' '}
                   <Link href="/signup">
@@ -117,5 +111,5 @@ export default function Home() {
         </div>
       </div>
     </>
-  );
+  )
 }

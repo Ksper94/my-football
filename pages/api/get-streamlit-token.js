@@ -1,12 +1,9 @@
 // pages/api/get-streamlit-token.js
-
 import jwt from 'jsonwebtoken';
 import { supabaseService } from '../../utils/supabaseService';
-import { supabaseClient } from '../../utils/supabaseClient';
-import PropTypes from 'prop-types';
+import { supabase } from '../../utils/supabaseClient'; // Note: vous importiez supabaseClient mais pas besoin de propTypes ici
 
 const jwtSecret = process.env.JWT_SECRET;
-
 if (!jwtSecret) {
   throw new Error('JWT_SECRET est requis.');
 }
@@ -18,14 +15,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Récupérer l'utilisateur actuel
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
+      console.error('Erreur d\'authentification:', authError?.message);
       return res.status(401).json({ error: 'Utilisateur non authentifié' });
     }
 
-    // Récupérer l'abonnement de l'utilisateur
     const { data, error } = await supabaseService
       .from('subscriptions')
       .select('token, plan')
@@ -33,7 +29,7 @@ export default async function handler(req, res) {
       .single();
 
     if (error || !data) {
-      console.error('Erreur lors de la récupération de l\'abonnement:', error ? error.message : 'Aucune donnée trouvée');
+      console.error('Erreur lors de la récupération de l\'abonnement:', error?.message);
       return res.status(500).json({ error: 'Erreur interne du serveur' });
     }
 
@@ -41,21 +37,13 @@ export default async function handler(req, res) {
       return res.status(403).json({ error: 'Abonnement non premium' });
     }
 
-    // Vérifier la validité du token
-    let decoded;
     try {
-      decoded = jwt.verify(data.token, jwtSecret);
+      jwt.verify(data.token, jwtSecret);
     } catch (verifyError) {
       console.error('Erreur lors de la vérification du token:', verifyError.message);
       return res.status(403).json({ error: 'Token invalide' });
     }
 
-    // Optionnel : Vérifier des informations supplémentaires dans le token
-    if (!decoded || typeof decoded !== 'object') {
-      return res.status(403).json({ error: 'Token invalide' });
-    }
-
-    // Si toutes les vérifications sont passées, renvoyer le token
     res.status(200).json({ token: data.token });
   } catch (err) {
     console.error('Erreur lors de la récupération du token:', err.message);

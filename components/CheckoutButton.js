@@ -1,11 +1,9 @@
 // components/CheckoutButton.js
-
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 
-// Initialiser Stripe en dehors du composant pour éviter de le recharger à chaque rendu
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
 export default function CheckoutButton({ productId }) {
@@ -27,31 +25,31 @@ export default function CheckoutButton({ productId }) {
       const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // Inclure les cookies dans la requête
+        credentials: 'include',
         body: JSON.stringify({ priceId: productId, email: user.email }),
       });
 
       const data = await response.json();
 
-      if (response.ok) {
-        // Obtenir l'instance Stripe
-        const stripe = await stripePromise;
-        if (!stripe) {
-          throw new Error('Stripe failed to initialize.');
-        }
-        // Rediriger vers la page de paiement Stripe
-        const { error: stripeError } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
-        if (stripeError) {
-          console.error('Erreur lors de la redirection vers Checkout:', stripeError);
-          setError(stripeError.message);
-        }
-      } else {
+      if (!response.ok) {
         console.error('Erreur lors de la création de la session de paiement:', data.error);
-        setError(data.error);
+        throw new Error(data.error || "Une erreur est survenue lors de la création de la session.");
       }
-    } catch (error) {
-      console.error('Erreur lors de la requête de paiement:', error);
-      setError('Une erreur est survenue. Veuillez réessayer.');
+
+      const stripe = await stripePromise;
+      if (!stripe) {
+        throw new Error('Erreur lors de l’initialisation de Stripe.');
+      }
+
+      const { error: stripeError } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
+      if (stripeError) {
+        console.error('Erreur lors de la redirection vers Checkout:', stripeError);
+        throw new Error(stripeError.message);
+      }
+
+    } catch (err) {
+      console.error('Erreur lors de la requête de paiement:', err);
+      setError(err.message || 'Une erreur est survenue. Veuillez réessayer.');
     } finally {
       setLoading(false);
     }

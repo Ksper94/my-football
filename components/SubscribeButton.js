@@ -31,11 +31,11 @@ const SubscribeButton = ({ priceId }) => {
       if (!stripePublicKey) throw new Error('Clé publique Stripe manquante.');
 
       const stripe = await loadStripe(stripePublicKey);
+      if (!stripe) throw new Error('Erreur lors de l’initialisation de Stripe.');
 
-      // Récupération de la session d'auth Supabase
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       if (sessionError || !session?.access_token) {
-        throw new Error('Utilisateur non authentifié.');
+        throw new Error('Utilisateur non authentifié ou session invalide.');
       }
 
       const response = await fetch('/api/create-checkout-session', {
@@ -51,7 +51,8 @@ const SubscribeButton = ({ priceId }) => {
       if (!response.ok) throw new Error(data.error || 'Erreur lors de la création de la session.');
 
       const { sessionId } = data;
-      await stripe.redirectToCheckout({ sessionId });
+      const { error: stripeError } = await stripe.redirectToCheckout({ sessionId });
+      if (stripeError) throw new Error(stripeError.message);
     } catch (err) {
       console.error('Erreur lors de l\'abonnement:', err.message);
       setError(err.message);

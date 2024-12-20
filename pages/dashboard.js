@@ -2,7 +2,7 @@
 import { useAuth } from '../context/AuthContext'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import { supabase } from '../utils/supabaseClient'
+import { supabase } from '../utils/supabaseClient' // Assurez-vous que supabase est correctement importé
 
 export default function Dashboard() {
   const { user, loading } = useAuth()
@@ -12,32 +12,35 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!loading && !user) {
-      console.log('User not logged in, redirecting to login')
+      // L’utilisateur n’est pas connecté, on le redirige
       router.push('/login')
     }
   }, [user, loading, router])
 
   useEffect(() => {
     const fetchProfile = async () => {
-      if (!loading && user) {
-        console.log('Fetching profile for user:', user.id)
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('id, email, username, full_name, avatar_url')
-          .eq('id', user.id)
-          .single();
-        
-        if (profileError) {
-          console.error('Erreur lors de la récupération du profil :', profileError.message);
-          setError(profileError.message)
-        } else {
-          console.log('Profile fetched:', profileData)
-          setProfile(profileData);
+      if (!loading && user && user.id) {
+        try {
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('id, email, username, full_name, avatar_url')
+            .eq('id', user.id)
+            .single()
+          
+          if (profileError) {
+            console.error('Erreur lors de la récupération du profil :', profileError.message)
+            setError(profileError.message)
+          } else {
+            setProfile(profileData)
+          }
+        } catch (err) {
+          console.error('Erreur inattendue lors de la récupération du profil :', err)
+          setError("Une erreur inattendue est survenue.")
         }
       }
-    };
-    fetchProfile();
-  }, [user, loading]);
+    }
+    fetchProfile()
+  }, [user, loading])
 
   if (loading) return <div>Chargement...</div>
   if (error) return <div className="text-red-500">{error}</div>
@@ -50,6 +53,7 @@ export default function Dashboard() {
       ) : (
         <p className="mb-4">Bienvenue !</p>
       )}
+      {/* Ajoutez ici du contenu supplémentaire pour le dashboard */}
     </div>
   )
 }

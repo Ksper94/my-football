@@ -12,7 +12,6 @@ export const config = {
 };
 
 const jwtSecret = process.env.JWT_SECRET;
-
 if (!jwtSecret) {
   throw new Error('JWT_SECRET est requis.');
 }
@@ -27,7 +26,6 @@ export default async function handler(req, res) {
   const sig = req.headers['stripe-signature'];
 
   let event;
-
   try {
     event = stripe.webhooks.constructEvent(buf.toString(), sig, process.env.STRIPE_WEBHOOK_SECRET);
     console.log(`Webhook Stripe reçu: ${event.type}`);
@@ -36,7 +34,6 @@ export default async function handler(req, res) {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  // Gestion des événements Stripe
   try {
     switch (event.type) {
       case 'checkout.session.completed':
@@ -59,8 +56,6 @@ export default async function handler(req, res) {
 
 async function handleCheckoutSessionCompleted(session) {
   console.log('Session de checkout complétée:', session.id);
-
-  // Assure-toi que user_id est présent dans les métadonnées
   const userId = session.metadata?.user_id;
 
   if (!userId) {
@@ -69,11 +64,9 @@ async function handleCheckoutSessionCompleted(session) {
   }
 
   try {
-    // Générer un token JWT
     const token = jwt.sign({ userId }, jwtSecret, { expiresIn: '30d' });
     console.log(`Token JWT généré pour l'utilisateur ${userId}`);
 
-    // Upsert dans la table 'subscriptions'
     const { error } = await supabaseService
       .from('subscriptions')
       .upsert([
@@ -88,7 +81,6 @@ async function handleCheckoutSessionCompleted(session) {
       ], { onConflict: 'user_id' });
 
     if (error) throw error;
-
     console.log(`Abonnement inséré/activé avec succès pour l'utilisateur ${userId}`);
   } catch (error) {
     console.error('Erreur lors de l\'insertion dans Supabase:', error.message);
@@ -98,7 +90,6 @@ async function handleCheckoutSessionCompleted(session) {
 
 async function handleSubscriptionEvent(subscription) {
   console.log('Événement de subscription:', subscription.id);
-
   const userId = subscription.metadata?.user_id;
 
   if (!userId) {
@@ -116,10 +107,8 @@ async function handleSubscriptionEvent(subscription) {
       plan = 'canceled';
     }
 
-    // Générer un token uniquement pour les utilisateurs actifs
     const token = status === 'active' ? jwt.sign({ userId }, jwtSecret, { expiresIn: '30d' }) : null;
 
-    // Mettre à jour dans Supabase
     const { error } = await supabaseService
       .from('subscriptions')
       .upsert([
@@ -134,7 +123,6 @@ async function handleSubscriptionEvent(subscription) {
       ], { onConflict: 'user_id' });
 
     if (error) throw error;
-
     console.log(`Abonnement mis à jour pour l'utilisateur ${userId}: Plan ${plan}, Status ${status}`);
   } catch (error) {
     console.error('Erreur lors de la mise à jour de l\'abonnement:', error.message);

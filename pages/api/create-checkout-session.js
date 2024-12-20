@@ -44,7 +44,6 @@ export default async function handler(req, res) {
       metadata: { user_id: user.id, price_id: priceId },
     });
 
-    // Insertion dans subscriptions
     const { error: insertError } = await supabaseService
       .from('subscriptions')
       .insert([{
@@ -56,7 +55,6 @@ export default async function handler(req, res) {
         updated_at: new Date().toISOString(),
       }]);
 
-    // Affichage du message d’erreur exact dans la console
     if (insertError) {
       console.error('Erreur lors de l\'insertion dans subscriptions:', insertError.message);
       return res.status(500).json({ error: 'Erreur lors de l\'enregistrement de l\'abonnement.' });

@@ -14,14 +14,19 @@ export const AuthProvider = ({ children }) => {
     let mounted = true;
 
     const getSession = async () => {
-      const { data, error } = await supabase.auth.getSession();
-      if (error) {
-        setAuthError(error);
-        console.log('Error getting session:', error);
-      }
-      if (mounted) {
-        setUser(data.session?.user || null);
-        setLoading(false);
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('Error getting session:', error);
+          setAuthError(error);
+        }
+        if (mounted) {
+          setUser(data.session?.user || null);
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error('Unexpected error getting session:', err);
+        if (mounted) setLoading(false);
       }
     };
 
@@ -33,38 +38,42 @@ export const AuthProvider = ({ children }) => {
 
     return () => {
       mounted = false;
-      authListener.subscription.unsubscribe();
+      authListener?.subscription?.unsubscribe();
     };
   }, []);
 
   const signOut = useCallback(async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      setAuthError(error);
-      console.log('Error signing out:', error);
-    } else {
-      setUser(null);
-      console.log('User signed out');
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Error signing out:', error);
+        setAuthError(error);
+      } else {
+        setUser(null);
+        console.log('User signed out');
+      }
+    } catch (err) {
+      console.error('Unexpected error signing out:', err);
     }
   }, []);
 
   const signIn = useCallback(async (email, password) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
+      console.error('Error signing in:', error);
       setAuthError(error);
-      console.log('Error signing in:', error);
       throw error;
     }
 
     console.log('User signed in:', data.user);
 
-    // Utiliser upsert pour insérer le profil s'il n'existe pas
+    // Upsert du profil
     const { error: profileUpsertError } = await supabase
       .from('profiles')
       .upsert([{ id: data.user.id, email: data.user.email }], { onConflict: 'id' });
 
     if (profileUpsertError) {
-      console.error('Erreur lors de l\'insertion/upsert du profil:', profileUpsertError.message);
+      console.error('Error upserting profile:', profileUpsertError.message);
     } else {
       console.log('Profile upserted successfully for user:', data.user.id);
     }
@@ -75,23 +84,26 @@ export const AuthProvider = ({ children }) => {
   const signUp = useCallback(async (email, password) => {
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) {
+      console.error('Error signing up:', error);
       setAuthError(error);
-      console.log('Error signing up:', error);
       throw error;
     }
     console.log('User signed up:', data.user);
-    // Email de confirmation envoyé. Pas de création de profil ici.
+    // Un email de confirmation est envoyé, pas de création de profil ici.
     return data;
   }, []);
 
-  const value = useMemo(() => ({
-    user,
-    loading,
-    authError,
-    signUp,
-    signIn,
-    signOut,
-  }), [user, loading, authError, signUp, signIn, signOut]);
+  const value = useMemo(
+    () => ({
+      user,
+      loading,
+      authError,
+      signUp,
+      signIn,
+      signOut,
+    }),
+    [user, loading, authError, signUp, signIn, signOut]
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

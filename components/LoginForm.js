@@ -23,6 +23,7 @@ export default function LoginForm() {
       await signIn(email, password);
       router.push('/dashboard');
     } catch (error) {
+      console.error('Erreur de connexion:', error);
       setErrorMsg(error.message || 'Erreur lors de la connexion.');
     }
   };
