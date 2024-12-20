@@ -1,4 +1,3 @@
-// pages/dashboard.js (déjà fourni auparavant, inchangé)
 import { useAuth } from '../context/AuthContext'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
@@ -73,8 +72,7 @@ export default function Dashboard() {
     } else if (plan === 'annuel') {
       endDate = new Date(startDate.getTime() + 365 * 24 * 60 * 60 * 1000);
     } else {
-      // Si pour une raison quelconque le plan n'est pas reconnu, on met par défaut mensuel
-      endDate = new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+      endDate = new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000); // par défaut mensuel si non reconnu
     }
 
     const now = new Date();
@@ -111,9 +109,12 @@ export default function Dashboard() {
             <div className="mt-4">
               <a
                 href={`https://footballgit-bdx4ln4gduabscvzmzgnyk.streamlit.app/?token=${subscription.token}`}
-                className="text-blue-500 hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                Accéder à l'appli Streamlit
+                <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                  Accéder à l'application Streamlit
+                </button>
               </a>
             </div>
           )}
