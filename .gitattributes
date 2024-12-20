@@ -1,0 +1,15 @@
+# Forcer les fichiers JavaScript et TypeScript à utiliser LF
+*.js     text eol=lf
+*.jsx    text eol=lf
+*.ts     text eol=lf
+*.tsx    text eol=lf
+
+# Pour les fichiers CSS et JSON également
+*.css    text eol=lf
+*.json   text eol=lf
+
+# Pour les fichiers Markdown
+*.md     text eol=lf
+
+# Tous les autres fichiers texte
+*       text=auto

@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -64,14 +63,6 @@ export default function LoginForm() {
       >
         Se connecter
       </button>
-
-      <div className="mt-4 text-center">
-        <Link href="/forgot-password">
-          <span className="text-blue-500 hover:underline cursor-pointer">
-            Mot de passe oublié ?
-          </span>
-        </Link>
-      </div>
     </form>
   );
 }

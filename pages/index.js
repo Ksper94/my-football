@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
 import Testimonial from '../components/Testimonial';
 import Hero from '../components/Hero';
-import LoginForm from '../components/LoginForm'; // Importer le formulaire de connexion
+import LoginForm from '../components/LoginForm';
 
 export default function Home() {
   const { user, loading, authError } = useAuth();
@@ -18,7 +18,7 @@ export default function Home() {
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <p>Chargement...</p>
       </div>
-    );
+    ); // Affiche un état de chargement tant que les données ne sont pas prêtes
   }
 
   return (
@@ -76,11 +76,17 @@ export default function Home() {
                 <p className="mb-6">
                   Inscrivez-vous pour bénéficier de nos analyses détaillées sur le football.
                 </p>
-                {/* Formulaire de connexion */}
+                {/* Intégration du formulaire de connexion */}
                 <LoginForm />
-                <div className="mt-4">
-                  <p>Vous n'avez pas de compte ? <Link href="/signup"><span className="text-blue-500 hover:underline cursor-pointer">Inscrivez-vous ici</span></Link></p>
-                </div>
+                {/* Optionnel : Lien vers la page d'inscription si l'utilisateur n'a pas de compte */}
+                <p className="mt-4">
+                  Pas encore inscrit ?{' '}
+                  <Link href="/signup">
+                    <span className="text-blue-500 hover:underline cursor-pointer">
+                      Créez un compte
+                    </span>
+                  </Link>
+                </p>
               </>
             )}
           </main>
