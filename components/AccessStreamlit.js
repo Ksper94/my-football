@@ -11,7 +11,13 @@ export default function AccessStreamlit() {
     setError(null);
 
     try {
-      const response = await axios.get('/api/get-streamlit-token');
+      const response = await axios.get('/api/get-streamlit-token', {
+        headers: {
+          'Content-Type': 'application/json',
+          // Ajoutez ici d'autres en-têtes si nécessaire, par exemple pour l'authentification
+        },
+        withCredentials: true, // Si vous utilisez des cookies pour l'authentification
+      });
       const { token } = response.data;
 
       if (!token) {
