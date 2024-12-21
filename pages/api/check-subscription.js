@@ -1,4 +1,4 @@
-// pages/api/check-subscription.js
+// pages/api/check-subscription.js 
 import { supabaseService } from '../../utils/supabaseService';
 import Joi from 'joi';
 import crypto from 'crypto';
