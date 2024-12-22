@@ -38,6 +38,7 @@ async function handleCheckoutSessionCompleted(session) {
     console.log(`Token JWT généré pour l'utilisateur ${userId}`);
 
     const planName = planMapping[session.metadata.price_id] || 'mensuel';
+    console.log(`Plan déterminé: ${planName}`);
 
     const { error } = await supabaseService
       .from('subscriptions')
@@ -48,11 +49,14 @@ async function handleCheckoutSessionCompleted(session) {
           plan: planName,
           token: token,
           status: 'active',
-          updated_at: new Date(),
+          updated_at: new Date().toISOString(),
         },
-      ], { onConflict: 'user_id' });
+      ], { onConflict: 'session_id' }); // Utiliser 'session_id' comme clé de conflit
 
-    if (error) throw error;
+    if (error) {
+      console.error('Erreur lors de l\'upsert dans subscriptions:', error.message);
+      throw error;
+    }
     console.log(`Abonnement inséré/activé avec succès pour l'utilisateur ${userId}`);
   } catch (error) {
     console.error('Erreur lors de l\'insertion dans Supabase:', error.message);
@@ -62,20 +66,20 @@ async function handleCheckoutSessionCompleted(session) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST')
-    return res.status(405).end('Method Not Allowed')
+    res.setHeader('Allow', 'POST');
+    return res.status(405).end('Method Not Allowed');
   }
 
-  const buf = await buffer(req)
-  const sig = req.headers['stripe-signature']
+  const buf = await buffer(req);
+  const sig = req.headers['stripe-signature'];
 
-  let event
+  let event;
   try {
-    event = stripe.webhooks.constructEvent(buf.toString(), sig, process.env.STRIPE_WEBHOOK_SECRET)
-    console.log(`Webhook Stripe reçu: ${event.type}`)
+    event = stripe.webhooks.constructEvent(buf, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    console.log(`Webhook Stripe reçu: ${event.type}`);
   } catch (err) {
-    console.error('Erreur de signature du webhook:', err.message)
-    return res.status(400).send(`Webhook Error: ${err.message}`)
+    console.error('Erreur de signature du webhook:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
   try {

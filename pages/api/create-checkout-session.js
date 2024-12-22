@@ -1,4 +1,3 @@
-// pages/api/create-checkout-session.js
 import Stripe from 'stripe';
 import { supabaseService } from '../../utils/supabaseService';
 import jwt from 'jsonwebtoken';
