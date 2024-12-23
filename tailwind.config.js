@@ -1,5 +1,3 @@
-// tailwind.config.js
-
 module.exports = {
   content: [
     './pages/**/*.{js,jsx,ts,tsx}',
@@ -15,7 +13,6 @@ module.exports = {
         foreground: 'var(--foreground)',
       },
     },
-    darkMode: 'media', // Ou 'class' selon votre préférence
   },
-  plugins: [],
-}
+  darkMode: 'media', // Ou 'class' selon votre préférence
+};

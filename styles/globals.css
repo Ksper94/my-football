@@ -2,16 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Définition des variables CSS pour le thème clair et sombre */
+/* Thème clair par défaut */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #ffffff; /* Fond blanc */
+  --foreground: #171717; /* Texte noir */
 }
 
+/* Thème sombre */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0a0a0a; /* Fond noir */
+    --foreground: #ededed; /* Texte gris clair */
   }
 }
 
@@ -19,13 +20,13 @@
 body {
   color: var(--foreground);
   background-color: var(--background);
-  font-family: 'Inter', sans-serif; /* Utilisation d'une police moderne */
-  transition: background-color 0.3s, color 0.3s; /* Transition douce pour les changements de thème */
+  font-family: 'Inter', sans-serif; /* Utilisation de la police Inter */
+  transition: background-color 0.3s, color 0.3s; /* Transition douce entre les thèmes */
 }
 
 /* Styles globaux pour les liens */
 a {
-  color: #1d4ed8; /* Bleu Tailwind par défaut */
+  color: #1d4ed8; /* Bleu Tailwind */
   text-decoration: none;
   transition: color 0.3s;
 }

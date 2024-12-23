@@ -1,5 +1,4 @@
-// pages/_document.js
-import Document, { Html, Head, Main, NextScript } from 'next/document'
+import Document, { Html, Head, Main, NextScript } from 'next/document';
 
 class MyDocument extends Document {
   render() {
@@ -16,11 +15,12 @@ class MyDocument extends Document {
           <meta property="og:url" content="https://votre-site.com" />
           <meta property="og:type" content="website" />
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+          <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
           <link rel="icon" href="/favicon.ico" />
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
           <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
-          <meta name="theme-color" content="#ffffff" />
+          <meta name="theme-color" content="#2563eb" /> {/* Ajustez selon vos couleurs principales */}
           <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         </Head>
         <body>
@@ -28,8 +28,8 @@ class MyDocument extends Document {
           <NextScript />
         </body>
       </Html>
-    )
+    );
   }
 }
 
-export default MyDocument
+export default MyDocument;
