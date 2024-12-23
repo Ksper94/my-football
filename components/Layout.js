@@ -12,7 +12,9 @@ export default function Layout({ children }) {
       <header className="bg-blue-600 text-white p-4 flex justify-between items-center">
         {/* Ajout du lien vers l'index */}
         <Link href="/">
-          <h1 className="text-2xl font-bold cursor-pointer">Mon Application</h1>
+          <h1 className="text-2xl font-bold text-white cursor-pointer">
+            Mon Application
+          </h1>
         </Link>
         <nav>
           {user ? (
