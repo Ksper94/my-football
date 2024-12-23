@@ -1,16 +1,39 @@
-// components/Layout.js
 import React from 'react';
 import PropTypes from 'prop-types';
+import Link from 'next/link';
+import { useAuth } from '../context/AuthContext';
 
 export default function Layout({ children }) {
+  const { user } = useAuth();
+
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="bg-blue-600 text-white p-4">
+      {/* Header */}
+      <header className="bg-blue-600 text-white p-4 flex justify-between items-center">
         <h1 className="text-2xl font-bold">Mon Application</h1>
+        <nav>
+          {user ? (
+            // Bouton "Dashboard" si connecté
+            <Link href="/dashboard">
+              <span className="text-white hover:underline cursor-pointer">
+                Tableau de bord
+              </span>
+            </Link>
+          ) : (
+            // Bouton "Se connecter" si non connecté
+            <Link href="/login">
+              <span className="text-white hover:underline cursor-pointer">
+                Se connecter
+              </span>
+            </Link>
+          )}
+        </nav>
       </header>
-      <main className="flex-grow container mx-auto p-4">
-        {children}
-      </main>
+
+      {/* Contenu principal */}
+      <main className="flex-grow container mx-auto p-4">{children}</main>
+
+      {/* Footer */}
       <footer className="bg-gray-800 text-white p-4 text-center">
         &copy; {new Date().getFullYear()} Mon Application. Tous droits réservés.
       </footer>
