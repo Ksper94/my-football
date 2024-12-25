@@ -9,7 +9,7 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center text-foreground transition-all duration-300">
         <p>Chargement...</p>
       </div>
     );
@@ -30,21 +30,19 @@ export default function Home() {
         <Hero />
 
         {/* Contenu principal */}
-        <div className="min-h-screen bg-gray-100 p-8">
+        <div className="min-h-screen bg-background text-foreground p-8 transition-all duration-300">
           <header className="flex flex-col md:flex-row justify-between items-center mb-8">
             <h1 className="text-4xl font-bold">Football Predictions</h1>
             <nav className="mt-4 md:mt-0" aria-label="Navigation principale">
               {user ? (
-                // Si l'utilisateur est connecté, bouton vers dashboard
                 <Link href="/dashboard">
-                  <span className="text-blue-500 hover:underline cursor-pointer">
+                  <span className="text-link hover:text-link-hover cursor-pointer transition-colors duration-300">
                     Accéder au tableau de bord
                   </span>
                 </Link>
               ) : (
-                // Si l'utilisateur n'est pas connecté, bouton vers login
                 <Link href="/login">
-                  <span className="text-blue-500 hover:underline cursor-pointer">
+                  <span className="text-link hover:text-link-hover cursor-pointer transition-colors duration-300">
                     Se connecter
                   </span>
                 </Link>
@@ -62,7 +60,7 @@ export default function Home() {
                   Vous êtes connecté et prêt à explorer nos prédictions.
                 </p>
                 <Link href="/dashboard">
-                  <span className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 cursor-pointer">
+                  <span className="bg-link text-white py-2 px-4 rounded hover:bg-link-hover cursor-pointer transition-colors duration-300">
                     Accéder au tableau de bord
                   </span>
                 </Link>
@@ -76,7 +74,7 @@ export default function Home() {
                   Inscrivez-vous pour bénéficier de nos analyses détaillées sur le football.
                 </p>
                 <Link href="/signup">
-                  <span className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 cursor-pointer">
+                  <span className="bg-link text-white py-2 px-4 rounded hover:bg-link-hover cursor-pointer transition-colors duration-300">
                     Créer un compte
                   </span>
                 </Link>
@@ -104,7 +102,7 @@ export default function Home() {
           </div>
 
           {/* Footer */}
-          <footer className="mt-16 text-center text-gray-500">
+          <footer className="mt-16 text-center text-foreground/60">
             &copy; {new Date().getFullYear()} Football Predictions. Tous droits réservés.
           </footer>
         </div>
