@@ -1,4 +1,3 @@
-// components/Navbar.js
 import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/router';
@@ -23,11 +22,13 @@ const Navbar = () => {
   }
 
   return (
-    <nav className="bg-white shadow-md p-4 flex justify-between items-center">
-      <Link href="/" className="text-xl font-bold">Football Predictions</Link>
+    <nav className="bg-background shadow-md p-4 flex justify-between items-center transition-all duration-300">
+      <Link href="/" className="text-xl font-bold text-foreground">
+        Football Predictions
+      </Link>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="md:hidden text-gray-700 focus:outline-none"
+        className="md:hidden text-foreground focus:outline-none"
         aria-label="Ouvrir le menu"
       >
         <svg
@@ -42,21 +43,28 @@ const Navbar = () => {
 
       <div className={`md:flex items-center ${isOpen ? 'block' : 'hidden'}`}>
         <div className="flex flex-col md:flex-row md:space-x-6">
-          <Link href="/pricing" className="text-blue-500 hover:underline">Tarifs</Link>
-          <Link href="/about" className="text-blue-500 hover:underline">À propos</Link>
+          <Link href="/pricing" className="text-link hover:text-link-hover transition-colors duration-300">
+            Tarifs
+          </Link>
+          <Link href="/about" className="text-link hover:text-link-hover transition-colors duration-300">
+            À propos
+          </Link>
           {user ? (
             <div className="flex flex-col md:flex-row md:items-center md:space-x-4 mt-4 md:mt-0">
-              <span className="text-gray-700">Bienvenue, {user.email}</span>
+              <span className="text-foreground">Bienvenue, {user.email}</span>
               <button
                 onClick={handleLogout}
-                className="text-blue-500 hover:underline focus:outline-none mt-2 md:mt-0"
+                className="text-link hover:text-link-hover focus:outline-none mt-2 md:mt-0 transition-colors duration-300"
                 aria-label="Se déconnecter"
               >
                 Se déconnecter
               </button>
             </div>
           ) : (
-            <Link href="/login" className="text-blue-500 hover:underline mt-4 md:mt-0">
+            <Link
+              href="/login"
+              className="text-link hover:text-link-hover mt-4 md:mt-0 transition-colors duration-300"
+            >
               Se connecter
             </Link>
           )}
