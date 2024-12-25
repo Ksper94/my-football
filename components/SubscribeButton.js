@@ -1,9 +1,7 @@
-// components/SubscribeButton.js
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
-import { supabase } from '../utils/supabaseClient';
 import PropTypes from 'prop-types';
 
 const SubscribeButton = ({ priceId }) => {
@@ -14,12 +12,12 @@ const SubscribeButton = ({ priceId }) => {
 
   const handleSubscribe = async () => {
     if (!user) {
-      router.push('/login');
+      router.push('/login'); // Redirige vers la page de connexion si l'utilisateur n'est pas connecté
       return;
     }
 
     if (!priceId) {
-      setError('priceId est manquant.');
+      setError('Le plan d\'abonnement est introuvable (priceId manquant).');
       return;
     }
 
@@ -27,29 +25,31 @@ const SubscribeButton = ({ priceId }) => {
     setError(null);
 
     try {
+      // Initialiser Stripe
       const stripePublicKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
       if (!stripePublicKey) throw new Error('Clé publique Stripe manquante.');
 
       const stripe = await loadStripe(stripePublicKey);
       if (!stripe) throw new Error('Erreur lors de l’initialisation de Stripe.');
 
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError || !session?.access_token) {
-        throw new Error('Utilisateur non authentifié ou session invalide.');
-      }
-
+      // Appel à l'API backend pour créer une session Stripe
       const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`, // Récupère le token JWT de Supabase
         },
         body: JSON.stringify({ priceId }),
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Erreur lors de la création de la session.');
 
+      // Gestion des erreurs de l'API
+      if (!response.ok || !data.sessionId) {
+        throw new Error(data.error || 'Erreur lors de la création de la session Stripe.');
+      }
+
+      // Redirection vers la page de paiement Stripe
       const { sessionId } = data;
       const { error: stripeError } = await stripe.redirectToCheckout({ sessionId });
       if (stripeError) throw new Error(stripeError.message);
