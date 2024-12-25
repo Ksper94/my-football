@@ -35,7 +35,7 @@ export default function Pricing() {
             key={plan.priceId}
             className="w-full max-w-sm bg-white text-gray-900 p-6 rounded-lg shadow-lg transition-colors duration-300"
           >
-            <h2 className="text-2xl font-semibold text-center mb-4">{plan.name}</h2>
+            <h2 className="text-2xl font-bold text-gray-900 text-center mb-4">{plan.name}</h2>
             <p className="text-center text-4xl font-bold mb-6">{plan.price}</p>
             <ul className="mb-6">
               {plan.features.map((feature, index) => (

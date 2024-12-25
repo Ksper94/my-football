@@ -100,7 +100,7 @@ export default function Dashboard() {
 
       {subscription ? (
         <div className="bg-white text-gray-900 p-6 rounded-lg shadow-md mb-4 max-w-md">
-          <h2 className="text-2xl font-semibold mb-2">Votre Abonnement</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Votre Abonnement</h2>
           <p>Plan : <strong>{subscription.plan}</strong></p>
           <p>Status : <strong>{subscription.status}</strong></p>
           <p>{timeRemaining}</p>
