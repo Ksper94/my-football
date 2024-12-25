@@ -27,6 +27,7 @@ body {
   font-family: 'Inter', sans-serif; /* Police moderne et lisible */
   transition: background-color 0.3s, color 0.3s; /* Transition douce entre les thèmes */
   line-height: 1.6; /* Espacement optimal pour le texte */
+  margin: 0; /* Supprimer tout margin par défaut */
 }
 
 /* Styles globaux pour les liens */
@@ -55,4 +56,19 @@ h1, h2, h3, h4, h5, h6 {
 
 .bg-visible {
   background-color: var(--background) !important; /* Contraste clair */
+}
+
+/* Classes Tailwind personnalisées */
+@media (max-width: 768px) {
+  body {
+    font-size: 16px; /* Ajustement de la taille des polices pour mobile */
+  }
+
+  a {
+    color: var(--link-color); /* Couleur cohérente même sur mobile */
+  }
+
+  a:hover {
+    color: var(--link-hover-color); /* Couleur au survol maintenue */
+  }
 }

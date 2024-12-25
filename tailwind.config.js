@@ -11,8 +11,10 @@ module.exports = {
       colors: {
         background: 'var(--background)',
         foreground: 'var(--foreground)',
+        link: 'var(--link-color)',
+        linkHover: 'var(--link-hover-color)',
       },
     },
   },
-  darkMode: 'media', // Ou 'class' selon votre préférence
+  darkMode: 'media', // Utiliser le système de l'utilisateur
 };
