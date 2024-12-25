@@ -6,6 +6,8 @@
 :root {
   --background: #ffffff; /* Fond blanc */
   --foreground: #171717; /* Texte noir */
+  --link-color: #1d4ed8; /* Couleur des liens */
+  --link-hover-color: #2563eb; /* Couleur des liens au survol */
 }
 
 /* Thème sombre */
@@ -13,25 +15,44 @@
   :root {
     --background: #0a0a0a; /* Fond noir */
     --foreground: #ededed; /* Texte gris clair */
+    --link-color: #60a5fa; /* Couleur des liens (bleu clair) */
+    --link-hover-color: #3b82f6; /* Couleur des liens au survol */
   }
 }
 
 /* Styles globaux pour le body */
 body {
-  color: var(--foreground);
-  background-color: var(--background);
-  font-family: 'Inter', sans-serif; /* Utilisation de la police Inter */
+  color: var(--foreground); /* Couleur principale du texte */
+  background-color: var(--background); /* Couleur principale du fond */
+  font-family: 'Inter', sans-serif; /* Police moderne et lisible */
   transition: background-color 0.3s, color 0.3s; /* Transition douce entre les thèmes */
+  line-height: 1.6; /* Espacement optimal pour le texte */
 }
 
 /* Styles globaux pour les liens */
 a {
-  color: #1d4ed8; /* Bleu Tailwind */
+  color: var(--link-color); /* Couleur dynamique des liens */
   text-decoration: none;
-  transition: color 0.3s;
+  transition: color 0.3s; /* Transition douce sur la couleur des liens */
 }
 
 a:hover {
-  color: #2563eb; /* Bleu Tailwind plus foncé */
-  text-decoration: underline;
+  color: var(--link-hover-color); /* Couleur au survol dynamique */
+  text-decoration: underline; /* Ajouter un soulignement au survol */
+}
+
+/* Assurez une visibilité optimale pour les titres */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--foreground); /* Toujours bien contrasté */
+  font-weight: 700; /* Mettre les titres en gras */
+  margin: 1rem 0; /* Ajout d'un espacement pour l'accessibilité */
+}
+
+/* Classes utilitaires pour améliorer la visibilité */
+.text-visible {
+  color: var(--foreground) !important; /* Toujours visible */
+}
+
+.bg-visible {
+  background-color: var(--background) !important; /* Contraste clair */
 }
