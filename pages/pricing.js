@@ -1,3 +1,7 @@
+import { useAuth } from '../context/AuthContext';
+import { useRouter } from 'next/router';
+import SubscribeButton from '../components/SubscribeButton';
+
 export default function Pricing() {
   const pricingPlans = [
     {
@@ -26,6 +30,29 @@ export default function Pricing() {
     },
   ];
 
+  const handleSubscription = async (priceId) => {
+    try {
+      // Rediriger vers la page de paiement
+      const response = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priceId }),
+      });
+
+      const { sessionId } = await response.json();
+
+      if (!sessionId) {
+        throw new Error('Session de paiement introuvable.');
+      }
+
+      const stripe = await getStripe(); // Initialisation de Stripe
+      await stripe.redirectToCheckout({ sessionId });
+    } catch (error) {
+      console.error('Erreur lors de la redirection vers le paiement :', error);
+      alert('Une erreur est survenue. Veuillez réessayer.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground p-8 transition-all duration-300">
       <h1 className="text-4xl font-bold text-center mb-8">Nos Formules</h1>
@@ -47,7 +74,10 @@ export default function Pricing() {
                 </li>
               ))}
             </ul>
-            <button className="bg-link text-white py-2 px-4 rounded hover:bg-link-hover focus:outline-none">
+            <button
+              onClick={() => handleSubscription(plan.priceId)}
+              className="bg-link text-white py-2 px-4 rounded hover:bg-link-hover focus:outline-none focus:ring-2 focus:ring-blue-300"
+            >
               S'abonner
             </button>
           </div>
@@ -55,4 +85,12 @@ export default function Pricing() {
       </div>
     </div>
   );
+}
+
+async function getStripe() {
+  if (!window.Stripe) {
+    const stripeJs = await import('@stripe/stripe-js');
+    return stripeJs.loadStripe('votre-clé-publique-Stripe'); // Remplacez par votre clé publique Stripe
+  }
+  return window.Stripe;
 }
