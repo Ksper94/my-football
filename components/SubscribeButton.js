@@ -32,19 +32,23 @@ const SubscribeButton = ({ priceId }) => {
       const stripe = await loadStripe(stripePublicKey);
       if (!stripe) throw new Error('Erreur lors de l’initialisation de Stripe.');
 
+      // Vérifier et récupérer le token JWT de l'utilisateur connecté
+      const token = localStorage.getItem('accessToken');
+      if (!token) throw new Error('Utilisateur non authentifié (token JWT manquant).');
+
       // Appel à l'API backend pour créer une session Stripe
       const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`, // Récupère le token JWT de Supabase
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ priceId }),
       });
 
       const data = await response.json();
 
-      // Gestion des erreurs de l'API
+      // Gestion des erreurs de l'API backend
       if (!response.ok || !data.sessionId) {
         throw new Error(data.error || 'Erreur lors de la création de la session Stripe.');
       }
