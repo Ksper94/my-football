@@ -99,7 +99,7 @@ export default function Dashboard() {
       )}
 
       {subscription ? (
-        <div className="bg-white text-foreground p-6 rounded-lg shadow-md mb-4 max-w-md">
+        <div className="bg-white text-gray-900 p-6 rounded-lg shadow-md mb-4 max-w-md">
           <h2 className="text-2xl font-semibold mb-2">Votre Abonnement</h2>
           <p>Plan : <strong>{subscription.plan}</strong></p>
           <p>Status : <strong>{subscription.status}</strong></p>
@@ -120,7 +120,7 @@ export default function Dashboard() {
           )}
         </div>
       ) : (
-        <div className="bg-white text-foreground p-6 rounded-lg shadow-md mb-4 max-w-md">
+        <div className="bg-white text-gray-900 p-6 rounded-lg shadow-md mb-4 max-w-md">
           <p>Vous n'avez pas d'abonnement actif.</p>
           <Link href="/pricing">
             <span className="text-link hover:text-link-hover cursor-pointer">

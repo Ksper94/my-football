@@ -31,7 +31,10 @@ export default function Pricing() {
       <h1 className="text-4xl font-bold text-center mb-8">Nos Formules</h1>
       <div className="flex flex-col md:flex-row justify-center items-center gap-6">
         {pricingPlans.map((plan) => (
-          <div key={plan.priceId} className="w-full max-w-sm bg-white text-foreground p-6 rounded-lg shadow-lg">
+          <div
+            key={plan.priceId}
+            className="w-full max-w-sm bg-white text-gray-900 p-6 rounded-lg shadow-lg transition-colors duration-300"
+          >
             <h2 className="text-2xl font-semibold text-center mb-4">{plan.name}</h2>
             <p className="text-center text-4xl font-bold mb-6">{plan.price}</p>
             <ul className="mb-6">
