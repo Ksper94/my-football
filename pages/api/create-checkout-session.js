@@ -26,10 +26,12 @@ export default async function handler(req, res) {
 
   const token = req.headers.authorization?.replace('Bearer ', '');
   if (!token) {
+    console.error('Token utilisateur manquant');
     return res.status(401).json({ error: 'Token utilisateur manquant.' });
   }
 
   try {
+    // Authentification de l'utilisateur via Supabase
     const { data: { user }, error: userError } = await supabaseService.auth.getUser(token);
     if (userError || !user) {
       console.error('Erreur d\'authentification:', userError?.message);
@@ -38,9 +40,13 @@ export default async function handler(req, res) {
 
     const { priceId } = req.body;
     if (!priceId) {
+      console.error('priceId manquant');
       return res.status(400).json({ error: 'priceId est requis.' });
     }
 
+    console.log('Création de la session Stripe pour priceId:', priceId, 'et utilisateur:', user.email);
+
+    // Création de la session Stripe
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       customer_email: user.email,
@@ -56,13 +62,18 @@ export default async function handler(req, res) {
       metadata: { user_id: user.id, price_id: priceId },
     });
 
+    console.log('Session Stripe créée avec succès. Session ID:', session.id);
+
     // Déterminer le nom du plan à partir du price_id
     const planName = planMapping[priceId] || 'mensuel';
-
-    // Générer le token immédiatement
     const userId = user.id;
+
+    // Générer un token d'accès pour l'utilisateur
     const generatedToken = jwt.sign({ userId }, jwtSecret, { expiresIn: '30d' });
 
+    console.log('Token généré pour l\'utilisateur:', userId);
+
+    // Insérer l'abonnement dans la base de données
     const { error: insertError } = await supabaseService
       .from('subscriptions')
       .insert([{
@@ -79,6 +90,8 @@ export default async function handler(req, res) {
       console.error('Erreur lors de l\'insertion dans subscriptions:', insertError.message);
       return res.status(500).json({ error: 'Erreur lors de l\'enregistrement de l\'abonnement.' });
     }
+
+    console.log('Abonnement inséré dans la base de données avec succès.');
 
     res.status(200).json({ sessionId: session.id });
   } catch (error) {
