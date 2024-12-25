@@ -1,41 +1,16 @@
-// pages/pricing.js
-import { useAuth } from '../context/AuthContext';
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
-import SubscribeButton from '../components/SubscribeButton';
-
 export default function Pricing() {
-  const { user } = useAuth();
-  const router = useRouter();
-
-  // Si vous ne voulez plus rediriger vers /login si non connecté, commentez le useEffect :
-  // useEffect(() => {
-  //   if (!user) {
-  //     router.push('/login');
-  //   }
-  // }, [user, router]);
-
   const pricingPlans = [
     {
       name: 'Mensuel',
       price: '10€',
       priceId: 'price_1QUlyhHd1CTS1QCeLJfFF9Kj',
-      features: [
-        'Accès complet aux prédictions',
-        'Mises à jour quotidiennes',
-        'Support prioritaire',
-      ],
+      features: ['Accès complet aux prédictions', 'Mises à jour quotidiennes', 'Support prioritaire'],
     },
     {
       name: 'Trimestriel',
       price: '27€',
       priceId: 'price_1QUlzrHd1CTS1QCebhWYJdYv',
-      features: [
-        'Accès complet aux prédictions',
-        'Mises à jour quotidiennes',
-        'Support prioritaire',
-        'Réduction de 10%',
-      ],
+      features: ['Accès complet aux prédictions', 'Mises à jour quotidiennes', 'Support prioritaire', 'Réduction de 10%'],
     },
     {
       name: 'Annuel',
@@ -51,14 +26,12 @@ export default function Pricing() {
     },
   ];
 
-  // Si vous tenez à bloquer l'accès si pas connecté, laissez le useEffect précédent, mais sinon l'utilisateur peut voir les formules et se connecter avant d'acheter.
-
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="min-h-screen bg-background text-foreground p-8 transition-all duration-300">
       <h1 className="text-4xl font-bold text-center mb-8">Nos Formules</h1>
       <div className="flex flex-col md:flex-row justify-center items-center gap-6">
         {pricingPlans.map((plan) => (
-          <div key={plan.priceId} className="w-full max-w-sm bg-white p-6 rounded-lg shadow-lg">
+          <div key={plan.priceId} className="w-full max-w-sm bg-white text-foreground p-6 rounded-lg shadow-lg">
             <h2 className="text-2xl font-semibold text-center mb-4">{plan.name}</h2>
             <p className="text-center text-4xl font-bold mb-6">{plan.price}</p>
             <ul className="mb-6">
@@ -71,7 +44,9 @@ export default function Pricing() {
                 </li>
               ))}
             </ul>
-            <SubscribeButton priceId={plan.priceId} />
+            <button className="bg-link text-white py-2 px-4 rounded hover:bg-link-hover focus:outline-none">
+              S'abonner
+            </button>
           </div>
         ))}
       </div>
