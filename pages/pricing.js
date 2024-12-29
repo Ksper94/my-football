@@ -74,8 +74,13 @@ export default function Pricing() {
 
       const { sessionId } = await response.json();
 
+      // Charger Stripe
+      const stripe = await stripePromise;
+      if (!stripe) {
+        throw new Error('La clé publique Stripe est manquante ou invalide.');
+      }
+
       // Redirection vers Stripe
-      const stripe = await stripePromise; // Charger Stripe via la promesse
       await stripe.redirectToCheckout({ sessionId });
     } catch (error) {
       console.error('Erreur lors de la redirection vers Stripe:', error.message);
