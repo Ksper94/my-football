@@ -64,21 +64,24 @@ async function handleCheckoutSessionCompleted(session) {
   }
 
   try {
+    const plan = session.metadata.plan || 'unknown';
     const token = jwt.sign({ userId }, jwtSecret, { expiresIn: '30d' });
-    console.log(`Token JWT généré pour l'utilisateur ${userId}`);
 
     const { error } = await supabaseService
       .from('subscriptions')
-      .upsert([
-        {
-          user_id: userId,
-          session_id: session.id,
-          plan: 'premium',
-          token: token,
-          status: 'active',
-          updated_at: new Date(),
-        },
-      ], { onConflict: 'user_id' });
+      .upsert(
+        [
+          {
+            user_id: userId,
+            session_id: session.id,
+            plan,
+            token,
+            status: 'active',
+            updated_at: new Date(),
+          },
+        ],
+        { onConflict: 'user_id' }
+      );
 
     if (error) throw error;
     console.log(`Abonnement inséré/activé avec succès pour l'utilisateur ${userId}`);
@@ -98,29 +101,26 @@ async function handleSubscriptionEvent(subscription) {
   }
 
   try {
-    let plan = 'free';
-    let status = subscription.status;
-
-    if (status === 'active') {
-      plan = 'premium';
-    } else if (status === 'canceled' || status === 'past_due') {
-      plan = 'canceled';
-    }
+    const plan = subscription.metadata.plan || 'unknown';
+    const status = subscription.status;
 
     const token = status === 'active' ? jwt.sign({ userId }, jwtSecret, { expiresIn: '30d' }) : null;
 
     const { error } = await supabaseService
       .from('subscriptions')
-      .upsert([
-        {
-          user_id: userId,
-          session_id: subscription.id,
-          plan: plan,
-          token: token,
-          status: status,
-          updated_at: new Date(),
-        },
-      ], { onConflict: 'user_id' });
+      .upsert(
+        [
+          {
+            user_id: userId,
+            session_id: subscription.id,
+            plan,
+            token,
+            status,
+            updated_at: new Date(),
+          },
+        ],
+        { onConflict: 'user_id' }
+      );
 
     if (error) throw error;
     console.log(`Abonnement mis à jour pour l'utilisateur ${userId}: Plan ${plan}, Status ${status}`);
