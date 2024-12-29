@@ -67,39 +67,29 @@ async function handleCheckoutSessionCompleted(session) {
     const plan = session.metadata.plan || 'unknown';
     const token = jwt.sign({ userId }, jwtSecret, { expiresIn: '30d' });
 
-    console.log('Données à insérer dans Supabase:', {
+    const dataToInsert = {
       user_id: userId,
       session_id: session.id,
       plan,
       token,
       status: 'active',
       updated_at: new Date(),
-    });
+    };
+
+    console.log('Données envoyées à Supabase :', dataToInsert);
 
     const { error } = await supabaseService
       .from('subscriptions')
-      .upsert(
-        [
-          {
-            user_id: userId,
-            session_id: session.id,
-            plan,
-            token,
-            status: 'active',
-            updated_at: new Date(),
-          },
-        ],
-        { onConflict: 'user_id' }
-      );
+      .upsert([dataToInsert], { onConflict: 'user_id' });
 
     if (error) {
-      console.error('Erreur lors de l\'insertion de l\'abonnement dans Supabase:', error.message);
+      console.error('Erreur lors de l\'insertion dans Supabase :', error.message);
       throw error;
     }
 
     console.log(`Abonnement inséré/activé avec succès pour l'utilisateur ${userId}`);
   } catch (error) {
-    console.error('Erreur lors de l\'insertion dans Supabase:', error.message);
+    console.error('Erreur lors de l\'insertion dans Supabase :', error.message);
     throw error;
   }
 }
@@ -119,30 +109,29 @@ async function handleSubscriptionEvent(subscription) {
 
     const token = status === 'active' ? jwt.sign({ userId }, jwtSecret, { expiresIn: '30d' }) : null;
 
+    const dataToUpdate = {
+      user_id: userId,
+      session_id: subscription.id,
+      plan,
+      token,
+      status,
+      updated_at: new Date(),
+    };
+
+    console.log('Données mises à jour dans Supabase :', dataToUpdate);
+
     const { error } = await supabaseService
       .from('subscriptions')
-      .upsert(
-        [
-          {
-            user_id: userId,
-            session_id: subscription.id,
-            plan,
-            token,
-            status,
-            updated_at: new Date(),
-          },
-        ],
-        { onConflict: 'user_id' }
-      );
+      .upsert([dataToUpdate], { onConflict: 'user_id' });
 
     if (error) {
-      console.error('Erreur lors de la mise à jour de l\'abonnement dans Supabase:', error.message);
+      console.error('Erreur lors de la mise à jour dans Supabase :', error.message);
       throw error;
     }
 
     console.log(`Abonnement mis à jour pour l'utilisateur ${userId} : Plan ${plan}, Status ${status}`);
   } catch (error) {
-    console.error('Erreur lors de la mise à jour de l\'abonnement:', error.message);
+    console.error('Erreur lors de la mise à jour dans Supabase :', error.message);
     throw error;
   }
 }
