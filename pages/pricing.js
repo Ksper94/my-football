@@ -1,6 +1,13 @@
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/router';
-import SubscribeButton from '../components/SubscribeButton';
+import { createClient } from '@supabase/supabase-js';
+import { loadStripe } from '@stripe/stripe-js';
+
+// Initialiser Supabase
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
 
 export default function Pricing() {
   const pricingPlans = [
