@@ -54,7 +54,7 @@ export default function Home() {
             {user ? (
               <>
                 <h2 className="text-3xl font-semibold mb-4">
-                  Bienvenue, {user.email} !
+                  Bienvenue, {user.first_name || 'Utilisateur'} !
                 </h2>
                 <p className="mb-6">
                   Vous êtes connecté et prêt à explorer nos prédictions.

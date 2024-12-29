@@ -45,6 +45,9 @@ export default function Pricing() {
     }
 
     try {
+      // Affiche le prénom lors de la souscription
+      alert(`Merci, ${user.first_name || 'Utilisateur'}, de souscrire à notre plan !`);
+
       // Récupération du token JWT avec Supabase
       const {
         data: { session },
@@ -62,7 +65,7 @@ export default function Pricing() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`, // Envoi du token JWT
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ priceId }),
       });

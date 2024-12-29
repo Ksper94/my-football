@@ -23,7 +23,7 @@ export default function Dashboard() {
       if (!loading && user) {
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .select('id, email, username, full_name, avatar_url')
+          .select('id, first_name, last_name, email, username, full_name, avatar_url')
           .eq('id', user.id)
           .maybeSingle();
 
@@ -48,7 +48,7 @@ export default function Dashboard() {
           .maybeSingle();
 
         if (subError) {
-          console.error('Erreur lors de la récupération de l\'abonnement :', subError.message);
+          console.error("Erreur lors de la récupération de l'abonnement :", subError.message);
           setSubscription(null);
         } else if (!subData) {
           setSubscription(null);
@@ -102,7 +102,9 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background text-foreground p-8 transition-all duration-300">
       <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
       {profile ? (
-        <p className="mb-4">Bienvenue, <strong>{profile.email}</strong>!</p>
+        <p className="mb-4">
+          Bienvenue, <strong>{profile.first_name || 'Utilisateur'}</strong> !
+        </p>
       ) : (
         <p className="mb-4">Bienvenue !</p>
       )}
