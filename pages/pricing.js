@@ -1,7 +1,29 @@
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/router';
+import SubscribeButton from '../components/SubscribeButton';
 
-export default function PricingPage() {
+export default function Pricing() {
+  const pricingPlans = [
+    {
+      name: 'Mensuel',
+      price: '10€',
+      priceId: 'price_1QUlyhHd1CTS1QCeLJfFF9Kj',
+      features: ['Accès complet aux prédictions', 'Mises à jour quotidiennes', 'Support prioritaire'],
+    },
+    {
+      name: 'Trimestriel',
+      price: '27€',
+      priceId: 'price_1QUlzrHd1CTS1QCebhWYJdYv',
+      features: ['Accès complet aux prédictions', 'Mises à jour quotidiennes', 'Support premium'],
+    },
+    {
+      name: 'Annuel',
+      price: '90€',
+      priceId: 'price_1QUm0YHd1CTS1QCeSrmFSzI7',
+      features: ['Accès complet aux prédictions', 'Mises à jour quotidiennes', 'Support premium VIP'],
+    },
+  ];
+
   const { user } = useAuth();
   const router = useRouter();
 
@@ -39,27 +61,28 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
-      <h1 className="text-3xl font-bold mb-6">Choisissez votre plan</h1>
-      <div className="flex flex-col space-y-4">
-        <button
-          onClick={() => handleSubscription('price_1QUlyhHd1CTS1QCeLJfFF9Kj')}
-          className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-        >
-          Mensuel - 10€
-        </button>
-        <button
-          onClick={() => handleSubscription('price_1QUlzrHd1CTS1QCebhWYJdYv')}
-          className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-        >
-          Trimestriel - 25€
-        </button>
-        <button
-          onClick={() => handleSubscription('price_1QUm0YHd1CTS1QCeSrmFSzI7')}
-          className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-        >
-          Annuel - 90€
-        </button>
+    <div className="min-h-screen bg-gray-100 p-8">
+      <h1 className="text-3xl font-bold mb-8 text-center">Choisissez votre abonnement</h1>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {pricingPlans.map((plan) => (
+          <div key={plan.priceId} className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-bold mb-4">{plan.name}</h2>
+            <p className="text-2xl font-semibold mb-4">{plan.price}</p>
+            <ul className="mb-6">
+              {plan.features.map((feature, index) => (
+                <li key={index} className="text-gray-700">
+                  - {feature}
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={() => handleSubscription(plan.priceId)}
+              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition"
+            >
+              S'abonner
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );
