@@ -55,9 +55,9 @@ export default async function handler(req, res) {
 }
 
 async function handleCheckoutSessionCompleted(session) {
-  console.log('Session de checkout complétée:', session.id);
-  const userId = session.metadata?.user_id;
+  console.log('Session de checkout complétée :', session);
 
+  const userId = session.metadata?.user_id;
   if (!userId) {
     console.error('user_id manquant dans les métadonnées de la session Stripe');
     return;
@@ -92,9 +92,9 @@ async function handleCheckoutSessionCompleted(session) {
 }
 
 async function handleSubscriptionEvent(subscription) {
-  console.log('Événement de subscription:', subscription.id);
-  const userId = subscription.metadata?.user_id;
+  console.log('Événement de subscription :', subscription.id);
 
+  const userId = subscription.metadata?.user_id;
   if (!userId) {
     console.error('user_id manquant dans les métadonnées de la subscription');
     return;
@@ -123,7 +123,7 @@ async function handleSubscriptionEvent(subscription) {
       );
 
     if (error) throw error;
-    console.log(`Abonnement mis à jour pour l'utilisateur ${userId}: Plan ${plan}, Status ${status}`);
+    console.log(`Abonnement mis à jour pour l'utilisateur ${userId} : Plan ${plan}, Status ${status}`);
   } catch (error) {
     console.error('Erreur lors de la mise à jour de l\'abonnement:', error.message);
     throw error;

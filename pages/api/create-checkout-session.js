@@ -36,6 +36,11 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Plan d\'abonnement invalide.' });
     }
 
+    console.log('Création de la session Stripe avec les métadonnées :', {
+      user_id: user.id,
+      plan: planMapping[priceId],
+    });
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       customer_email: user.email,
@@ -45,6 +50,8 @@ export default async function handler(req, res) {
       cancel_url: `${req.headers.origin}/pricing`,
       metadata: { user_id: user.id, plan: planMapping[priceId] },
     });
+
+    console.log('Session Stripe créée avec succès:', session.id);
 
     res.status(200).json({ sessionId: session.id });
   } catch (error) {
