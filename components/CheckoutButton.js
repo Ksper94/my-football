@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
+import { supabase } from '../utils/supabaseClient'; // Assurez-vous d'avoir bien importé Supabase
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
@@ -22,49 +23,41 @@ export default function CheckoutButton({ productId }) {
     setError(null);
 
     try {
+      // Récupération du JWT
+      const session = supabase.auth.session();
+      const token = session?.access_token;
+
+      if (!token) {
+        throw new Error('Utilisateur non authentifié. Veuillez vous reconnecter.');
+      }
+
       const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Inclusion du JWT
+        },
         body: JSON.stringify({ priceId: productId, email: user.email }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        console.error('Erreur lors de la création de la session de paiement:', data.error);
-        throw new Error(data.error || "Une erreur est survenue lors de la création de la session.");
+        throw new Error(data.error || 'Une erreur est survenue.');
       }
 
       const stripe = await stripePromise;
-      if (!stripe) {
-        throw new Error('Erreur lors de l’initialisation de Stripe.');
-      }
-
-      const { error: stripeError } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
-      if (stripeError) {
-        console.error('Erreur lors de la redirection vers Checkout:', stripeError);
-        throw new Error(stripeError.message);
-      }
-
+      await stripe.redirectToCheckout({ sessionId: data.sessionId });
     } catch (err) {
-      console.error('Erreur lors de la requête de paiement:', err);
-      setError(err.message || 'Une erreur est survenue. Veuillez réessayer.');
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div>
-      <button
-        onClick={handleCheckout}
-        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 disabled:opacity-50"
-        disabled={loading}
-      >
-        {loading ? 'Chargement...' : 'Acheter'}
-      </button>
-      {error && <p className="text-red-500 mt-2">{error}</p>}
-    </div>
+    <button onClick={handleCheckout} disabled={loading}>
+      {loading ? 'Chargement...' : 'S’abonner'}
+    </button>
   );
 }
