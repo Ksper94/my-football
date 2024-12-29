@@ -1,96 +1,66 @@
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/router';
-import SubscribeButton from '../components/SubscribeButton';
 
-export default function Pricing() {
-  const pricingPlans = [
-    {
-      name: 'Mensuel',
-      price: '10€',
-      priceId: 'price_1QUlyhHd1CTS1QCeLJfFF9Kj',
-      features: ['Accès complet aux prédictions', 'Mises à jour quotidiennes', 'Support prioritaire'],
-    },
-    {
-      name: 'Trimestriel',
-      price: '27€',
-      priceId: 'price_1QUlzrHd1CTS1QCebhWYJdYv',
-      features: ['Accès complet aux prédictions', 'Mises à jour quotidiennes', 'Support prioritaire', 'Réduction de 10%'],
-    },
-    {
-      name: 'Annuel',
-      price: '100€',
-      priceId: 'price_1QUm0YHd1CTS1QCeSrmFSzI7',
-      features: [
-        'Accès complet aux prédictions',
-        'Mises à jour quotidiennes',
-        'Support prioritaire',
-        'Réduction de 20%',
-        'Accès anticipé aux nouvelles fonctionnalités',
-      ],
-    },
-  ];
+export default function PricingPage() {
+  const { user } = useAuth();
+  const router = useRouter();
 
   const handleSubscription = async (priceId) => {
+    if (!user) {
+      alert('Vous devez être connecté pour souscrire à un abonnement.');
+      router.push('/login');
+      return;
+    }
+
     try {
-      // Rediriger vers la page de paiement
+      const token = supabase.auth.session()?.access_token; // Récupère le token JWT
+
       const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Envoi du token JWT
+        },
         body: JSON.stringify({ priceId }),
       });
 
-      const { sessionId } = await response.json();
-
-      if (!sessionId) {
-        throw new Error('Session de paiement introuvable.');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur lors de la création de la session de paiement.');
       }
 
-      const stripe = await getStripe(); // Initialisation de Stripe
+      const { sessionId } = await response.json();
+      const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
       await stripe.redirectToCheckout({ sessionId });
     } catch (error) {
-      console.error('Erreur lors de la redirection vers le paiement :', error);
+      console.error('Erreur lors de la redirection vers Stripe:', error.message);
       alert('Une erreur est survenue. Veuillez réessayer.');
     }
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-8 transition-all duration-300">
-      <h1 className="text-4xl font-bold text-center mb-8">Nos Formules</h1>
-      <div className="flex flex-col md:flex-row justify-center items-center gap-6">
-        {pricingPlans.map((plan) => (
-          <div
-            key={plan.priceId}
-            className="w-full max-w-sm bg-white text-gray-900 p-6 rounded-lg shadow-lg transition-colors duration-300"
-          >
-            <h2 className="text-2xl font-bold text-gray-900 text-center mb-4">{plan.name}</h2>
-            <p className="text-center text-4xl font-bold mb-6">{plan.price}</p>
-            <ul className="mb-6">
-              {plan.features.map((feature, index) => (
-                <li key={index} className="flex items-center mb-2">
-                  <svg className="w-6 h-6 text-green-500 mr-2" fill="none" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
-            <button
-              onClick={() => handleSubscription(plan.priceId)}
-              className="bg-link text-white py-2 px-4 rounded hover:bg-link-hover focus:outline-none focus:ring-2 focus:ring-blue-300"
-            >
-              S'abonner
-            </button>
-          </div>
-        ))}
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
+      <h1 className="text-3xl font-bold mb-6">Choisissez votre plan</h1>
+      <div className="flex flex-col space-y-4">
+        <button
+          onClick={() => handleSubscription('price_1QUlyhHd1CTS1QCeLJfFF9Kj')}
+          className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+        >
+          Mensuel - 10€
+        </button>
+        <button
+          onClick={() => handleSubscription('price_1QUlzrHd1CTS1QCebhWYJdYv')}
+          className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+        >
+          Trimestriel - 25€
+        </button>
+        <button
+          onClick={() => handleSubscription('price_1QUm0YHd1CTS1QCeSrmFSzI7')}
+          className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+        >
+          Annuel - 90€
+        </button>
       </div>
     </div>
   );
-}
-
-async function getStripe() {
-  if (!window.Stripe) {
-    const stripeJs = await import('@stripe/stripe-js');
-    return stripeJs.loadStripe('votre-clé-publique-Stripe'); // Remplacez par votre clé publique Stripe
-  }
-  return window.Stripe;
 }
