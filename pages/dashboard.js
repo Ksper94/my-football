@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { supabase } from '../utils/supabaseClient';
 
 export default function Dashboard() {
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const router = useRouter();
   const [profile, setProfile] = useState(null);
   const [error, setError] = useState('');
@@ -86,6 +86,15 @@ export default function Dashboard() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      router.push('/login');
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error.message);
+    }
+  };
+
   if (loading) return <div>Chargement...</div>;
   if (error) return <div className="text-red-500">{error}</div>;
 
@@ -129,6 +138,12 @@ export default function Dashboard() {
           </Link>
         </div>
       )}
+      <button
+        onClick={handleLogout}
+        className="mt-4 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition"
+      >
+        Se déconnecter
+      </button>
     </div>
   );
 }

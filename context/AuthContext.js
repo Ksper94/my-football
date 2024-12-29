@@ -46,51 +46,15 @@ export const AuthProvider = ({ children }) => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) {
-        console.error('Error signing out:', error);
+        console.error('Error during sign out:', error.message);
         setAuthError(error);
       } else {
-        setUser(null);
-        console.log('User signed out');
+        setUser(null); // Réinitialise l'utilisateur
+        console.log('User signed out successfully');
       }
     } catch (err) {
-      console.error('Unexpected error signing out:', err);
+      console.error('Unexpected error during sign out:', err);
     }
-  }, []);
-
-  const signIn = useCallback(async (email, password) => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      console.error('Error signing in:', error);
-      setAuthError(error);
-      throw error;
-    }
-
-    console.log('User signed in:', data.user);
-
-    // Upsert du profil
-    const { error: profileUpsertError } = await supabase
-      .from('profiles')
-      .upsert([{ id: data.user.id, email: data.user.email }], { onConflict: 'id' });
-
-    if (profileUpsertError) {
-      console.error('Error upserting profile:', profileUpsertError.message);
-    } else {
-      console.log('Profile upserted successfully for user:', data.user.id);
-    }
-
-    return data;
-  }, []);
-
-  const signUp = useCallback(async (email, password) => {
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    if (error) {
-      console.error('Error signing up:', error);
-      setAuthError(error);
-      throw error;
-    }
-    console.log('User signed up:', data.user);
-    // Un email de confirmation est envoyé, pas de création de profil ici.
-    return data;
   }, []);
 
   const value = useMemo(
@@ -98,11 +62,9 @@ export const AuthProvider = ({ children }) => {
       user,
       loading,
       authError,
-      signUp,
-      signIn,
       signOut,
     }),
-    [user, loading, authError, signUp, signIn, signOut]
+    [user, loading, authError, signOut]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

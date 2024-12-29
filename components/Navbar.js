@@ -4,14 +4,14 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 const Navbar = () => {
-  const { user, loading, signOut, authError } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
       await signOut();
-      router.push('/login');
+      router.push('/login'); // Redirection après déconnexion
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error.message);
     }
@@ -70,7 +70,6 @@ const Navbar = () => {
           )}
         </div>
       </div>
-      {authError && <p className="text-red-500 mt-2">{authError.message}</p>}
     </nav>
   );
 };
