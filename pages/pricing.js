@@ -42,7 +42,17 @@ export default function Pricing() {
     }
 
     try {
-      const token = supabase.auth.session()?.access_token; // Récupère le token JWT
+      // Récupération du token JWT avec la méthode auth.getSession()
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+
+      if (error || !session) {
+        throw new Error('Impossible de récupérer le token utilisateur.');
+      }
+
+      const token = session.access_token;
 
       const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
