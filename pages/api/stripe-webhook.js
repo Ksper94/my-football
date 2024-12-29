@@ -67,7 +67,6 @@ async function handleCheckoutSessionCompleted(session) {
   }
 
   try {
-    // Générer un JWT pour l'utilisateur
     const token = jwt.sign({ userId }, jwtSecret, { expiresIn: '30d' });
 
     const dataToInsert = {
