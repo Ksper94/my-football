@@ -1,4 +1,4 @@
-// pages/api/check-subscription.js 
+// pages/api/check-subscription.js
 import { supabaseService } from '../../utils/supabaseService';
 import Joi from 'joi';
 import crypto from 'crypto';
@@ -46,6 +46,7 @@ export default async function handler(req, res) {
   // Valider le corps de la requête
   const { error, value } = schema.validate(req.body);
   if (error) {
+    console.error('Erreur de validation des données :', error.details[0].message);
     return res.status(400).json({ success: false, message: error.details[0].message });
   }
 
@@ -55,8 +56,9 @@ export default async function handler(req, res) {
   let decoded;
   try {
     decoded = jwt.verify(token, JWT_SECRET);
+    console.log('Token décodé avec succès :', decoded);
   } catch (err) {
-    console.error('Erreur de vérification du token JWT:', err.message);
+    console.error('Erreur de vérification du token JWT :', err.message);
     return res.status(403).json({ success: false, message: 'Token invalide ou expiré.' });
   }
 
@@ -70,9 +72,14 @@ export default async function handler(req, res) {
       .eq('user_id', userId)
       .single();
 
-    if (subscriptionError || !data) {
-      console.error('Erreur lors de la récupération de l\'abonnement:', subscriptionError?.message);
+    if (subscriptionError) {
+      console.error('Erreur lors de la récupération de l\'abonnement :', subscriptionError.message);
       return res.status(400).json({ success: false, message: 'Abonnement non trouvé.' });
+    }
+
+    if (!data) {
+      console.error('Aucun abonnement trouvé pour l\'utilisateur ID :', userId);
+      return res.status(404).json({ success: false, message: 'Abonnement non trouvé.' });
     }
 
     // Définir une liste de plans valides
@@ -80,18 +87,21 @@ export default async function handler(req, res) {
 
     // Vérifier que l'abonnement est valide
     if (!allowedPlans.includes(data.plan)) {
+      console.error('Plan non valide détecté pour l\'utilisateur ID :', userId);
       return res.status(403).json({ success: false, message: 'Abonnement non valide.' });
     }
 
     // Comparer le token stocké avec celui fourni
     if (!secureCompare(data.token, token)) {
+      console.error('Le token fourni ne correspond pas à celui enregistré pour l\'utilisateur ID :', userId);
       return res.status(403).json({ success: false, message: 'Token invalide.' });
     }
 
     // Si tout est correct, renvoyer une réponse de succès
+    console.log('Abonnement valide pour l\'utilisateur ID :', userId);
     return res.status(200).json({ success: true, message: 'Token valide.' });
   } catch (err) {
-    console.error('Erreur lors de la vérification du token:', err.message);
+    console.error('Erreur lors de la vérification de l\'abonnement :', err.message);
     return res.status(500).json({ success: false, message: 'Erreur interne du serveur.' });
   }
 }
