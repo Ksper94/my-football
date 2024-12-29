@@ -65,12 +65,14 @@ async function handleCheckoutSessionCompleted(session) {
 
   try {
     const plan = session.metadata.plan || 'unknown';
+    const priceId = session.metadata.price_id || session.subscription; // Ajout de `price_id`
     const token = jwt.sign({ userId }, jwtSecret, { expiresIn: '30d' });
 
     const dataToInsert = {
       user_id: userId,
       session_id: session.id,
       plan,
+      price_id: priceId, // Inclure `price_id`
       token,
       status: 'active',
       updated_at: new Date(),
@@ -105,6 +107,7 @@ async function handleSubscriptionEvent(subscription) {
 
   try {
     const plan = subscription.metadata.plan || 'unknown';
+    const priceId = subscription.metadata.price_id || subscription.id; // Ajout de `price_id`
     const status = subscription.status;
 
     const token = status === 'active' ? jwt.sign({ userId }, jwtSecret, { expiresIn: '30d' }) : null;
@@ -113,6 +116,7 @@ async function handleSubscriptionEvent(subscription) {
       user_id: userId,
       session_id: subscription.id,
       plan,
+      price_id: priceId, // Inclure `price_id`
       token,
       status,
       updated_at: new Date(),
