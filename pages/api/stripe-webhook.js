@@ -67,6 +67,15 @@ async function handleCheckoutSessionCompleted(session) {
     const plan = session.metadata.plan || 'unknown';
     const token = jwt.sign({ userId }, jwtSecret, { expiresIn: '30d' });
 
+    console.log('Données à insérer dans Supabase:', {
+      user_id: userId,
+      session_id: session.id,
+      plan,
+      token,
+      status: 'active',
+      updated_at: new Date(),
+    });
+
     const { error } = await supabaseService
       .from('subscriptions')
       .upsert(
@@ -83,7 +92,11 @@ async function handleCheckoutSessionCompleted(session) {
         { onConflict: 'user_id' }
       );
 
-    if (error) throw error;
+    if (error) {
+      console.error('Erreur lors de l\'insertion de l\'abonnement dans Supabase:', error.message);
+      throw error;
+    }
+
     console.log(`Abonnement inséré/activé avec succès pour l'utilisateur ${userId}`);
   } catch (error) {
     console.error('Erreur lors de l\'insertion dans Supabase:', error.message);
@@ -122,7 +135,11 @@ async function handleSubscriptionEvent(subscription) {
         { onConflict: 'user_id' }
       );
 
-    if (error) throw error;
+    if (error) {
+      console.error('Erreur lors de la mise à jour de l\'abonnement dans Supabase:', error.message);
+      throw error;
+    }
+
     console.log(`Abonnement mis à jour pour l'utilisateur ${userId} : Plan ${plan}, Status ${status}`);
   } catch (error) {
     console.error('Erreur lors de la mise à jour de l\'abonnement:', error.message);
