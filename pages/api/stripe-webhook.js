@@ -28,9 +28,9 @@ export default async function handler(req, res) {
   let event;
   try {
     event = stripe.webhooks.constructEvent(buf.toString(), sig, process.env.STRIPE_WEBHOOK_SECRET);
-    console.log(`Webhook Stripe reçu: ${event.type}`);
+    console.log(`Webhook Stripe reçu : ${event.type}`);
   } catch (err) {
-    console.error('Erreur de signature du webhook:', err.message);
+    console.error('Erreur de signature du webhook :', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -44,12 +44,12 @@ export default async function handler(req, res) {
         await handleSubscriptionEvent(event.data.object);
         break;
       default:
-        console.warn(`Événement non géré: ${event.type}`);
+        console.warn(`Événement non géré : ${event.type}`);
     }
 
     res.status(200).json({ received: true });
   } catch (error) {
-    console.error('Erreur lors du traitement de l\'événement:', error.message);
+    console.error('Erreur lors du traitement de l\'événement :', error.message);
     res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 }
@@ -78,7 +78,7 @@ async function handleCheckoutSessionCompleted(session) {
 
     console.log('Données envoyées à Supabase :', dataToInsert);
 
-    const { error } = await supabaseService
+    const { data, error } = await supabaseService
       .from('subscriptions')
       .upsert([dataToInsert], { onConflict: 'user_id' });
 
@@ -87,7 +87,7 @@ async function handleCheckoutSessionCompleted(session) {
       throw error;
     }
 
-    console.log(`Abonnement inséré/activé avec succès pour l'utilisateur ${userId}`);
+    console.log('Données insérées dans Supabase :', data);
   } catch (error) {
     console.error('Erreur lors de l\'insertion dans Supabase :', error.message);
     throw error;
@@ -120,7 +120,7 @@ async function handleSubscriptionEvent(subscription) {
 
     console.log('Données mises à jour dans Supabase :', dataToUpdate);
 
-    const { error } = await supabaseService
+    const { data, error } = await supabaseService
       .from('subscriptions')
       .upsert([dataToUpdate], { onConflict: 'user_id' });
 
@@ -129,7 +129,7 @@ async function handleSubscriptionEvent(subscription) {
       throw error;
     }
 
-    console.log(`Abonnement mis à jour pour l'utilisateur ${userId} : Plan ${plan}, Status ${status}`);
+    console.log('Données mises à jour dans Supabase :', data);
   } catch (error) {
     console.error('Erreur lors de la mise à jour dans Supabase :', error.message);
     throw error;
