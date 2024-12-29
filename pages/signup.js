@@ -1,67 +1,57 @@
-// pages/signup.js
-import { useState } from 'react'
-import { useAuth } from '../context/AuthContext'
+import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 export default function SignUpPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [errorMsg, setErrorMsg] = useState('')
-  const [successMsg, setSuccessMsg] = useState('')
-  const { signUp } = useAuth() // Assurez-vous que signUp est correctement défini dans AuthContext
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const { signUp } = useAuth();
 
   const handleSignUp = async () => {
-    setErrorMsg('')
-    setSuccessMsg('')
+    setError('');
+    setSuccess('');
 
     if (!email || !password) {
-      setErrorMsg("Veuillez renseigner un email et un mot de passe.")
-      return
+      setError('Veuillez renseigner un email et un mot de passe.');
+      return;
     }
 
     try {
-      await signUp(email, password)
-      setSuccessMsg("Un email de confirmation vous a été envoyé. Veuillez confirmer votre adresse avant de vous connecter.")
-    } catch (error) {
-      console.error('Erreur lors de l\'inscription :', error)
-      setErrorMsg(error.message || "Une erreur est survenue lors de l'inscription.")
+      await signUp(email, password);
+      setSuccess('Un email de confirmation vous a été envoyé. Veuillez vérifier votre boîte de réception.');
+    } catch (err) {
+      setError(err.message || 'Une erreur est survenue lors de l\'inscription.');
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-md shadow-md p-8 max-w-md w-full">
-        <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">Créer un compte</h1>
-
-        {errorMsg && <div className="bg-red-100 border border-red-400 text-red-700 p-3 rounded mb-4">{errorMsg}</div>}
-        {successMsg && <div className="bg-green-100 border border-green-400 text-green-700 p-3 rounded mb-4">{successMsg}</div>}
-
-        <label className="block mb-2 font-semibold text-gray-700" htmlFor="email">Adresse Email</label>
-        <input 
-          type="email" 
-          id="email" 
-          className="w-full border border-gray-300 rounded p-2 mb-4 focus:outline-none focus:border-blue-500" 
-          placeholder="votre email"
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
+        <h1 className="text-2xl font-bold mb-6">Créer un compte</h1>
+        {error && <p className="text-red-500 mb-4">{error}</p>}
+        {success && <p className="text-green-500 mb-4">{success}</p>}
+        <label className="block mb-2">Email</label>
+        <input
+          type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          className="w-full p-2 mb-4 border rounded"
         />
-
-        <label className="block mb-2 font-semibold text-gray-700" htmlFor="password">Mot de passe</label>
-        <input 
-          type="password" 
-          id="password"
-          className="w-full border border-gray-300 rounded p-2 mb-6 focus:outline-none focus:border-blue-500"
-          placeholder="••••••••"
+        <label className="block mb-2">Mot de passe</label>
+        <input
+          type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          className="w-full p-2 mb-6 border rounded"
         />
-
         <button
           onClick={handleSignUp}
-          className="w-full py-2 px-4 rounded text-white font-semibold bg-blue-500 hover:bg-blue-600 transition-colors"
+          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
         >
-          Créer mon compte
+          Créer un compte
         </button>
       </div>
     </div>
-  )
+  );
 }
