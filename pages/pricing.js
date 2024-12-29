@@ -9,6 +9,9 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 
+// Charger Stripe avec la clé publique
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
+
 export default function Pricing() {
   const pricingPlans = [
     {
@@ -42,7 +45,7 @@ export default function Pricing() {
     }
 
     try {
-      // Récupération du token JWT avec la méthode auth.getSession()
+      // Récupération du token JWT avec Supabase
       const {
         data: { session },
         error,
@@ -54,6 +57,7 @@ export default function Pricing() {
 
       const token = session.access_token;
 
+      // Appel à l'API pour créer la session Stripe
       const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: {
@@ -69,7 +73,9 @@ export default function Pricing() {
       }
 
       const { sessionId } = await response.json();
-      const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
+
+      // Redirection vers Stripe
+      const stripe = await stripePromise; // Charger Stripe via la promesse
       await stripe.redirectToCheckout({ sessionId });
     } catch (error) {
       console.error('Erreur lors de la redirection vers Stripe:', error.message);
