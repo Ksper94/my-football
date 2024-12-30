@@ -1,3 +1,5 @@
+// pages/pricing.js
+
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/router';
 import { createClient } from '@supabase/supabase-js';
@@ -13,41 +15,57 @@ const supabase = createClient(
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
 
 export default function Pricing() {
+  // Tes différents plans
   const pricingPlans = [
     {
       name: 'Mensuel',
       price: '10€',
       priceId: 'price_1QUlyhHd1CTS1QCeLJfFF9Kj',
-      features: ['Accès complet aux prédictions', 'Mises à jour quotidiennes', 'Support prioritaire'],
+      features: [
+        'Accès complet aux prédictions',
+        'Mises à jour quotidiennes',
+        'Support prioritaire',
+      ],
     },
     {
       name: 'Trimestriel',
       price: '27€',
       priceId: 'price_1QUlzrHd1CTS1QCebhWYJdYv',
-      features: ['Accès complet aux prédictions', 'Mises à jour quotidiennes', 'Support premium'],
+      features: [
+        'Accès complet aux prédictions',
+        'Mises à jour quotidiennes',
+        'Support premium',
+      ],
     },
     {
       name: 'Annuel',
       price: '90€',
       priceId: 'price_1QUm0YHd1CTS1QCeSrmFSzI7',
-      features: ['Accès complet aux prédictions', 'Mises à jour quotidiennes', 'Support premium VIP'],
+      features: [
+        'Accès complet aux prédictions',
+        'Mises à jour quotidiennes',
+        'Support premium VIP',
+      ],
     },
   ];
 
   const { user } = useAuth();
   const router = useRouter();
 
+  // Gérer l'abonnement
   const handleSubscription = async (priceId) => {
+    // Vérifier que l'utilisateur est connecté
     if (!user) {
       alert('Vous devez être connecté pour souscrire à un abonnement.');
       router.push('/login');
       return;
     }
 
-    try {
-      // Affiche le prénom lors de la souscription
-      alert(`Merci, ${user.first_name || 'Utilisateur'}, de souscrire à notre plan !`);
+    // Récupérer le prénom depuis user.user_metadata
+    const firstName = user?.user_metadata?.first_name;
+    alert(`Merci, ${firstName || 'Utilisateur'}, de souscrire à notre plan !`);
 
+    try {
       // Récupération du token JWT avec Supabase
       const {
         data: { session },
@@ -72,18 +90,20 @@ export default function Pricing() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Erreur lors de la création de la session de paiement.');
+        throw new Error(
+          errorData.error || 'Erreur lors de la création de la session de paiement.'
+        );
       }
 
       const { sessionId } = await response.json();
 
-      // Charger Stripe
+      // Charger Stripe (clé publique)
       const stripe = await stripePromise;
       if (!stripe) {
         throw new Error('La clé publique Stripe est manquante ou invalide.');
       }
 
-      // Redirection vers Stripe
+      // Redirection vers la page de paiement Stripe
       await stripe.redirectToCheckout({ sessionId });
     } catch (error) {
       console.error('Erreur lors de la redirection vers Stripe:', error.message);

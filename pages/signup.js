@@ -25,7 +25,7 @@ export default function SignUpPage() {
     setError('');
     setSuccess('');
 
-    console.log("Données soumises :", formData); // Log des données envoyées
+    console.log('Données soumises :', formData); // Log des données envoyées
 
     const {
       email,
@@ -48,6 +48,7 @@ export default function SignUpPage() {
     }
 
     try {
+      // On passe les infos supplémentaires dans signUp
       await signUp(email, password, {
         first_name: firstName,
         last_name: lastName,
@@ -55,9 +56,11 @@ export default function SignUpPage() {
         country: country,
         phone_number: formData.phoneNumber,
       });
-      setSuccess('Un email de confirmation vous a été envoyé. Veuillez vérifier votre boîte de réception.');
+      setSuccess(
+        'Un email de confirmation vous a été envoyé. Veuillez vérifier votre boîte de réception.'
+      );
     } catch (err) {
-      console.error("Erreur lors de l'inscription :", err); // Log détaillé des erreurs
+      console.error("Erreur lors de l'inscription :", err);
       setError(err.message || "Une erreur est survenue lors de l'inscription.");
     }
   };

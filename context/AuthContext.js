@@ -15,8 +15,8 @@ export const AuthProvider = ({ children }) => {
         console.error('Error fetching session:', error);
         setAuthError(error);
       } else {
-        if (session?.user) {
-          fetchUserProfile(session.user);
+        if (session?.session?.user) {
+          setUser(session.session.user);
         } else {
           setUser(null);
         }
@@ -26,81 +26,68 @@ export const AuthProvider = ({ children }) => {
 
     getSession();
 
-    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
+    // Gestion en temps réel de l'authentification
+    const {
+      data: subscription,
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
-        fetchUserProfile(session.user);
+        setUser(session.user);
       } else {
         setUser(null);
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const fetchUserProfile = async (authUser) => {
-    try {
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('first_name, last_name, date_of_birth, country, phone_number')
-        .eq('id', authUser.id)
-        .single();
-
-      if (error) {
-        console.error('Erreur lors de la récupération du profil utilisateur:', error.message);
-        setUser(authUser); // Revenir aux données de base si le profil n'est pas trouvé
-      } else {
-        // Fusionner les données Supabase avec les champs du profil
-        setUser({ ...authUser, ...profile });
-      }
-    } catch (err) {
-      console.error('Erreur inattendue lors de la récupération du profil:', err.message);
-    }
-  };
-
+  /**
+   * Création de compte: On stocke les champs
+   * (prénom, nom, etc.) dans user_metadata.
+   * => L'email de confirmation sera envoyé automatiquement par Supabase.
+   */
   const signUp = useCallback(async (email, password, additionalData) => {
     try {
-      const { data, error } = await supabase.auth.signUp({ email, password });
+      // additionalData contient { first_name, last_name, date_of_birth, ... }
+      // On va les mettre dans "data" du signUp Supabase
+      const { data, error } = await supabase.auth.signUp(
+        { email, password },
+        { data: additionalData }
+      );
+
       if (error) {
         console.error('Erreur lors de la création du compte:', error.message);
         throw error;
       }
 
-      // Ajouter les informations supplémentaires dans la table `profiles`
-      if (data.user) {
-        const { error: profileError } = await supabase.from('profiles').insert([
-          {
-            id: data.user.id,
-            ...additionalData, // Inclut first_name, last_name, etc.
-          },
-        ]);
-
-        if (profileError) {
-          console.error('Erreur lors de la création du profil:', profileError.message);
-          throw profileError;
-        }
-      }
-
-      console.log('Utilisateur et profil créés avec succès:', data.user);
+      // data.user = l'utilisateur *non confirmé* (pending email confirmation)
+      // --> AUCUNE insertion dans "profiles" ici, pour éviter le 401
+      console.log('Utilisateur créé (email envoyé) :', data.user);
       return data.user;
     } catch (err) {
-      console.error('Erreur inattendue lors de l\'inscription:', err.message);
+      console.error("Erreur inattendue lors de l'inscription:", err.message);
       throw err;
     }
   }, []);
 
+  /**
+   * Connexion standard
+   */
   const signIn = useCallback(async (email, password) => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
       if (error) {
         console.error('Erreur lors de la connexion:', error.message);
         throw error;
       }
-
       if (data.user) {
-        fetchUserProfile(data.user); // Charger les champs supplémentaires après connexion
+        console.log('Connexion réussie:', data.user);
+        setUser(data.user);
       }
-
-      console.log('Connexion réussie:', data.user);
       return data.user;
     } catch (err) {
       console.error('Erreur inattendue lors de la connexion:', err.message);
@@ -108,6 +95,9 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  /**
+   * Déconnexion
+   */
   const signOut = useCallback(async () => {
     try {
       const { error } = await supabase.auth.signOut();
