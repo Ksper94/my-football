@@ -25,6 +25,8 @@ export default function SignUpPage() {
     setError('');
     setSuccess('');
 
+    console.log("Données soumises :", formData); // Log des données envoyées
+
     const {
       email,
       password,
@@ -55,6 +57,7 @@ export default function SignUpPage() {
       });
       setSuccess('Un email de confirmation vous a été envoyé. Veuillez vérifier votre boîte de réception.');
     } catch (err) {
+      console.error("Erreur lors de l'inscription :", err); // Log détaillé des erreurs
       setError(err.message || "Une erreur est survenue lors de l'inscription.");
     }
   };
