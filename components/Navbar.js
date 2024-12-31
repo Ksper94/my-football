@@ -24,7 +24,7 @@ const Navbar = () => {
   return (
     <nav className="bg-background shadow-md p-4 flex justify-between items-center transition-all duration-300">
       <Link href="/" className="text-xl font-bold text-foreground">
-        Football Predictions
+        Foot Predictions
       </Link>
       <button
         onClick={() => setIsOpen(!isOpen)}

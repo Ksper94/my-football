@@ -6,13 +6,13 @@ class MyDocument extends Document {
       <Html lang="fr">
         <Head>
           <meta charSet="UTF-8" />
-          <meta name="description" content="Football Predictions - Prédictions précises pour vos paris sportifs" />
+          <meta name="description" content="Foot Predictions - Prédictions précises pour vos paris sportifs" />
           <meta name="keywords" content="football, prédictions, paris sportifs, algorithme" />
           <meta name="author" content="Votre Nom" />
-          <meta property="og:title" content="Football Predictions" />
+          <meta property="og:title" content="Foot Predictions" />
           <meta property="og:description" content="Prédictions précises pour vos paris sportifs" />
           <meta property="og:image" content="/football-bg.jpg" />
-          <meta property="og:url" content="https://votre-site.com" />
+          <meta property="og:url" content="https://foot-predictions.com" />
           <meta property="og:type" content="website" />
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />

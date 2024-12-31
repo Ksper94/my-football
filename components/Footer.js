@@ -8,7 +8,7 @@ export default function Footer() {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="mb-6 md:mb-0">
-            <h2 className="text-2xl font-bold text-white">Football Predictions</h2>
+            <h2 className="text-2xl font-bold text-white">Foot Predictions</h2>
             <p className="mt-2 text-sm">
               Prédictions précises pour vos paris sportifs de football. Analyse approfondie et mise à jour en temps réel.
             </p>
@@ -50,7 +50,7 @@ export default function Footer() {
         <hr className="my-6 border-gray-700" />
 
         <div className="text-center text-sm text-gray-400">
-          &copy; {new Date().getFullYear()} Football Predictions. Tous droits réservés.
+          &copy; {new Date().getFullYear()} Foot Predictions. Tous droits réservés.
         </div>
       </div>
     </footer>

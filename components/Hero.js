@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { useRouter } from 'next/router';
 
 export default function Hero({
-  title = 'Football Predictions',
+  title = 'Foot Predictions',
   subtitle = 'Prédictions précises pour vos paris sportifs de football',
   backgroundImage = '/football-bg.jpg',
   buttonText = 'Découvrez nos formules',

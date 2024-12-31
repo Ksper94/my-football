@@ -20,7 +20,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Football Predictions</title>
+        <title>Foot Predictions</title>
         <meta
           name="description"
           content="Prédictions précises pour vos paris sportifs de football"
@@ -34,7 +34,7 @@ export default function Home() {
         {/* Contenu principal */}
         <div className="min-h-screen bg-background text-foreground p-8 transition-all duration-300">
           <header className="flex flex-col md:flex-row justify-between items-center mb-8">
-            <h1 className="text-4xl font-bold">Football Predictions</h1>
+            <h1 className="text-4xl font-bold">Foot Predictions</h1>
             <nav className="mt-4 md:mt-0" aria-label="Navigation principale">
               {user ? (
                 <Link href="/dashboard">
@@ -90,7 +90,7 @@ export default function Home() {
             <h2 className="text-3xl font-semibold text-center mb-6">Témoignages</h2>
             <div className="flex flex-col md:flex-row justify-center items-center gap-6">
               <Testimonial
-                text="Grâce à Football Predictions, j'ai pu augmenter mes gains !"
+                text="Grâce à Foot Predictions, j'ai pu augmenter mes gains !"
                 author="Jean Dupont"
               />
               <Testimonial
@@ -106,7 +106,7 @@ export default function Home() {
 
           {/* Footer */}
           <footer className="mt-16 text-center text-foreground/60">
-            &copy; {new Date().getFullYear()} Football Predictions. Tous droits réservés.
+            &copy; {new Date().getFullYear()} Foot Predictions. Tous droits réservés.
           </footer>
         </div>
       </div>
