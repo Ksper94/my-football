@@ -39,7 +39,7 @@ export default function Pricing() {
     },
     {
       name: 'Annuel',
-      price: '90€',
+      price: '100€',
       priceId: 'price_1QUm0YHd1CTS1QCeSrmFSzI7',
       features: [
         'Accès complet aux prédictions',
@@ -91,7 +91,8 @@ export default function Pricing() {
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
-          errorData.error || 'Erreur lors de la création de la session de paiement.'
+          errorData.error ||
+            'Erreur lors de la création de la session de paiement.'
         );
       }
 
@@ -112,11 +113,16 @@ export default function Pricing() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-bold mb-8 text-center">Choisissez votre abonnement</h1>
+    <div className="min-h-screen bg-gray-100 p-8 text-gray-800">
+      <h1 className="text-3xl font-bold mb-8 text-center text-gray-900">
+        Choisissez votre abonnement
+      </h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {pricingPlans.map((plan) => (
-          <div key={plan.priceId} className="bg-white p-6 rounded-lg shadow-md">
+          <div
+            key={plan.priceId}
+            className="bg-white p-6 rounded-lg shadow-md text-gray-900"
+          >
             <h2 className="text-xl font-bold mb-4">{plan.name}</h2>
             <p className="text-2xl font-semibold mb-4">{plan.price}</p>
             <ul className="mb-6">
