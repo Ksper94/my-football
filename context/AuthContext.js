@@ -1,5 +1,12 @@
 // context/AuthContext.js
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+} from 'react';
 import { supabase } from '../utils/supabaseClient';
 
 const AuthContext = createContext();
@@ -28,13 +35,15 @@ export const AuthProvider = ({ children }) => {
     getSession();
 
     // Gestion en temps réel de l'authentification
-    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        setUser(session.user);
-      } else {
-        setUser(null);
+    const { data: subscription } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        if (session?.user) {
+          setUser(session.user);
+        } else {
+          setUser(null);
+        }
       }
-    });
+    );
 
     return () => {
       subscription.unsubscribe();
@@ -44,21 +53,34 @@ export const AuthProvider = ({ children }) => {
   /**
    * Créer un compte + envoyer les métadonnées dans user_metadata
    * => L'email de confirmation sera envoyé automatiquement par Supabase (si activé).
+   *
+   * En Supabase JS v2, on doit passer "email", "password" et "options" dans un seul objet.
+   * Exemple d'utilisation :
+   *   signUp({
+   *     email: '...',
+   *     password: '...',
+   *     options: {
+   *       data: {
+   *         first_name: 'Hugo',
+   *         last_name: 'Stephan',
+   *       },
+   *     },
+   *   });
    */
-  const signUp = useCallback(async (email, password, additionalData) => {
+  const signUp = useCallback(async ({ email, password, options }) => {
     try {
-      // Ici, on passe 'additionalData' dans le 2ème argument "options" -> { data: ... }
-      const { data, error } = await supabase.auth.signUp(
-        { email, password },
-        { data: additionalData }
-      );
+      // Supabase JS v2 requiert cette forme
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options,
+      });
 
       if (error) {
         console.error('Erreur lors de la création du compte:', error.message);
         throw error;
       }
 
-      // data.user = l'utilisateur *non confirmé* si email confirmations sont activées
       console.log('Utilisateur créé (email envoyé) :', data.user);
       return data.user;
     } catch (err) {
