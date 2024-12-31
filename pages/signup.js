@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useRouter } from 'next/router';
 
 export default function SignUpPage() {
   const [formData, setFormData] = useState({
@@ -13,8 +14,8 @@ export default function SignUpPage() {
     phoneNumber: '',
   });
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const { signUp } = useAuth();
+  const router = useRouter();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,9 +24,6 @@ export default function SignUpPage() {
 
   const handleSignUp = async () => {
     setError('');
-    setSuccess('');
-
-    console.log('Données soumises :', formData); // Log des données envoyées
 
     const {
       email,
@@ -35,6 +33,7 @@ export default function SignUpPage() {
       lastName,
       dateOfBirth,
       country,
+      phoneNumber
     } = formData;
 
     if (!email || !password || !firstName || !lastName || !dateOfBirth || !country) {
@@ -48,17 +47,16 @@ export default function SignUpPage() {
     }
 
     try {
-      // On passe les infos supplémentaires dans signUp
       await signUp(email, password, {
         first_name: firstName,
         last_name: lastName,
         date_of_birth: dateOfBirth,
-        country: country,
-        phone_number: formData.phoneNumber,
+        country,
+        phone_number: phoneNumber,
       });
-      setSuccess(
-        'Un email de confirmation vous a été envoyé. Veuillez vérifier votre boîte de réception.'
-      );
+
+      // Redirige l'utilisateur vers la page de confirmation
+      router.push('/confirmation');
     } catch (err) {
       console.error("Erreur lors de l'inscription :", err);
       setError(err.message || "Une erreur est survenue lors de l'inscription.");
@@ -69,8 +67,8 @@ export default function SignUpPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
         <h1 className="text-2xl font-bold mb-6">Créer un compte</h1>
+
         {error && <p className="text-red-500 mb-4">{error}</p>}
-        {success && <p className="text-green-500 mb-4">{success}</p>}
 
         <label className="block mb-2">Prénom</label>
         <input
