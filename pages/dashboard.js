@@ -8,67 +8,31 @@ export default function Dashboard() {
   const { user, loading, signOut } = useAuth();
   const router = useRouter();
 
-  // On va stocker soit le profil venant de "profiles", soit un "profil virtuel"
   const [profile, setProfile] = useState(null);
-
   const [error, setError] = useState('');
   const [subscription, setSubscription] = useState(null);
   const [timeRemaining, setTimeRemaining] = useState('');
 
-  // Redirect si pas connecté
+  // 1) Rediriger si pas connecté
   useEffect(() => {
     if (!loading && !user) {
       router.push('/login');
     }
   }, [user, loading, router]);
 
-  // 1) Tenter de récupérer la ligne "profiles" depuis Supabase
-  //    Si elle n’existe pas ou RLS bloquée, on se rabat sur user_metadata
+  // 2) Initialiser "profile" depuis user_metadata (plus besoin de la table profiles)
   useEffect(() => {
-    const fetchProfile = async () => {
-      if (!loading && user) {
-        try {
-          const { data: profileData, error: profileError, status } = await supabase
-            .from('profiles')
-            .select('id, first_name, last_name, email, username, full_name, avatar_url')
-            .eq('id', user.id)
-            .maybeSingle();
-
-          if (profileError && status !== 406) {
-            // status 406 = "not found" => pas de profil => pas forcément grave
-            console.error('Erreur lors de la récupération du profil :', profileError.message);
-            setError(profileError.message);
-          }
-
-          // Si on n’a pas de data ou qu’on a un 401, on utilise user_metadata
-          if (!profileData) {
-            // On crée un "fallback" à partir de user_metadata
-            const fallbackProfile = {
-              first_name: user.user_metadata?.first_name || '',
-              last_name: user.user_metadata?.last_name || '',
-              email: user.email, // l'email du compte
-            };
-            setProfile(fallbackProfile);
-          } else {
-            setProfile(profileData);
-          }
-        } catch (err) {
-          // Si vraiment ça pète (ex: 401), on fait un fallback
-          console.error('Erreur fetchProfile:', err);
-          const fallbackProfile = {
-            first_name: user.user_metadata?.first_name || '',
-            last_name: user.user_metadata?.last_name || '',
-            email: user.email,
-          };
-          setProfile(fallbackProfile);
-        }
-      }
-    };
-
-    fetchProfile();
+    if (!loading && user) {
+      const fallbackProfile = {
+        first_name: user?.user_metadata?.first_name || '',
+        last_name: user?.user_metadata?.last_name || '',
+        email: user.email,
+      };
+      setProfile(fallbackProfile);
+    }
   }, [user, loading]);
 
-  // 2) Récupérer la subscription (si elle existe)
+  // 3) Récupérer la subscription (si elle existe)
   useEffect(() => {
     const fetchSubscription = async () => {
       if (!loading && user) {
@@ -92,7 +56,7 @@ export default function Dashboard() {
     fetchSubscription();
   }, [user, loading]);
 
-  // 3) Calculer le temps restant (mois, trimestre, annuel, etc.)
+  // 4) Calculer le temps restant (mensuel, trimestriel, annuel...)
   const calculateTimeRemaining = (plan, updatedAt) => {
     const startDate = new Date(updatedAt);
     let endDate;
@@ -104,7 +68,6 @@ export default function Dashboard() {
     } else if (plan === 'annuel') {
       endDate = new Date(startDate.getTime() + 365 * 24 * 60 * 60 * 1000);
     } else {
-      // par défaut, on considère 30 jours
       endDate = new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000);
     }
 
@@ -119,7 +82,7 @@ export default function Dashboard() {
     }
   };
 
-  // 4) Gérer la déconnexion
+  // 5) Gérer la déconnexion
   const handleLogout = async () => {
     try {
       await signOut();
@@ -139,10 +102,8 @@ export default function Dashboard() {
       {profile ? (
         <p className="mb-4">
           Bienvenue,{' '}
-          <strong>
-            {profile.first_name || 'Utilisateur'}
-          </strong>{' '}
-          {profile.last_name && profile.last_name}.
+          <strong>{profile.first_name || 'Utilisateur'}</strong>
+          {profile.last_name ? ` ${profile.last_name}` : ''} !
         </p>
       ) : (
         <p className="mb-4">Bienvenue !</p>
@@ -151,9 +112,7 @@ export default function Dashboard() {
       {/* Bloc abonnement */}
       {subscription ? (
         <div className="bg-white text-gray-900 p-6 rounded-lg shadow-md mb-4 max-w-md">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Votre Abonnement
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Votre Abonnement</h2>
           <p>
             Plan : <strong>{subscription.plan}</strong>
           </p>

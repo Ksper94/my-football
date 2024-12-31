@@ -1,3 +1,4 @@
+// context/AuthContext.js
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '../utils/supabaseClient';
 
@@ -27,9 +28,7 @@ export const AuthProvider = ({ children }) => {
     getSession();
 
     // Gestion en temps réel de l'authentification
-    const {
-      data: subscription,
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         setUser(session.user);
       } else {
@@ -43,14 +42,12 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   /**
-   * Création de compte: On stocke les champs
-   * (prénom, nom, etc.) dans user_metadata.
-   * => L'email de confirmation sera envoyé automatiquement par Supabase.
+   * Créer un compte + envoyer les métadonnées dans user_metadata
+   * => L'email de confirmation sera envoyé automatiquement par Supabase (si activé).
    */
   const signUp = useCallback(async (email, password, additionalData) => {
     try {
-      // additionalData contient { first_name, last_name, date_of_birth, ... }
-      // On va les mettre dans "data" du signUp Supabase
+      // Ici, on passe 'additionalData' dans le 2ème argument "options" -> { data: ... }
       const { data, error } = await supabase.auth.signUp(
         { email, password },
         { data: additionalData }
@@ -61,8 +58,7 @@ export const AuthProvider = ({ children }) => {
         throw error;
       }
 
-      // data.user = l'utilisateur *non confirmé* (pending email confirmation)
-      // --> AUCUNE insertion dans "profiles" ici, pour éviter le 401
+      // data.user = l'utilisateur *non confirmé* si email confirmations sont activées
       console.log('Utilisateur créé (email envoyé) :', data.user);
       return data.user;
     } catch (err) {

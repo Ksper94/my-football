@@ -1,3 +1,5 @@
+// pages/signup.js
+
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/router';
@@ -19,7 +21,7 @@ export default function SignUpPage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSignUp = async () => {
@@ -36,11 +38,11 @@ export default function SignUpPage() {
       phoneNumber
     } = formData;
 
+    // Vérifications basiques
     if (!email || !password || !firstName || !lastName || !dateOfBirth || !country) {
       setError('Veuillez remplir tous les champs obligatoires.');
       return;
     }
-
     if (password !== confirmPassword) {
       setError('Les mots de passe ne correspondent pas.');
       return;
@@ -48,14 +50,15 @@ export default function SignUpPage() {
 
     try {
       await signUp(email, password, {
-        first_name: firstName,
+        // On stocke dans user_metadata (raw_user_meta_data)
+        first_name: firstName,    // underscore = ce qu'on lira ensuite en user_metadata.first_name
         last_name: lastName,
         date_of_birth: dateOfBirth,
         country,
         phone_number: phoneNumber,
       });
 
-      // Redirige l'utilisateur vers la page de confirmation
+      // Exemple : on redirige vers /confirmation
       router.push('/confirmation');
     } catch (err) {
       console.error("Erreur lors de l'inscription :", err);
@@ -67,7 +70,6 @@ export default function SignUpPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
         <h1 className="text-2xl font-bold mb-6">Créer un compte</h1>
-
         {error && <p className="text-red-500 mb-4">{error}</p>}
 
         <label className="block mb-2">Prénom</label>
