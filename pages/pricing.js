@@ -123,8 +123,12 @@ export default function Pricing() {
             key={plan.priceId}
             className="bg-white p-6 rounded-lg shadow-md text-gray-900"
           >
-            <h2 className="text-xl font-bold mb-4">{plan.name}</h2>
-            <p className="text-2xl font-semibold mb-4">{plan.price}</p>
+            <h2 className="text-xl font-bold mb-4 text-gray-900">
+              {plan.name}
+            </h2>
+            <p className="text-2xl font-semibold mb-4 text-gray-900">
+              {plan.price}
+            </p>
             <ul className="mb-6">
               {plan.features.map((feature, index) => (
                 <li key={index} className="text-gray-700">
