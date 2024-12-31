@@ -91,15 +91,15 @@ export default function Home() {
             <div className="flex flex-col md:flex-row justify-center items-center gap-6">
               <Testimonial
                 text="Grâce à Foot Predictions, j'ai pu augmenter mes gains !"
-                author="Jean Dupont"
+                author="Guillaume Lemoine"
               />
               <Testimonial
                 text="Un service exceptionnel avec des prédictions fiables."
-                author="Marie Curie"
+                author="Eddy Laurens"
               />
               <Testimonial
                 text="L'algorithme est incroyablement précis."
-                author="Luc Martin"
+                author="Vanessa Sadon"
               />
             </div>
           </div>
