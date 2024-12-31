@@ -13,7 +13,7 @@ export default function Layout({ children }) {
         {/* Ajout du lien vers l'index */}
         <Link href="/">
           <h1 className="text-2xl font-bold text-white cursor-pointer">
-            Mon Application
+            Foot predictions
           </h1>
         </Link>
         <nav>
@@ -40,7 +40,7 @@ export default function Layout({ children }) {
 
       {/* Footer */}
       <footer className="bg-gray-800 text-white p-4 text-center">
-        &copy; {new Date().getFullYear()} Mon Application. Tous droits réservés.
+        &copy; {new Date().getFullYear()} Foot predictions. Tous droits réservés.
       </footer>
     </div>
   );
