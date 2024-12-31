@@ -19,11 +19,13 @@ export default function SignUpPage() {
   const { signUp } = useAuth();
   const router = useRouter();
 
+  // Mise à jour des champs à chaque saisie
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Fonction qui se déclenche au clic sur "Créer un compte"
   const handleSignUp = async () => {
     setError('');
 
@@ -48,17 +50,32 @@ export default function SignUpPage() {
       return;
     }
 
+    // Log pour vérifier le contenu exact avant d'appeler signUp()
+    console.log('=== handleSignUp called with ===', {
+      email,
+      password,
+      first_name: firstName,
+      last_name: lastName,
+      date_of_birth: dateOfBirth,
+      country,
+      phone_number: phoneNumber,
+    });
+
     try {
-      await signUp(email, password, {
+      // Appel à la méthode signUp() de l'AuthContext
+      const user = await signUp(email, password, {
         // On stocke dans user_metadata (raw_user_meta_data)
-        first_name: firstName,    // underscore => sera accessible via user.user_metadata?.first_name
+        first_name: firstName,   // underscore => dans user.user_metadata?.first_name
         last_name: lastName,
         date_of_birth: dateOfBirth,
         country,
         phone_number: phoneNumber,
       });
 
-      // Exemple : on redirige vers /confirmation
+      // Si pas d'erreur, log le user renvoyé
+      console.log('=== signUp success ===', user);
+
+      // Redirection vers /confirmation
       router.push('/confirmation');
     } catch (err) {
       console.error("Erreur lors de l'inscription :", err);
