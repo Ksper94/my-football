@@ -13,7 +13,7 @@ export default function Layout({ children }) {
         {/* Ajout du lien vers l'index */}
         <Link href="/">
           <h1 className="text-2xl font-bold text-white cursor-pointer">
-            Foot predictions
+            Foot Predictions
           </h1>
         </Link>
         <nav>
