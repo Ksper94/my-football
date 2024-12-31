@@ -84,87 +84,95 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-800">
       <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6">Créer un compte</h1>
+        <h1 className="text-2xl font-bold mb-6 text-gray-900">Créer un compte</h1>
+
         {error && <p className="text-red-500 mb-4">{error}</p>}
 
-        <label className="block mb-2">Prénom</label>
+        <label className="block mb-2 font-medium text-gray-700">Prénom</label>
         <input
           type="text"
           name="firstName"
           value={formData.firstName}
           onChange={handleChange}
-          className="w-full p-2 mb-4 border rounded"
+          className="w-full p-2 mb-4 border border-gray-300 rounded text-gray-900"
+          placeholder="Votre prénom"
           required
         />
 
-        <label className="block mb-2">Nom</label>
+        <label className="block mb-2 font-medium text-gray-700">Nom</label>
         <input
           type="text"
           name="lastName"
           value={formData.lastName}
           onChange={handleChange}
-          className="w-full p-2 mb-4 border rounded"
+          className="w-full p-2 mb-4 border border-gray-300 rounded text-gray-900"
+          placeholder="Votre nom"
           required
         />
 
-        <label className="block mb-2">Date de naissance</label>
+        <label className="block mb-2 font-medium text-gray-700">Date de naissance</label>
         <input
           type="date"
           name="dateOfBirth"
           value={formData.dateOfBirth}
           onChange={handleChange}
-          className="w-full p-2 mb-4 border rounded"
+          className="w-full p-2 mb-4 border border-gray-300 rounded text-gray-900"
           required
         />
 
-        <label className="block mb-2">Pays</label>
+        <label className="block mb-2 font-medium text-gray-700">Pays</label>
         <input
           type="text"
           name="country"
           value={formData.country}
           onChange={handleChange}
-          className="w-full p-2 mb-4 border rounded"
+          className="w-full p-2 mb-4 border border-gray-300 rounded text-gray-900"
+          placeholder="Votre pays"
           required
         />
 
-        <label className="block mb-2">Numéro de téléphone (optionnel)</label>
+        <label className="block mb-2 font-medium text-gray-700">Numéro de téléphone (optionnel)</label>
         <input
           type="text"
           name="phoneNumber"
           value={formData.phoneNumber}
           onChange={handleChange}
-          className="w-full p-2 mb-4 border rounded"
+          className="w-full p-2 mb-4 border border-gray-300 rounded text-gray-900"
+          placeholder="06 12 34 56 78"
         />
 
-        <label className="block mb-2">Email</label>
+        <label className="block mb-2 font-medium text-gray-700">Email</label>
         <input
           type="email"
           name="email"
           value={formData.email}
           onChange={handleChange}
-          className="w-full p-2 mb-4 border rounded"
+          className="w-full p-2 mb-4 border border-gray-300 rounded text-gray-900"
+          placeholder="votre@email.com"
           required
         />
 
-        <label className="block mb-2">Mot de passe</label>
+        <label className="block mb-2 font-medium text-gray-700">Mot de passe</label>
         <input
           type="password"
           name="password"
           value={formData.password}
           onChange={handleChange}
-          className="w-full p-2 mb-4 border rounded"
+          className="w-full p-2 mb-4 border border-gray-300 rounded text-gray-900"
+          placeholder="••••••••"
           required
         />
 
-        <label className="block mb-2">Confirmer le mot de passe</label>
+        <label className="block mb-2 font-medium text-gray-700">Confirmer le mot de passe</label>
         <input
           type="password"
           name="confirmPassword"
           value={formData.confirmPassword}
           onChange={handleChange}
-          className="w-full p-2 mb-6 border rounded"
+          className="w-full p-2 mb-6 border border-gray-300 rounded text-gray-900"
+          placeholder="••••••••"
           required
         />
 
