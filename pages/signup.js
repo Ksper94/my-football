@@ -51,7 +51,7 @@ export default function SignUpPage() {
     try {
       await signUp(email, password, {
         // On stocke dans user_metadata (raw_user_meta_data)
-        first_name: firstName,    // underscore = ce qu'on lira ensuite en user_metadata.first_name
+        first_name: firstName,    // underscore => sera accessible via user.user_metadata?.first_name
         last_name: lastName,
         date_of_birth: dateOfBirth,
         country,

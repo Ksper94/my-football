@@ -1,3 +1,5 @@
+// pages/dashboard.js
+
 import { useAuth } from '../context/AuthContext';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
@@ -20,7 +22,7 @@ export default function Dashboard() {
     }
   }, [user, loading, router]);
 
-  // 2) Initialiser "profile" depuis user_metadata (plus besoin de la table profiles)
+  // 2) Initialiser "profile" depuis user_metadata (pas de table profiles)
   useEffect(() => {
     if (!loading && user) {
       const fallbackProfile = {
@@ -101,8 +103,7 @@ export default function Dashboard() {
 
       {profile ? (
         <p className="mb-4">
-          Bienvenue,{' '}
-          <strong>{profile.first_name || 'Utilisateur'}</strong>
+          Bienvenue, <strong>{profile.first_name || 'Utilisateur'}</strong>
           {profile.last_name ? ` ${profile.last_name}` : ''} !
         </p>
       ) : (
@@ -113,12 +114,8 @@ export default function Dashboard() {
       {subscription ? (
         <div className="bg-white text-gray-900 p-6 rounded-lg shadow-md mb-4 max-w-md">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Votre Abonnement</h2>
-          <p>
-            Plan : <strong>{subscription.plan}</strong>
-          </p>
-          <p>
-            Status : <strong>{subscription.status}</strong>
-          </p>
+          <p>Plan : <strong>{subscription.plan}</strong></p>
+          <p>Status : <strong>{subscription.status}</strong></p>
           <p>{timeRemaining}</p>
 
           {subscription.token && (

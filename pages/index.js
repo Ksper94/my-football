@@ -1,3 +1,5 @@
+// pages/index.js
+
 import Head from 'next/head';
 import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
@@ -54,7 +56,8 @@ export default function Home() {
             {user ? (
               <>
                 <h2 className="text-3xl font-semibold mb-4">
-                  Bienvenue, {user.first_name || 'Utilisateur'} !
+                  {/* Correction ici : on lit user.user_metadata?.first_name */}
+                  Bienvenue, {user.user_metadata?.first_name || 'Utilisateur'} !
                 </h2>
                 <p className="mb-6">
                   Vous êtes connecté et prêt à explorer nos prédictions.
