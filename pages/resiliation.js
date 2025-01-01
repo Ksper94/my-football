@@ -4,9 +4,11 @@ import Link from 'next/link';
 
 export default function Resiliation() {
   return (
-    <div className="min-h-screen bg-background text-foreground p-6">
-      <div className="max-w-2xl mx-auto bg-white text-gray-900 p-6 rounded shadow-md">
-        <h1 className="text-2xl font-bold mb-4">Résiliation de l’abonnement</h1>
+    <div className="min-h-screen bg-white text-black p-6">
+      <div className="max-w-2xl mx-auto p-6 rounded shadow-md bg-white">
+        <h1 className="text-2xl font-bold mb-4 text-black">
+          Résiliation de l’abonnement
+        </h1>
 
         <p className="mb-4">
           Nous sommes désolés de vous voir partir ! Si vous souhaitez mettre un terme à votre abonnement, 
@@ -32,7 +34,7 @@ export default function Resiliation() {
           Conformément aux dispositions du Code de la consommation, vous disposez d’un droit de rétractation et 
           pouvez à tout moment demander la résiliation de votre abonnement. Toutefois, selon l’article L.221-28 du 
           Code de la consommation, certains services pleinement exécutés avant la fin du délai de 14 jours peuvent 
-          ne pas donner lieu à remboursement. 
+          ne pas donner lieu à remboursement.
           <br />
           <br />
           En cas de question ou de doute, n’hésitez pas à nous contacter via l’adresse 

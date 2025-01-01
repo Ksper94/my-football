@@ -1,3 +1,5 @@
+// pages/login.js
+
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/router';
@@ -29,8 +31,9 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      {/* Conteneur du formulaire */}
       <div className="bg-white rounded-md shadow-md p-8 max-w-md w-full">
-        <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">
+        <h1 className="text-2xl font-bold mb-6 text-center text-black">
           Se connecter
         </h1>
 
@@ -41,7 +44,7 @@ export default function LoginPage() {
         )}
 
         <label
-          className="block mb-2 font-semibold text-gray-700"
+          className="block mb-2 font-semibold text-black"
           htmlFor="email"
         >
           Adresse Email
@@ -49,14 +52,14 @@ export default function LoginPage() {
         <input
           type="email"
           id="email"
-          className="w-full border border-gray-300 rounded p-2 mb-4 focus:outline-none focus:border-blue-500"
+          className="w-full border border-gray-300 rounded p-2 mb-4 focus:outline-none focus:border-blue-500 text-black"
           placeholder="Votre email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
         <label
-          className="block mb-2 font-semibold text-gray-700"
+          className="block mb-2 font-semibold text-black"
           htmlFor="password"
         >
           Mot de passe
@@ -64,7 +67,7 @@ export default function LoginPage() {
         <input
           type="password"
           id="password"
-          className="w-full border border-gray-300 rounded p-2 mb-6 focus:outline-none focus:border-blue-500"
+          className="w-full border border-gray-300 rounded p-2 mb-6 focus:outline-none focus:border-blue-500 text-black"
           placeholder="••••••••"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
