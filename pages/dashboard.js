@@ -114,10 +114,15 @@ export default function Dashboard() {
       {subscription ? (
         <div className="bg-white text-gray-900 p-6 rounded-lg shadow-md mb-4 max-w-md">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Votre Abonnement</h2>
-          <p>Plan : <strong>{subscription.plan}</strong></p>
-          <p>Status : <strong>{subscription.status}</strong></p>
+          <p>
+            Plan : <strong>{subscription.plan}</strong>
+          </p>
+          <p>
+            Status : <strong>{subscription.status}</strong>
+          </p>
           <p>{timeRemaining}</p>
 
+          {/* Bouton pour accéder à l'application Streamlit si un token est présent */}
           {subscription.token && (
             <div className="mt-4">
               <a
@@ -129,6 +134,18 @@ export default function Dashboard() {
                   Accéder à l'application Streamlit
                 </button>
               </a>
+            </div>
+          )}
+
+          {/* Bouton de résiliation : seulement si status = 'active' */}
+          {subscription.status === 'active' && (
+            <div className="mt-4">
+              <button
+                onClick={() => router.push('/resiliation')}
+                className="text-sm bg-gray-200 text-gray-800 px-3 py-2 rounded hover:bg-gray-300"
+              >
+                Annuler / Résilier mon abonnement
+              </button>
             </div>
           )}
         </div>
