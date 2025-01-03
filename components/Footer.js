@@ -32,13 +32,13 @@ export default function Footer() {
           </nav>
 
           <div className="flex space-x-4">
-            <a href="https://facebook.com/votrepage" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="hover:text-white transition-colors duration-200">
+            <a href="https://www.facebook.com/profile.php?id=61571191483001" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="hover:text-white transition-colors duration-200">
               <FaFacebook size={20} />
             </a>
             <a href="https://twitter.com/votrepage" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="hover:text-white transition-colors duration-200">
               <FaTwitter size={20} />
             </a>
-            <a href="https://instagram.com/votrepage" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:text-white transition-colors duration-200">
+            <a href="https://www.instagram.com/foot_predictions/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:text-white transition-colors duration-200">
               <FaInstagram size={20} />
             </a>
             <a href="https://linkedin.com/in/votrepage" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="hover:text-white transition-colors duration-200">
