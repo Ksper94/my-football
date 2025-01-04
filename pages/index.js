@@ -1,5 +1,3 @@
-// pages/index.js
-
 import Head from 'next/head';
 import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
@@ -56,7 +54,6 @@ export default function Home() {
             {user ? (
               <>
                 <h2 className="text-3xl font-semibold mb-4">
-                  {/* Correction ici : on lit user.user_metadata?.first_name */}
                   Bienvenue, {user.user_metadata?.first_name || 'Utilisateur'} !
                 </h2>
                 <p className="mb-6">
@@ -106,6 +103,43 @@ export default function Home() {
 
           {/* Footer */}
           <footer className="mt-16 text-center text-foreground/60">
+            <div className="mb-4">
+              <p>Suivez-nous sur :</p>
+              <div className="flex justify-center space-x-4">
+                <a
+                  href="https://www.facebook.com/profile.php?id=61571191483001"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-link hover:text-link-hover"
+                >
+                  Facebook
+                </a>
+                <a
+                  href="https://x.com/footprediction2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-link hover:text-link-hover"
+                >
+                  X
+                </a>
+                <a
+                  href="https://www.instagram.com/foot_predictions/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-link hover:text-link-hover"
+                >
+                  Instagram
+                </a>
+                <a
+                  href="https://www.tiktok.com/@footpredictions2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-link hover:text-link-hover"
+                >
+                  TikTok
+                </a>
+              </div>
+            </div>
             &copy; {new Date().getFullYear()} Foot Predictions. Tous droits réservés.
           </footer>
         </div>
