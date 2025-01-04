@@ -112,7 +112,11 @@ export default function Home() {
                   rel="noopener noreferrer"
                   className="text-link hover:text-link-hover"
                 >
-                  Facebook
+                  <img
+                    src="/icons/facebook.png"
+                    alt="Facebook"
+                    className="w-6 h-6"
+                  />
                 </a>
                 <a
                   href="https://x.com/footprediction2"
@@ -120,7 +124,11 @@ export default function Home() {
                   rel="noopener noreferrer"
                   className="text-link hover:text-link-hover"
                 >
-                  X
+                  <img
+                    src="/icons/x.png"
+                    alt="X (Twitter)"
+                    className="w-6 h-6"
+                  />
                 </a>
                 <a
                   href="https://www.instagram.com/foot_predictions/"
@@ -128,7 +136,11 @@ export default function Home() {
                   rel="noopener noreferrer"
                   className="text-link hover:text-link-hover"
                 >
-                  Instagram
+                  <img
+                    src="/icons/instagram.png"
+                    alt="Instagram"
+                    className="w-6 h-6"
+                  />
                 </a>
                 <a
                   href="https://www.tiktok.com/@footpredictions2"
@@ -136,7 +148,11 @@ export default function Home() {
                   rel="noopener noreferrer"
                   className="text-link hover:text-link-hover"
                 >
-                  TikTok
+                  <img
+                    src="/icons/tiktok.png"
+                    alt="TikTok"
+                    className="w-6 h-6"
+                  />
                 </a>
               </div>
             </div>
