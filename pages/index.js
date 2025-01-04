@@ -156,7 +156,14 @@ export default function Home() {
                 </a>
               </div>
             </div>
-            &copy; {new Date().getFullYear()} Foot Predictions. Tous droits réservés.
+            <div className="mt-4">
+              <Link href="/cgv">
+                <a className="text-link hover:text-link-hover">
+                  Conditions Générales de Vente
+                </a>
+              </Link>
+            </div>
+            <p>&copy; {new Date().getFullYear()} Foot Predictions. Tous droits réservés.</p>
           </footer>
         </div>
       </div>
