@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import Link from 'next/link'; // Import de Link pour éviter l'erreur
 
 export default function CGV() {
   return (
