@@ -28,8 +28,8 @@ export default function CGV() {
 
           <h2 className="text-2xl font-semibold">2. Informations légales</h2>
           <p>
-            Le site <strong>Foot Predictions</strong> est édité par Foot Predictions, immatriculée au [registre 
-            concerné], sous le numéro [numéro SIRET ou autre].<br />
+            Le site <strong>Foot Predictions</strong> est édité par Foot Predictions, immatriculée au REGISTRE DU COMMERCE ET DES SOCIETES, 
+            sous le numéro 939 215 505 R.C.S. Quimper.<br />
             Contact : services@foot-predictions.com
           </p>
 
