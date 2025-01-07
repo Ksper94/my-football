@@ -20,7 +20,7 @@ export default function Pricing() {
     {
       name: 'Mensuel',
       price: '10€',
-      priceId: 'price_1QUlyhHd1CTS1QCeLJfFF9Kj',
+      priceId: 'price_1QecamHd1CTS1QCeA27YxMut',
       features: [
         'Accès complet aux prédictions',
         'Mises à jour quotidiennes',
@@ -30,7 +30,7 @@ export default function Pricing() {
     {
       name: 'Trimestriel',
       price: '27€',
-      priceId: 'price_1QUlzrHd1CTS1QCebhWYJdYv',
+      priceId: 'price_1QecgvHd1CTS1QCeMNW7A4TZ',
       features: [
         'Accès complet aux prédictions',
         'Mises à jour quotidiennes',
@@ -40,7 +40,7 @@ export default function Pricing() {
     {
       name: 'Annuel',
       price: '100€',
-      priceId: 'price_1QUm0YHd1CTS1QCeSrmFSzI7',
+      priceId: 'price_1QecifHd1CTS1QCe6v6bKejO',
       features: [
         'Accès complet aux prédictions',
         'Mises à jour quotidiennes',

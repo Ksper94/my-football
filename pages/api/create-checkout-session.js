@@ -6,9 +6,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 const planMapping = {
-  'price_1QUlyhHd1CTS1QCeLJfFF9Kj': 'mensuel',
-  'price_1QUlzrHd1CTS1QCebhWYJdYv': 'trimestriel',
-  'price_1QUm0YHd1CTS1QCeSrmFSzI7': 'annuel',
+  'price_1QecamHd1CTS1QCeA27YxMut': 'mensuel',
+  'price_1QecgvHd1CTS1QCeMNW7A4TZ': 'trimestriel',
+  'price_1QecifHd1CTS1QCe6v6bKejO': 'annuel',
 };
 
 export default async function handler(req, res) {
