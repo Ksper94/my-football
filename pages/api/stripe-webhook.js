@@ -27,7 +27,11 @@ export default async function handler(req, res) {
 
   let event;
   try {
-    event = stripe.webhooks.constructEvent(buf.toString(), sig, process.env.STRIPE_WEBHOOK_SECRET);
+    event = stripe.webhooks.constructEvent(
+      buf.toString(),
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
     console.log(`Webhook Stripe reçu : ${event.type}`);
   } catch (err) {
     console.error('Erreur de signature du webhook :', err.message);
@@ -49,7 +53,7 @@ export default async function handler(req, res) {
 
     res.status(200).json({ received: true });
   } catch (error) {
-    console.error('Erreur lors du traitement de l\'événement :', error.message);
+    console.error("Erreur lors du traitement de l'événement :", error.message);
     res.status(500).json({ error: 'Erreur interne du serveur.' });
   }
 }
@@ -61,12 +65,19 @@ async function handleCheckoutSessionCompleted(session) {
   const plan = session.metadata?.plan || 'unknown';
   const priceId = session.metadata?.price_id || session.subscription;
 
-  if (!userId || !plan || !priceId) {
-    console.error('Données manquantes dans la session Stripe : user_id, plan ou price_id');
+  // Cet ID est crucial pour annuler l'abonnement plus tard
+  const stripeSubscriptionId = session.subscription; // sub_xxx
+
+  if (!userId || !plan || !priceId || !stripeSubscriptionId) {
+    console.error(
+      'Données manquantes dans la session Stripe :',
+      'user_id, plan, price_id, ou subscription'
+    );
     return;
   }
 
   try {
+    // Générer un token local si tu en as besoin
     const token = jwt.sign({ userId }, jwtSecret, { expiresIn: '30d' });
 
     const dataToInsert = {
@@ -77,6 +88,7 @@ async function handleCheckoutSessionCompleted(session) {
       token,
       status: 'active',
       updated_at: new Date(),
+      stripe_subscription_id: stripeSubscriptionId,
     };
 
     console.log('Données envoyées à Supabase :', dataToInsert);
@@ -86,13 +98,13 @@ async function handleCheckoutSessionCompleted(session) {
       .upsert(dataToInsert, { onConflict: 'user_id' });
 
     if (error) {
-      console.error('Erreur lors de l\'insertion dans Supabase :', error.message);
+      console.error("Erreur lors de l'insertion Supabase :", error.message);
       throw error;
     }
 
-    console.log('Abonnement enregistré avec succès pour l\'utilisateur :', userId);
+    console.log("Abonnement enregistré avec succès pour l'utilisateur :", userId);
   } catch (error) {
-    console.error('Erreur lors de l\'enregistrement dans Supabase :', error.message);
+    console.error("Erreur lors de l'enregistrement dans Supabase :", error.message);
     throw error;
   }
 }
@@ -105,22 +117,31 @@ async function handleSubscriptionEvent(subscription) {
   const priceId = subscription.metadata?.price_id || subscription.id;
   const status = subscription.status;
 
-  if (!userId || !plan || !priceId) {
-    console.error('Données manquantes dans la subscription Stripe : user_id, plan ou price_id');
+  // L'ID d'abonnement Stripe
+  const stripeSubscriptionId = subscription.id; // sub_xxx
+
+  if (!userId || !plan || !priceId || !stripeSubscriptionId) {
+    console.error(
+      'Données manquantes dans la subscription Stripe : user_id, plan, price_id ou subscription.id'
+    );
     return;
   }
 
   try {
-    const token = status === 'active' ? jwt.sign({ userId }, jwtSecret, { expiresIn: '30d' }) : null;
+    // Générer un token local si l'abonnement redevient "active"
+    const token =
+      status === 'active'
+        ? jwt.sign({ userId }, jwtSecret, { expiresIn: '30d' })
+        : null;
 
     const dataToUpdate = {
       user_id: userId,
-      session_id: subscription.id,
       plan,
       price_id: priceId,
       token,
       status,
       updated_at: new Date(),
+      stripe_subscription_id: stripeSubscriptionId,
     };
 
     console.log('Données mises à jour dans Supabase :', dataToUpdate);
@@ -130,11 +151,11 @@ async function handleSubscriptionEvent(subscription) {
       .upsert(dataToUpdate, { onConflict: 'user_id' });
 
     if (error) {
-      console.error('Erreur lors de la mise à jour dans Supabase :', error.message);
+      console.error('Erreur lors de la mise à jour Supabase :', error.message);
       throw error;
     }
 
-    console.log('Abonnement mis à jour avec succès pour l\'utilisateur :', userId);
+    console.log("Abonnement mis à jour avec succès pour l'utilisateur :", userId);
   } catch (error) {
     console.error('Erreur lors de la mise à jour dans Supabase :', error.message);
     throw error;

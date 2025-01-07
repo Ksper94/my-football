@@ -1,5 +1,3 @@
-// pages/dashboard.js
-
 import { useAuth } from '../context/AuthContext';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
@@ -40,12 +38,15 @@ export default function Dashboard() {
       if (!loading && user) {
         const { data: subData, error: subError } = await supabase
           .from('subscriptions')
-          .select('plan, status, token, updated_at')
+          .select('plan, status, token, updated_at, stripe_subscription_id')
           .eq('user_id', user.id)
           .maybeSingle();
 
         if (subError) {
-          console.error("Erreur lors de la récupération de l'abonnement :", subError.message);
+          console.error(
+            "Erreur lors de la récupération de l'abonnement :",
+            subError.message
+          );
           setSubscription(null);
         } else if (!subData) {
           setSubscription(null);
@@ -94,6 +95,46 @@ export default function Dashboard() {
     }
   };
 
+  /**
+   * 6) Nouvelle fonction : Résilier à la fin de la période
+   */
+  const handleCancelAtPeriodEnd = async () => {
+    try {
+      if (!user) {
+        alert("Vous devez être connecté pour résilier.");
+        return;
+      }
+
+      const response = await fetch('/api/cancel-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id }),
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        console.error('Erreur depuis /api/cancel-subscription:', errData);
+        alert('Impossible de résilier à la fin de la période.');
+        return;
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        alert('Votre abonnement sera résilié à la fin de la période.');
+        // Optionnel: rechargement ou mise à jour de l'état local
+        setSubscription((prev) => {
+          if (!prev) return prev;
+          return { ...prev, status: 'cancel_pending' };
+        });
+      } else {
+        alert(data.error || 'Une erreur est survenue.');
+      }
+    } catch (err) {
+      console.error('Erreur interne :', err);
+      alert("Erreur interne lors de la résiliation.");
+    }
+  };
+
   if (loading) return <div>Chargement...</div>;
   if (error) return <div className="text-red-500">{error}</div>;
 
@@ -113,7 +154,9 @@ export default function Dashboard() {
       {/* Bloc abonnement */}
       {subscription ? (
         <div className="bg-white text-gray-900 p-6 rounded-lg shadow-md mb-4 max-w-md">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Votre Abonnement</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Votre Abonnement
+          </h2>
           <p>
             Plan : <strong>{subscription.plan}</strong>
           </p>
@@ -137,15 +180,31 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* Bouton de résiliation : seulement si status = 'active' */}
+          {/* Boutons de résiliation : seulement si status = 'active' */}
           {subscription.status === 'active' && (
-            <div className="mt-4">
+            <div className="mt-4 space-x-2">
               <button
                 onClick={() => router.push('/resiliation')}
                 className="text-sm bg-gray-200 text-gray-800 px-3 py-2 rounded hover:bg-gray-300"
               >
-                Annuler / Résilier mon abonnement
+                Annuler (par email)
               </button>
+
+              <button
+                onClick={handleCancelAtPeriodEnd}
+                className="text-sm bg-yellow-500 text-white px-3 py-2 rounded hover:bg-yellow-600"
+              >
+                Résilier à la fin de la période
+              </button>
+            </div>
+          )}
+
+          {/* Si le statut est déjà "cancel_pending", afficher un message */}
+          {subscription.status === 'cancel_pending' && (
+            <div className="mt-4">
+              <p className="text-yellow-700 font-semibold">
+                Votre résiliation est programmée à la fin de la période en cours.
+              </p>
             </div>
           )}
         </div>
