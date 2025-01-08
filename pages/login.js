@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/router';
-import Link from 'next/link'; // <-- import Link pour créer un lien Next.js
+import Link from 'next/link';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // <-- nouvel état
   const [errorMsg, setErrorMsg] = useState('');
   const { signIn } = useAuth();
   const router = useRouter();
@@ -54,20 +55,27 @@ export default function LoginPage() {
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        <label
-          className="block mb-2 font-semibold text-black"
-          htmlFor="password"
-        >
+        <label className="block mb-2 font-semibold text-black" htmlFor="password">
           Mot de passe
         </label>
-        <input
-          type="password"
-          id="password"
-          className="w-full border border-gray-300 rounded p-2 mb-6 focus:outline-none focus:border-blue-500 text-black"
-          placeholder="••••••••"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <div className="relative">
+          <input
+            type={showPassword ? 'text' : 'password'} // <-- bascule du type
+            id="password"
+            className="w-full border border-gray-300 rounded p-2 mb-6 focus:outline-none focus:border-blue-500 text-black pr-10"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          {/* Bouton / Icône pour afficher/masquer le mot de passe */}
+          <button
+            type="button"
+            className="absolute right-2 top-2 text-sm text-gray-500 hover:text-gray-700"
+            onClick={() => setShowPassword((prev) => !prev)}
+          >
+            {showPassword ? 'Masquer' : 'Afficher'}
+          </button>
+        </div>
 
         <button
           onClick={handleLogin}
@@ -76,7 +84,7 @@ export default function LoginPage() {
           Se connecter
         </button>
 
-        {/* Ajout : lien pour s'inscrire */}
+        {/* Lien pour s'inscrire */}
         <div className="text-center mt-4">
           <p className="text-gray-700">
             Pas encore de compte ?{' '}

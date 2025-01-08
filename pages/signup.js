@@ -1,5 +1,3 @@
-// pages/signup.js
-
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/router';
@@ -16,6 +14,10 @@ export default function SignUpPage() {
     phoneNumber: '',
   });
   const [error, setError] = useState('');
+
+  const [showPassword, setShowPassword] = useState(false);         // <-- nouvel état
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // idem
+
   const { signUp } = useAuth();
   const router = useRouter();
 
@@ -47,17 +49,6 @@ export default function SignUpPage() {
       setError('Les mots de passe ne correspondent pas.');
       return;
     }
-
-    // Juste pour debug : affiche les infos qu'on envoie
-    console.log('=== handleSignUp called with ===', {
-      email,
-      password,
-      first_name: firstName,
-      last_name: lastName,
-      date_of_birth: dateOfBirth,
-      country,
-      phone_number: phoneNumber,
-    });
 
     try {
       // En Supabase JS v2, on doit passer "options" dans le même objet
@@ -155,26 +146,44 @@ export default function SignUpPage() {
         />
 
         <label className="block mb-2 font-medium text-gray-700">Mot de passe</label>
-        <input
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          className="w-full p-2 mb-4 border border-gray-300 rounded text-gray-900"
-          placeholder="••••••••"
-          required
-        />
+        <div className="relative mb-4">
+          <input
+            type={showPassword ? 'text' : 'password'}
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            className="w-full p-2 border border-gray-300 rounded text-gray-900 pr-10"
+            placeholder="••••••••"
+            required
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute right-2 top-2 text-sm text-gray-500 hover:text-gray-700"
+          >
+            {showPassword ? 'Masquer' : 'Afficher'}
+          </button>
+        </div>
 
         <label className="block mb-2 font-medium text-gray-700">Confirmer le mot de passe</label>
-        <input
-          type="password"
-          name="confirmPassword"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          className="w-full p-2 mb-6 border border-gray-300 rounded text-gray-900"
-          placeholder="••••••••"
-          required
-        />
+        <div className="relative mb-6">
+          <input
+            type={showConfirmPassword ? 'text' : 'password'}
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            className="w-full p-2 border border-gray-300 rounded text-gray-900 pr-10"
+            placeholder="••••••••"
+            required
+          />
+          <button
+            type="button"
+            onClick={() => setShowConfirmPassword((prev) => !prev)}
+            className="absolute right-2 top-2 text-sm text-gray-500 hover:text-gray-700"
+          >
+            {showConfirmPassword ? 'Masquer' : 'Afficher'}
+          </button>
+        </div>
 
         <button
           onClick={handleSignUp}
