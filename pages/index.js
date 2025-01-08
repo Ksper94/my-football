@@ -35,17 +35,16 @@ export default function Home() {
             <h1 className="text-4xl font-bold">Foot Predictions</h1>
             <nav className="mt-4 md:mt-0" aria-label="Navigation principale">
               {user ? (
+                // Si l'utilisateur est connecté, on affiche un lien vers le dashboard
                 <Link href="/dashboard">
                   <span className="text-link hover:text-link-hover cursor-pointer transition-colors duration-300">
                     Accéder au tableau de bord
                   </span>
                 </Link>
               ) : (
-                <Link href="/login">
-                  <span className="text-link hover:text-link-hover cursor-pointer transition-colors duration-300">
-                    Se connecter
-                  </span>
-                </Link>
+                // Si l'utilisateur n'est pas connecté, on ne montre plus "Se connecter"
+                // (rien ou un <></> vide)
+                <></>
               )}
             </nav>
           </header>
@@ -68,10 +67,20 @@ export default function Home() {
             ) : (
               <>
                 <h2 className="text-3xl font-semibold mb-4">
-                  Rejoignez-nous pour des prédictions exclusives !
+                  Rejoignez-nous et boostez vos paris sportifs !
                 </h2>
-                <p className="mb-6">
-                  Inscrivez-vous pour bénéficier de nos analyses détaillées sur le football.
+                <p className="mb-6 max-w-2xl mx-auto">
+                  Notre algorithme <strong>analyse des millions de données</strong> 
+                  en temps réel pour vous fournir des <strong>prédictions précises</strong> 
+                  et fiables. Que vous soyez débutant ou parieur confirmé, 
+                  <strong>Foot Predictions</strong> vous donne un <strong>avantage décisif</strong> 
+                  pour miser sur les bons matchs. 
+                </p>
+                <p className="mb-8 max-w-2xl mx-auto">
+                  Grâce à notre expertise et à la puissance de nos serveurs, 
+                  chaque pronostic est le fruit d’une <strong>analyse statistique approfondie</strong> 
+                  : historique des confrontations, forme des équipes, composition, météo… 
+                  <strong>Ne laissez plus le hasard décider</strong> de vos gains !
                 </p>
                 <Link href="/signup">
                   <span className="bg-link text-white py-2 px-4 rounded hover:bg-link-hover cursor-pointer transition-colors duration-300">
@@ -87,15 +96,15 @@ export default function Home() {
             <h2 className="text-3xl font-semibold text-center mb-6">Témoignages</h2>
             <div className="flex flex-col md:flex-row justify-center items-center gap-6">
               <Testimonial
-                text="Grâce à Foot Predictions, j'ai pu augmenter mes gains !"
+                text="Grâce à Foot Predictions, j'ai pu augmenter mes gains de manière significative !"
                 author="Guillaume Lemoine"
               />
               <Testimonial
-                text="Un service exceptionnel avec des prédictions fiables."
+                text="Un service exceptionnel avec des prédictions fiables et un support réactif."
                 author="Eddy Laurens"
               />
               <Testimonial
-                text="L'algorithme est incroyablement précis."
+                text="L'algorithme est incroyablement précis, c'est un vrai game changer."
                 author="Vanessa Sadon"
               />
             </div>

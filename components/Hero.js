@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 import { useRouter } from 'next/router';
 
 export default function Hero({
-  title = 'Foot Predictions',
-  subtitle = 'Prédictions précises pour vos paris sportifs de football',
+  title = 'Foot Predictions : Votre allié pour des paris gagnants',
+  subtitle = 'Notre algorithme d’IA analyse des millions de données pour vous fournir des pronostics ultra-fiables',
   backgroundImage = '/football-bg.jpg',
   buttonText = 'Découvrez nos formules',
 }) {
@@ -22,7 +22,7 @@ export default function Hero({
       transition={{ duration: 1 }}
       className="relative bg-cover bg-center h-screen flex items-center justify-center"
       style={{ backgroundImage: `url('${encodeURI(backgroundImage)}')` }}
-      aria-label="Section d'accueil principale avec prédictions de football"
+      aria-label="Section d'accueil principale"
     >
       <div className="absolute inset-0 bg-black opacity-50" aria-hidden="true"></div>
 
