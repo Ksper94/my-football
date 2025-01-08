@@ -1,8 +1,7 @@
-// pages/login.js
-
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/router';
+import Link from 'next/link'; // <-- import Link pour créer un lien Next.js
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -14,7 +13,7 @@ export default function LoginPage() {
   const handleLogin = async () => {
     setErrorMsg('');
     if (!email || !password) {
-      setErrorMsg('Veuillez saisir votre email et mot de passe.');
+      setErrorMsg('Veuillez saisir votre email et votre mot de passe.');
       return;
     }
 
@@ -43,10 +42,7 @@ export default function LoginPage() {
           </div>
         )}
 
-        <label
-          className="block mb-2 font-semibold text-black"
-          htmlFor="email"
-        >
+        <label className="block mb-2 font-semibold text-black" htmlFor="email">
           Adresse Email
         </label>
         <input
@@ -79,6 +75,18 @@ export default function LoginPage() {
         >
           Se connecter
         </button>
+
+        {/* Ajout : lien pour s'inscrire */}
+        <div className="text-center mt-4">
+          <p className="text-gray-700">
+            Pas encore de compte ?{' '}
+            <Link href="/signup">
+              <span className="text-blue-600 hover:underline cursor-pointer">
+                Créer un compte
+              </span>
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
