@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { useRouter } from 'next/router';
 
 export default function Hero({
-  title = 'Foot Predictions : Votre allié pour des paris gagnants',
+  title = 'Votre allié pour des paris gagnants',
   subtitle = 'Notre algorithme d’IA analyse des millions de données pour vous fournir des pronostics ultra-fiables',
   backgroundImage = '/football-bg.jpg',
   buttonText = 'Découvrez nos formules',

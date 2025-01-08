@@ -70,10 +70,10 @@ export default function Home() {
                   Rejoignez-nous et boostez vos paris sportifs !
                 </h2>
                 <p className="mb-6 max-w-2xl mx-auto">
-                  Notre algorithme <strong>analyse des millions de données</strong> 
-                  en temps réel pour vous fournir des <strong>prédictions précises</strong> 
+                  Notre algorithme <strong>analyse des millions de données</strong>  
+                  en temps réel pour vous fournir des <strong>prédictions précises</strong>  
                   et fiables. Que vous soyez débutant ou parieur confirmé, 
-                  <strong>Foot Predictions</strong> vous donne un <strong>avantage décisif</strong> 
+                  <strong>Foot Predictions</strong> vous donne un <strong>avantage décisif</strong>  
                   pour miser sur les bons matchs. 
                 </p>
                 <p className="mb-8 max-w-2xl mx-auto">
