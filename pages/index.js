@@ -82,6 +82,16 @@ export default function Home() {
                   : historique des confrontations, forme des équipes, composition, météo… 
                   <strong>Ne laissez plus le hasard décider</strong> de vos gains !
                 </p>
+
+                {/* === Ajout de la mention concernant la période d'essai de 1 semaine === */}
+                <p className="mb-8 max-w-2xl mx-auto font-bold">
+                  En vous inscrivant gratuitement dès maintenant, vous bénéficiez 
+                  automatiquement d’une <strong>période d’essai de 1 semaine</strong> 
+                  pour tester notre super application et découvrir 
+                  la <strong>puissance de notre algorithme</strong>.
+                </p>
+                {/* ============================================================== */}
+
                 <Link href="/signup">
                   <span className="bg-link text-white py-2 px-4 rounded hover:bg-link-hover cursor-pointer transition-colors duration-300">
                     Créer un compte
