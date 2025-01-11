@@ -2,7 +2,6 @@ import { useAuth } from '../context/AuthContext';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { supabase } from '../utils/supabaseClient';
 
 export default function Dashboard() {
   const { user, loading, signOut } = useAuth();
@@ -13,6 +12,7 @@ export default function Dashboard() {
   const [accessStatus, setAccessStatus] = useState('loading'); // 'loading', 'trial', 'active', 'expired'
   const [subscription, setSubscription] = useState(null);
   const [timeRemaining, setTimeRemaining] = useState('');
+  const [token, setToken] = useState(null); // Token pour Streamlit
 
   // 1) Rediriger si pas connecté
   useEffect(() => {
@@ -49,15 +49,15 @@ export default function Dashboard() {
           if (response.ok && data.success) {
             if (data.message === 'Trial actif') {
               setAccessStatus('trial');
-              // Calculer le temps restant pour la trial
-              const trialDaysRemaining = data.trialDaysRemaining;
-              setTimeRemaining(`Temps restant dans votre période d'essai : ${trialDaysRemaining} jour(s)`);
+              setTimeRemaining(`Temps restant dans votre période d'essai : ${data.trialDaysRemaining} jour(s)`);
+              setToken(data.token); // Définir le token pour trial
             } else if (data.message === 'Abonnement payant actif.') {
               // Récupérer les détails de l'abonnement
               const subscriptionData = data.subscription;
               setSubscription(subscriptionData);
               setAccessStatus('active');
               calculateTimeRemaining(subscriptionData.plan, subscriptionData.updated_at);
+              setToken(subscriptionData.token); // Définir le token pour abonnement
             }
           } else {
             // Accès refusé : trial expiré ou pas d’abonnement
@@ -152,6 +152,7 @@ export default function Dashboard() {
   };
 
   if (loading || accessStatus === 'loading') return <div>Chargement...</div>;
+  
   if (accessStatus === 'expired') {
     return (
       <div className="min-h-screen bg-background text-foreground p-8 transition-all duration-300">
@@ -221,10 +222,10 @@ export default function Dashboard() {
           )}
 
           {/* Bouton pour accéder à l'application Streamlit si un token est présent */}
-          {accessStatus === 'active' && subscription?.token && (
+          {(accessStatus === 'trial' || accessStatus === 'active') && token && (
             <div className="mt-4">
               <a
-                href={`https://footballgit-bdx4ln4gduabscvzmzgnyk.streamlit.app/?token=${subscription.token}`}
+                href={`https://footballgit-bdx4ln4gduabscvzmzgnyk.streamlit.app/?token=${token}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >

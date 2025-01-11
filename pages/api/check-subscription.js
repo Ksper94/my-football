@@ -1,5 +1,9 @@
 // pages/api/check-subscription.js
 import { supabaseService } from '../../utils/supabaseService';
+import jwt from 'jsonwebtoken';
+
+// Assurez-vous d'ajouter `JWT_SECRET` dans vos variables d'environnement
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -29,7 +33,19 @@ export default async function handler(req, res) {
 
     if (diffDays < 7) {
       // => Période d’essai de 7 jours
-      return res.status(200).json({ success: true, message: 'Trial actif', trialDaysRemaining: 7 - diffDays });
+      // Générer un token pour Streamlit
+      const trialToken = jwt.sign(
+        { userId: user.id, type: 'trial' },
+        JWT_SECRET,
+        { expiresIn: '7d' } // Token valide pour 7 jours
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: 'Trial actif',
+        trialDaysRemaining: 7 - diffDays,
+        token: trialToken, // Ajouter le token
+      });
     }
 
     // 3) Si trial expiré, vérifier un abonnement payant
@@ -54,7 +70,18 @@ export default async function handler(req, res) {
 
     // Vérifier le status de l’abonnement
     if (['active', 'cancel_pending'].includes(subscription.status)) {
-      return res.status(200).json({ success: true, message: 'Abonnement payant actif.', subscription });
+      // Générer un token pour Streamlit si nécessaire
+      const subscriptionToken = subscription.token || jwt.sign(
+        { userId: user.id, type: 'subscription' },
+        JWT_SECRET,
+        { expiresIn: '30d' } // Adapter la durée selon le plan
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: 'Abonnement payant actif.',
+        subscription: { ...subscription, token: subscriptionToken },
+      });
     }
 
     // Sinon => inactif
