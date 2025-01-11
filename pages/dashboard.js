@@ -10,6 +10,7 @@ export default function Dashboard() {
 
   const [profile, setProfile] = useState(null);
   const [error, setError] = useState('');
+  const [accessStatus, setAccessStatus] = useState('loading'); // 'loading', 'trial', 'active', 'expired'
   const [subscription, setSubscription] = useState(null);
   const [timeRemaining, setTimeRemaining] = useState('');
 
@@ -32,31 +33,46 @@ export default function Dashboard() {
     }
   }, [user, loading]);
 
-  // 3) Récupérer la subscription (si elle existe)
+  // 3) Vérifier l'accès via l'API
   useEffect(() => {
-    const fetchSubscription = async () => {
+    const checkAccess = async () => {
       if (!loading && user) {
-        const { data: subData, error: subError } = await supabase
-          .from('subscriptions')
-          .select('plan, status, token, updated_at, stripe_subscription_id')
-          .eq('user_id', user.id)
-          .maybeSingle();
+        try {
+          const response = await fetch('/api/check-subscription', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: user.id }),
+          });
 
-        if (subError) {
-          console.error(
-            "Erreur lors de la récupération de l'abonnement :",
-            subError.message
-          );
-          setSubscription(null);
-        } else if (!subData) {
-          setSubscription(null);
-        } else {
-          setSubscription(subData);
-          calculateTimeRemaining(subData.plan, subData.updated_at);
+          const data = await response.json();
+
+          if (response.ok && data.success) {
+            if (data.message === 'Trial actif') {
+              setAccessStatus('trial');
+              // Calculer le temps restant pour la trial
+              const trialDaysRemaining = data.trialDaysRemaining;
+              setTimeRemaining(`Temps restant dans votre période d'essai : ${trialDaysRemaining} jour(s)`);
+            } else if (data.message === 'Abonnement payant actif.') {
+              // Récupérer les détails de l'abonnement
+              const subscriptionData = data.subscription;
+              setSubscription(subscriptionData);
+              setAccessStatus('active');
+              calculateTimeRemaining(subscriptionData.plan, subscriptionData.updated_at);
+            }
+          } else {
+            // Accès refusé : trial expiré ou pas d’abonnement
+            setAccessStatus('expired');
+            setError(data.message || 'Accès refusé.');
+          }
+        } catch (err) {
+          console.error('Erreur lors de la vérification de l\'accès:', err);
+          setAccessStatus('expired');
+          setError('Erreur lors de la vérification de votre abonnement.');
         }
       }
     };
-    fetchSubscription();
+
+    checkAccess();
   }, [user, loading]);
 
   // 4) Calculer le temps restant (mensuel, trimestriel, annuel...)
@@ -71,7 +87,7 @@ export default function Dashboard() {
     } else if (plan === 'annuel') {
       endDate = new Date(startDate.getTime() + 365 * 24 * 60 * 60 * 1000);
     } else {
-      endDate = new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+      endDate = new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000); // Default à 30 jours
     }
 
     const now = new Date();
@@ -121,7 +137,7 @@ export default function Dashboard() {
       const data = await response.json();
       if (data.success) {
         alert('Votre abonnement sera résilié à la fin de la période.');
-        // Optionnel: rechargement ou mise à jour de l'état local
+        // Optionnel: mise à jour de l'état local
         setSubscription((prev) => {
           if (!prev) return prev;
           return { ...prev, status: 'cancel_pending' };
@@ -135,9 +151,36 @@ export default function Dashboard() {
     }
   };
 
-  if (loading) return <div>Chargement...</div>;
-  if (error) return <div className="text-red-500">{error}</div>;
+  if (loading || accessStatus === 'loading') return <div>Chargement...</div>;
+  if (accessStatus === 'expired') {
+    return (
+      <div className="min-h-screen bg-background text-foreground p-8 transition-all duration-300">
+        <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
+        {profile && (
+          <p className="mb-4">
+            Bienvenue, <strong>{profile.first_name || 'Utilisateur'}</strong>
+            {profile.last_name ? ` ${profile.last_name}` : ''} !
+          </p>
+        )}
+        <div className="bg-white text-gray-900 p-6 rounded-lg shadow-md mb-4 max-w-md">
+          <p>{error || "Votre période d'essai est expirée et vous n'avez pas d'abonnement actif."}</p>
+          <Link href="/pricing">
+            <span className="text-link hover:text-link-hover cursor-pointer">
+              Découvrez nos formules
+            </span>
+          </Link>
+        </div>
+        <button
+          onClick={handleLogout}
+          className="mt-4 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition"
+        >
+          Se déconnecter
+        </button>
+      </div>
+    );
+  }
 
+  // status 'trial' or 'active'
   return (
     <div className="min-h-screen bg-background text-foreground p-8 transition-all duration-300">
       <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
@@ -152,21 +195,33 @@ export default function Dashboard() {
       )}
 
       {/* Bloc abonnement */}
-      {subscription ? (
+      {(accessStatus === 'trial' || accessStatus === 'active') && (
         <div className="bg-white text-gray-900 p-6 rounded-lg shadow-md mb-4 max-w-md">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Votre Abonnement
+            {accessStatus === 'trial' ? 'Période d\'essai' : 'Votre Abonnement'}
           </h2>
-          <p>
-            Plan : <strong>{subscription.plan}</strong>
-          </p>
-          <p>
-            Status : <strong>{subscription.status}</strong>
-          </p>
-          <p>{timeRemaining}</p>
+          {accessStatus === 'trial' && (
+            <>
+              <p>
+                Vous êtes en période d’essai gratuite de 7 jours.
+              </p>
+              <p>{timeRemaining}</p>
+            </>
+          )}
+          {accessStatus === 'active' && subscription && (
+            <>
+              <p>
+                Plan : <strong>{subscription.plan}</strong>
+              </p>
+              <p>
+                Status : <strong>{subscription.status}</strong>
+              </p>
+              <p>{timeRemaining}</p>
+            </>
+          )}
 
           {/* Bouton pour accéder à l'application Streamlit si un token est présent */}
-          {subscription.token && (
+          {accessStatus === 'active' && subscription?.token && (
             <div className="mt-4">
               <a
                 href={`https://footballgit-bdx4ln4gduabscvzmzgnyk.streamlit.app/?token=${subscription.token}`}
@@ -181,7 +236,7 @@ export default function Dashboard() {
           )}
 
           {/* Boutons de résiliation : seulement si status = 'active' */}
-          {subscription.status === 'active' && (
+          {accessStatus === 'active' && subscription.status === 'active' && (
             <div className="mt-4 space-x-2">
               <button
                 onClick={() => router.push('/resiliation')}
@@ -200,22 +255,13 @@ export default function Dashboard() {
           )}
 
           {/* Si le statut est déjà "cancel_pending", afficher un message */}
-          {subscription.status === 'cancel_pending' && (
+          {accessStatus === 'active' && subscription.status === 'cancel_pending' && (
             <div className="mt-4">
               <p className="text-yellow-700 font-semibold">
                 Votre résiliation est programmée à la fin de la période en cours.
               </p>
             </div>
           )}
-        </div>
-      ) : (
-        <div className="bg-white text-gray-900 p-6 rounded-lg shadow-md mb-4 max-w-md">
-          <p>Vous n'avez pas d'abonnement actif.</p>
-          <Link href="/pricing">
-            <span className="text-link hover:text-link-hover cursor-pointer">
-              Découvrez nos formules
-            </span>
-          </Link>
         </div>
       )}
 
