@@ -31,13 +31,8 @@ export default function Home() {
 
         {/* Contenu principal */}
         <div className="min-h-screen bg-background text-foreground transition-all duration-300">
-
-          {/*
-            HEADER "futuriste"
-            - Dégradé sombre -> touche de modernité
-            - Couleur flashy pour le logo/titre (ex: un violet ou un cyan)
-          */}
-          <header 
+          {/* HEADER "futuriste" */}
+          <header
             className="
               bg-gradient-to-r from-gray-900 to-gray-800
               text-white
@@ -45,20 +40,20 @@ export default function Home() {
               rounded-b-md
               py-4
               px-8
-              flex 
-              flex-col 
-              md:flex-row 
-              justify-between 
+              flex
+              flex-col
+              md:flex-row
+              justify-between
               items-center
             "
           >
-            <h1 
+            <h1
               className="
-                text-4xl 
-                font-bold 
+                text-4xl
+                font-bold
                 tracking-wide
-                hover:scale-105 
-                transition-transform 
+                hover:scale-105
+                transition-transform
                 duration-300
                 text-cyan-400
               "
@@ -77,7 +72,7 @@ export default function Home() {
                   </span>
                 </Link>
               ) : (
-                // On peut éventuellement proposer un lien 'Créer un compte' dans le header
+                /* On peut éventuellement proposer un lien 'Créer un compte' dans le header */
                 <></>
               )}
             </nav>
@@ -104,29 +99,14 @@ export default function Home() {
                   Rejoignez-nous et boostez vos paris sportifs !
                 </h2>
                 <p className="mb-6 max-w-2xl mx-auto">
-                  Notre algorithme <strong>analyse des millions de données</strong>  
-                  en temps réel pour vous fournir des <strong>prédictions précises</strong>  
-                  et fiables. Que vous soyez débutant ou parieur confirmé, 
-                  <strong>Foot Predictions</strong> vous donne un <strong>avantage décisif</strong>  
-                  pour miser sur les bons matchs. 
+                  Notre algorithme <strong>analyse des millions de données</strong> en temps réel pour vous fournir des <strong>prédictions précises</strong> et fiables. Que vous soyez débutant ou parieur confirmé, <strong>Foot Predictions</strong> vous donne un <strong>avantage décisif</strong> pour miser sur les bons matchs.
                 </p>
                 <p className="mb-8 max-w-2xl mx-auto">
-                  Grâce à notre expertise et à la puissance de nos serveurs, 
-                  chaque pronostic est le fruit d’une 
-                  <strong> analyse statistique approfondie</strong> : historique des confrontations,
-                  forme des équipes, composition, météo… 
-                  <strong> Ne laissez plus le hasard décider</strong> de vos gains !
+                  Grâce à notre expertise et à la puissance de nos serveurs, chaque pronostic est le fruit d’une <strong>analyse statistique approfondie</strong> : historique des confrontations, forme des équipes, composition, météo… <strong>Ne laissez plus le hasard décider</strong> de vos gains !
                 </p>
-
-                {/* === Ajout de la mention concernant la période d'essai de 1 semaine === */}
                 <p className="mb-8 max-w-2xl mx-auto font-bold">
-                  En vous inscrivant gratuitement dès maintenant, vous bénéficiez 
-                  automatiquement d’une <strong>période d’essai de 1 semaine</strong> 
-                  pour tester notre super application et découvrir 
-                  la <strong>puissance de notre algorithme</strong>.
+                  En vous inscrivant gratuitement dès maintenant, vous bénéficiez automatiquement d’une <strong>période d’essai de 1 semaine</strong> pour tester notre super application et découvrir la <strong>puissance de notre algorithme</strong>.
                 </p>
-                {/* ============================================================== */}
-
                 <Link href="/signup">
                   <span className="bg-cyan-500 text-white py-2 px-4 rounded hover:bg-cyan-400 cursor-pointer transition-colors duration-300">
                     Créer un compte
