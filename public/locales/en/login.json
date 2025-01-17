@@ -1,0 +1,15 @@
+{
+    "title": "Login",
+    "emailLabel": "Email Address",
+    "emailPlaceholder": "Your email",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "••••••••",
+    "loginButton": "Login",
+    "missingCredentials": "Please enter your email and password.",
+    "loginError": "An error occurred during login.",
+    "showPassword": "Show",
+    "hidePassword": "Hide",
+    "noAccount": "Don't have an account?",
+    "signupLink": "Sign up"
+  }
+  

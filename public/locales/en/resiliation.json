@@ -1,0 +1,15 @@
+{
+    "title": "Subscription Cancellation",
+    "intro": "We’re sorry to see you go! If you wish to cancel your subscription, please send us an email at",
+    "instructions": "To facilitate the processing of your request, please include:",
+    "details": {
+      "name": "Your full name",
+      "email": "The email address associated with your account",
+      "plan": "The plan you subscribed to (monthly, quarterly, annual…)"
+    },
+    "legal": {
+      "text": "According to consumer protection regulations, you have a right to cancel your subscription at any time. However, as per Article L.221-28 of the French Consumer Code, some services fully provided before the end of the 14-day withdrawal period may not be refundable. If you have any questions, please contact us at"
+    },
+    "returnDashboard": "Back to Dashboard"
+  }
+  

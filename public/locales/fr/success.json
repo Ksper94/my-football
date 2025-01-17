@@ -1,0 +1,13 @@
+{
+    "successTitle": "Succès !",
+    "successMessage": "Votre abonnement a été créé avec succès !",
+    "errorTitle": "Erreur",
+    "errors": {
+      "invalidSession": "Session invalide ou expirée. Veuillez réessayer.",
+      "subscriptionFetch": "Erreur lors de la récupération des détails de l'abonnement.",
+      "noSubscription": "Aucun abonnement trouvé pour cette session. Veuillez réessayer.",
+      "unexpectedError": "Une erreur inattendue est survenue."
+    },
+    "returnHome": "Retour à l'accueil"
+  }
+  

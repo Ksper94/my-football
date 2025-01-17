@@ -1,8 +1,9 @@
-// components/LogoutButton.js
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 export default function LogoutButton() {
   const { signOut } = useAuth();
+  const { t } = useTranslation('logout'); // Charger le namespace "logout"
 
   const handleLogout = async () => {
     await signOut();
@@ -14,7 +15,7 @@ export default function LogoutButton() {
       onClick={handleLogout}
       className="py-2 px-4 bg-red-500 text-white font-bold rounded hover:bg-red-600 transition"
     >
-      Se déconnecter
+      {t('logoutButton')} {/* Traduction pour "Se déconnecter" */}
     </button>
   );
 }

@@ -1,0 +1,35 @@
+{
+    "title": "Choose your subscription",
+    "plans": {
+      "monthly": {
+        "name": "Monthly",
+        "price": "€10",
+        "features": [
+          "Full access to predictions",
+          "Daily updates",
+          "Priority support"
+        ]
+      },
+      "quarterly": {
+        "name": "Quarterly",
+        "price": "€27",
+        "features": [
+          "Full access to predictions",
+          "Daily updates",
+          "Premium support"
+        ]
+      },
+      "yearly": {
+        "name": "Yearly",
+        "price": "€100",
+        "features": [
+          "Full access to predictions",
+          "Daily updates",
+          "VIP premium support"
+        ]
+      }
+    },
+    "subscribeButton": "Subscribe",
+    "loginPrompt": "You must be logged in to subscribe to a plan."
+  }
+  

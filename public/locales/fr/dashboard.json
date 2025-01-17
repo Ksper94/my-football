@@ -1,0 +1,25 @@
+{
+    "loading": "Chargement...",
+    "dashboardTitle": "Tableau de bord",
+    "welcome": "Bienvenue, {{firstName}}",
+    "trialTitle": "Période d'essai",
+    "subscriptionTitle": "Votre Abonnement",
+    "trialTimeRemaining": "Temps restant dans votre période d'essai : {{days}} jour(s)",
+    "timeRemaining": "Temps restant : {{days}} jour(s)",
+    "subscriptionExpired": "Votre abonnement est expiré",
+    "trialExpired": "Votre période d'essai est expirée. Découvrez nos formules !",
+    "accessDenied": "Accès refusé.",
+    "accessCheckError": "Erreur lors de la vérification de votre abonnement.",
+    "viewPlans": "Découvrez nos formules",
+    "logout": "Se déconnecter",
+    "accessApp": "Accéder à l'application",
+    "cancelByEmail": "Annuler (par email)",
+    "cancelAtEnd": "Résilier à la fin de la période",
+    "cancelPending": "Votre résiliation est programmée à la fin de la période en cours.",
+    "cancelError": "Impossible de résilier à la fin de la période.",
+    "cancelSuccess": "Votre abonnement sera résilié à la fin de la période.",
+    "loginRequired": "Vous devez être connecté pour effectuer cette action.",
+    "internalError": "Erreur interne. Veuillez réessayer.",
+    "unknownError": "Une erreur inconnue est survenue."
+  }
+  

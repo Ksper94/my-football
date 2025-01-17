@@ -2,9 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 export default function Layout({ children }) {
   const { user } = useAuth();
+  const { t } = useTranslation('layout'); // Charger le namespace "layout"
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 text-gray-800">
@@ -30,7 +32,7 @@ export default function Layout({ children }) {
               transition-transform duration-300
             "
           >
-            Foot Predictions
+            {t('siteTitle')}
           </h1>
         </Link>
 
@@ -48,7 +50,7 @@ export default function Layout({ children }) {
                   font-semibold
                 "
               >
-                Tableau de bord
+                {t('dashboard')}
               </span>
             </Link>
           ) : (
@@ -63,7 +65,7 @@ export default function Layout({ children }) {
                   font-semibold
                 "
               >
-                Se connecter
+                {t('login')}
               </span>
             </Link>
           )}
@@ -71,9 +73,7 @@ export default function Layout({ children }) {
       </header>
 
       {/* Contenu principal */}
-      <main className="flex-grow container mx-auto p-6">
-        {children}
-      </main>
+      <main className="flex-grow container mx-auto p-6">{children}</main>
 
       {/* Footer */}
       <footer
@@ -87,7 +87,7 @@ export default function Layout({ children }) {
           shadow-inner
         "
       >
-        &copy; {new Date().getFullYear()} Foot Predictions. Tous droits réservés.
+        &copy; {new Date().getFullYear()} {t('footerText')}
       </footer>
     </div>
   );

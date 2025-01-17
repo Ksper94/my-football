@@ -1,0 +1,33 @@
+{
+    "title": "Créer un compte",
+    "fields": {
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "dateOfBirth": "Date de naissance",
+      "country": "Pays",
+      "phoneNumber": "Numéro de téléphone (optionnel)",
+      "email": "Email",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe"
+    },
+    "placeholders": {
+      "firstName": "Votre prénom",
+      "lastName": "Votre nom",
+      "country": "Votre pays",
+      "phoneNumber": "06 12 34 56 78",
+      "email": "votre@email.com",
+      "password": "••••••••",
+      "confirmPassword": "••••••••"
+    },
+    "actions": {
+      "show": "Afficher",
+      "hide": "Masquer",
+      "signUp": "Créer un compte"
+    },
+    "error": {
+      "missingFields": "Veuillez remplir tous les champs obligatoires.",
+      "passwordMismatch": "Les mots de passe ne correspondent pas.",
+      "generic": "Une erreur est survenue lors de l'inscription."
+    }
+  }
+  

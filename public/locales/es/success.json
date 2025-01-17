@@ -1,0 +1,13 @@
+{
+    "successTitle": "¡Éxito!",
+    "successMessage": "¡Tu suscripción se ha creado con éxito!",
+    "errorTitle": "Error",
+    "errors": {
+      "invalidSession": "Sesión inválida o caducada. Por favor, inténtalo de nuevo.",
+      "subscriptionFetch": "Error al recuperar los detalles de la suscripción.",
+      "noSubscription": "No se encontró ninguna suscripción para esta sesión. Por favor, inténtalo de nuevo.",
+      "unexpectedError": "Ocurrió un error inesperado."
+    },
+    "returnHome": "Volver al inicio"
+  }
+  

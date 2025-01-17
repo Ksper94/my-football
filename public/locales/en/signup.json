@@ -1,0 +1,33 @@
+{
+    "title": "Sign Up",
+    "fields": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "dateOfBirth": "Date of Birth",
+      "country": "Country",
+      "phoneNumber": "Phone Number (optional)",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password"
+    },
+    "placeholders": {
+      "firstName": "Your first name",
+      "lastName": "Your last name",
+      "country": "Your country",
+      "phoneNumber": "123-456-7890",
+      "email": "your@email.com",
+      "password": "••••••••",
+      "confirmPassword": "••••••••"
+    },
+    "actions": {
+      "show": "Show",
+      "hide": "Hide",
+      "signUp": "Sign Up"
+    },
+    "error": {
+      "missingFields": "Please fill in all required fields.",
+      "passwordMismatch": "Passwords do not match.",
+      "generic": "An error occurred during sign-up."
+    }
+  }
+  

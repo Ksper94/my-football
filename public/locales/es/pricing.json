@@ -1,0 +1,35 @@
+{
+    "title": "Elige tu suscripción",
+    "plans": {
+      "monthly": {
+        "name": "Mensual",
+        "price": "10€",
+        "features": [
+          "Acceso completo a las predicciones",
+          "Actualizaciones diarias",
+          "Soporte prioritario"
+        ]
+      },
+      "quarterly": {
+        "name": "Trimestral",
+        "price": "27€",
+        "features": [
+          "Acceso completo a las predicciones",
+          "Actualizaciones diarias",
+          "Soporte premium"
+        ]
+      },
+      "yearly": {
+        "name": "Anual",
+        "price": "100€",
+        "features": [
+          "Acceso completo a las predicciones",
+          "Actualizaciones diarias",
+          "Soporte premium VIP"
+        ]
+      }
+    },
+    "subscribeButton": "Suscribirse",
+    "loginPrompt": "Debes estar conectado para suscribirte a un plan."
+  }
+  

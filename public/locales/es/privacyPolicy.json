@@ -1,0 +1,50 @@
+{
+    "title": "Política de Privacidad",
+    "lastUpdated": "Última actualización:",
+    "sections": {
+      "introduction": {
+        "title": "1. Introducción",
+        "content": "En <strong>Foot Predictions</strong>, la privacidad de sus datos personales es una prioridad. Esta política de privacidad explica cómo recopilamos, usamos y protegemos su información personal cuando utiliza nuestro sitio."
+      },
+      "dataCollected": {
+        "title": "2. Datos Recopilados",
+        "userProvided": {
+          "title": "2.1. Datos proporcionados por el usuario",
+          "content": "Cuando crea una cuenta o se suscribe a nuestros servicios, recopilamos información como: su nombre, apellido, correo electrónico y otros detalles necesarios para gestionar su cuenta."
+        },
+        "automaticallyCollected": {
+          "title": "2.2. Datos recopilados automáticamente",
+          "content": "También recopilamos información automáticamente a través de cookies, como su dirección IP, tipo de navegador, páginas visitadas y duración de su visita."
+        }
+      },
+      "dataUsage": {
+        "title": "3. Uso de Datos",
+        "content": "Los datos recopilados se utilizan para: Proporcionar y gestionar los servicios ofrecidos en nuestro sitio. Personalizar su experiencia de usuario. Enviar comunicaciones de marketing o actualizaciones sobre nuestros servicios. Cumplir con las obligaciones legales."
+      },
+      "dataSharing": {
+        "title": "4. Compartir Datos",
+        "content": "Sus datos personales nunca se venden ni alquilan a terceros. Sin embargo, podemos compartirlos con: Nuestros proveedores de servicios (pagos, alojamiento, etc.) para garantizar el correcto funcionamiento del sitio. Las autoridades competentes si la ley lo requiere."
+      },
+      "dataProtection": {
+        "title": "5. Protección de Datos",
+        "content": "Implementamos medidas técnicas y organizativas para proteger sus datos contra el acceso no autorizado, pérdida, destrucción o alteración."
+      },
+      "userRights": {
+        "title": "6. Sus Derechos",
+        "content": "De acuerdo con el RGPD, usted tiene los siguientes derechos: Derecho de acceso, Derecho de rectificación, Derecho de eliminación, Derecho de oposición, Derecho a la portabilidad de datos."
+      },
+      "cookies": {
+        "title": "7. Cookies",
+        "content": "Utilizamos cookies para mejorar su experiencia de usuario y analizar el tráfico del sitio. Puede configurar su navegador para rechazar las cookies, pero esto puede limitar ciertas funcionalidades."
+      },
+      "policyChanges": {
+        "title": "8. Cambios en esta Política",
+        "content": "Nos reservamos el derecho de modificar esta política de privacidad en cualquier momento. Los cambios se publicarán en esta página con una fecha de actualización."
+      },
+      "contact": {
+        "title": "9. Contacto",
+        "content": "Para cualquier pregunta o solicitud relacionada con esta política de privacidad, puede contactarnos en: services@foot-predictions.com"
+      }
+    }
+  }
+  

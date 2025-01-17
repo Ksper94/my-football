@@ -1,11 +1,11 @@
-// pages/success.js
-
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { supabase } from '../utils/supabaseClient';
 import Spinner from '../components/Spinner';
+import { useTranslation } from 'react-i18next'; // Importer useTranslation
 
 export default function Success() {
+  const { t } = useTranslation('success'); // Charger le namespace "success"
   const router = useRouter();
   const { session_id } = router.query;
 
@@ -16,7 +16,7 @@ export default function Success() {
   useEffect(() => {
     const fetchSession = async () => {
       if (!session_id) {
-        setErrorMsg('Session invalide ou expirée. Veuillez réessayer.');
+        setErrorMsg(t('errors.invalidSession'));
         setLoading(false);
         return;
       }
@@ -29,17 +29,17 @@ export default function Success() {
           .maybeSingle();
 
         if (error) {
-          console.error('Erreur lors de la récupération de la session :', error);
-          setErrorMsg("Erreur lors de la récupération des détails de l'abonnement.");
+          console.error(t('errors.fetchError'), error);
+          setErrorMsg(t('errors.subscriptionFetch'));
         } else if (!data) {
           // Aucun abonnement trouvé pour cette session_id
-          setErrorMsg('Aucun abonnement trouvé pour cette session. Veuillez réessayer.');
+          setErrorMsg(t('errors.noSubscription'));
         } else {
-          setMessage('Votre abonnement a été créé avec succès !');
+          setMessage(t('successMessage'));
         }
       } catch (err) {
-        console.error('Erreur inattendue lors de la récupération de la session:', err);
-        setErrorMsg('Une erreur inattendue est survenue.');
+        console.error(t('errors.unexpectedError'), err);
+        setErrorMsg(t('errors.unexpectedError'));
       } finally {
         setLoading(false);
       }
@@ -48,7 +48,7 @@ export default function Success() {
     if (router.isReady) {
       fetchSession();
     }
-  }, [session_id, router.isReady]);
+  }, [session_id, router.isReady, t]);
 
   const handleReturnHome = () => {
     router.push('/');
@@ -61,26 +61,26 @@ export default function Success() {
           <Spinner />
         ) : errorMsg ? (
           <div>
-            <h1 className="text-3xl font-bold mb-4 text-red-500">Erreur</h1>
+            <h1 className="text-3xl font-bold mb-4 text-red-500">{t('errorTitle')}</h1>
             <p className="text-lg mb-6">{errorMsg}</p>
             <button
               onClick={handleReturnHome}
               className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
-              aria-label="Retour à l'accueil"
+              aria-label={t('returnHome')}
             >
-              Retour à l'accueil
+              {t('returnHome')}
             </button>
           </div>
         ) : (
           <div>
-            <h1 className="text-3xl font-bold mb-4 text-gray-900">Succès&nbsp;!</h1>
+            <h1 className="text-3xl font-bold mb-4 text-gray-900">{t('successTitle')}</h1>
             <p className="text-lg mb-6 text-gray-700">{message}</p>
             <button
               onClick={handleReturnHome}
               className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
-              aria-label="Retour à l'accueil"
+              aria-label={t('returnHome')}
             >
-              Retour à l'accueil
+              {t('returnHome')}
             </button>
           </div>
         )}

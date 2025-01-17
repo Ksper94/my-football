@@ -1,0 +1,34 @@
+{
+    "pageTitle": "Terms and Conditions of Sale",
+    "pageDescription": "Read the terms and conditions of sale of Foot Predictions",
+    "title": "Terms and Conditions of Sale",
+    "lastUpdate": "Last updated",
+    "section1": {
+      "title": "1. Introduction",
+      "content": "These Terms and Conditions of Sale ('T&Cs') govern the subscription, access, and use of the services offered on the foot-predictions.com website ('the Site'). By using or subscribing to the Site's services, you expressly accept these T&Cs."
+    },
+    "section2": {
+      "title": "2. Legal information",
+      "content": "The Foot Predictions site is published by Foot Predictions, registered with the Trade and Companies Register under number 939 215 505 R.C.S. Quimper. Contact: services@foot-predictions.com"
+    },
+    "section3": {
+      "title": "3. Description of services",
+      "content": "Foot Predictions offers paid subscriptions providing access to an application that generates probabilities and predictions for upcoming football matches, based on advanced algorithms. These services are designed to assist users in making decisions for their sports betting."
+    },
+    "section4": {
+      "title": "4. Conditions for accessing services",
+      "sub1": {
+        "title": "4.1. Account creation",
+        "content": "To access the services, the user must create an account by providing accurate and complete information. Any inaccuracies may result in the suspension or termination of the account."
+      },
+      "sub2": {
+        "title": "4.2. Subscription",
+        "content": "Access to the full features of the Site requires a paid subscription. Details of rates and subscription terms are provided on the dedicated page."
+      },
+      "sub3": {
+        "title": "4.3. Restrictions of use",
+        "content": "The user agrees not to reproduce or redistribute the contents of the Site without prior authorization or use the predictions for illegal activities or those not compliant with applicable laws."
+      }
+    }
+  }
+  

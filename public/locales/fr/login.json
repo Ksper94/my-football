@@ -1,0 +1,15 @@
+{
+    "title": "Se connecter",
+    "emailLabel": "Adresse Email",
+    "emailPlaceholder": "Votre email",
+    "passwordLabel": "Mot de passe",
+    "passwordPlaceholder": "••••••••",
+    "loginButton": "Se connecter",
+    "missingCredentials": "Veuillez saisir votre email et votre mot de passe.",
+    "loginError": "Une erreur est survenue lors de la connexion.",
+    "showPassword": "Afficher",
+    "hidePassword": "Masquer",
+    "noAccount": "Pas encore de compte ?",
+    "signupLink": "Créer un compte"
+  }
+  

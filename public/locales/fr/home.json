@@ -1,0 +1,54 @@
+{
+    "loading": "Chargement...",
+    "pageTitle": "Foot Predictions",
+    "pageDescription": "Prédictions précises pour vos paris sportifs de football",
+    "headerTitle": "Foot Predictions",
+    "dashboard": "Tableau de bord",
+    "welcome": "Bienvenue, {{firstName}}",
+    "user": "Utilisateur",
+    "readyToExplore": "Vous êtes connecté et prêt à explorer nos prédictions.",
+    "joinUs": "Rejoignez-nous et boostez vos paris sportifs !",
+    "algorithmDescription": "Notre algorithme analyse des millions de données en temps réel pour fournir des prédictions précises et fiables.",
+    "advancedAnalysis": "Grâce à notre expertise, chaque pronostic est basé sur une analyse approfondie : historique des confrontations, forme des équipes, météo…",
+    "trialOffer": "Inscrivez-vous gratuitement et bénéficiez d’une période d’essai de 1 semaine.",
+    "createAccount": "Créer un compte",
+    "testimonialsTitle": "Témoignages",
+    "testimonial1": {
+      "text": "Grâce à Foot Predictions, j'ai pu augmenter mes gains de manière significative !",
+      "author": "Guillaume Lemoine"
+    },
+    "testimonial2": {
+      "text": "Un service exceptionnel avec des prédictions fiables et un support réactif.",
+      "author": "Eddy Laurens"
+    },
+    "testimonial3": {
+      "text": "L'algorithme est incroyablement précis, c'est un vrai game changer.",
+      "author": "Vanessa Sadon"
+    },
+    "followUs": "Suivez-nous sur :",
+    "social": {
+      "facebook": {
+        "link": "https://www.facebook.com/profile.php?id=61571191483001",
+        "icon": "/icons/facebook.png",
+        "alt": "Facebook"
+      },
+      "twitter": {
+        "link": "https://x.com/footprediction2",
+        "icon": "/icons/x.png",
+        "alt": "X (Twitter)"
+      },
+      "instagram": {
+        "link": "https://www.instagram.com/foot_predictions/",
+        "icon": "/icons/instagram.png",
+        "alt": "Instagram"
+      },
+      "tiktok": {
+        "link": "https://www.tiktok.com/@footpredictions2",
+        "icon": "/icons/tiktok.png",
+        "alt": "TikTok"
+      }
+    },
+    "termsAndConditions": "Conditions Générales de Vente",
+    "footer": "Foot Predictions. Tous droits réservés."
+  }
+  

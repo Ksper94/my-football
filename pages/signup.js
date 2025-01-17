@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'react-i18next'; // Importer useTranslation
 
 export default function SignUpPage() {
+  const { t } = useTranslation('signup'); // Charger le namespace "signup"
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -14,9 +16,8 @@ export default function SignUpPage() {
     phoneNumber: '',
   });
   const [error, setError] = useState('');
-
-  const [showPassword, setShowPassword] = useState(false);         // <-- nouvel état
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // idem
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { signUp } = useAuth();
   const router = useRouter();
@@ -40,18 +41,16 @@ export default function SignUpPage() {
       phoneNumber,
     } = formData;
 
-    // Vérifications basiques
     if (!email || !password || !firstName || !lastName || !dateOfBirth || !country) {
-      setError('Veuillez remplir tous les champs obligatoires.');
+      setError(t('error.missingFields')); // Traduction des messages d'erreur
       return;
     }
     if (password !== confirmPassword) {
-      setError('Les mots de passe ne correspondent pas.');
+      setError(t('error.passwordMismatch')); // Traduction
       return;
     }
 
     try {
-      // En Supabase JS v2, on doit passer "options" dans le même objet
       const user = await signUp({
         email,
         password,
@@ -70,40 +69,40 @@ export default function SignUpPage() {
       router.push('/confirmation');
     } catch (err) {
       console.error("Erreur lors de l'inscription :", err);
-      setError(err.message || "Une erreur est survenue lors de l'inscription.");
+      setError(err.message || t('error.generic')); // Traduction
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-800">
       <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-gray-900">Créer un compte</h1>
+        <h1 className="text-2xl font-bold mb-6 text-gray-900">{t('title')}</h1>
 
         {error && <p className="text-red-500 mb-4">{error}</p>}
 
-        <label className="block mb-2 font-medium text-gray-700">Prénom</label>
+        <label className="block mb-2 font-medium text-gray-700">{t('fields.firstName')}</label>
         <input
           type="text"
           name="firstName"
           value={formData.firstName}
           onChange={handleChange}
           className="w-full p-2 mb-4 border border-gray-300 rounded text-gray-900"
-          placeholder="Votre prénom"
+          placeholder={t('placeholders.firstName')}
           required
         />
 
-        <label className="block mb-2 font-medium text-gray-700">Nom</label>
+        <label className="block mb-2 font-medium text-gray-700">{t('fields.lastName')}</label>
         <input
           type="text"
           name="lastName"
           value={formData.lastName}
           onChange={handleChange}
           className="w-full p-2 mb-4 border border-gray-300 rounded text-gray-900"
-          placeholder="Votre nom"
+          placeholder={t('placeholders.lastName')}
           required
         />
 
-        <label className="block mb-2 font-medium text-gray-700">Date de naissance</label>
+        <label className="block mb-2 font-medium text-gray-700">{t('fields.dateOfBirth')}</label>
         <input
           type="date"
           name="dateOfBirth"
@@ -113,39 +112,39 @@ export default function SignUpPage() {
           required
         />
 
-        <label className="block mb-2 font-medium text-gray-700">Pays</label>
+        <label className="block mb-2 font-medium text-gray-700">{t('fields.country')}</label>
         <input
           type="text"
           name="country"
           value={formData.country}
           onChange={handleChange}
           className="w-full p-2 mb-4 border border-gray-300 rounded text-gray-900"
-          placeholder="Votre pays"
+          placeholder={t('placeholders.country')}
           required
         />
 
-        <label className="block mb-2 font-medium text-gray-700">Numéro de téléphone (optionnel)</label>
+        <label className="block mb-2 font-medium text-gray-700">{t('fields.phoneNumber')}</label>
         <input
           type="text"
           name="phoneNumber"
           value={formData.phoneNumber}
           onChange={handleChange}
           className="w-full p-2 mb-4 border border-gray-300 rounded text-gray-900"
-          placeholder="06 12 34 56 78"
+          placeholder={t('placeholders.phoneNumber')}
         />
 
-        <label className="block mb-2 font-medium text-gray-700">Email</label>
+        <label className="block mb-2 font-medium text-gray-700">{t('fields.email')}</label>
         <input
           type="email"
           name="email"
           value={formData.email}
           onChange={handleChange}
           className="w-full p-2 mb-4 border border-gray-300 rounded text-gray-900"
-          placeholder="votre@email.com"
+          placeholder={t('placeholders.email')}
           required
         />
 
-        <label className="block mb-2 font-medium text-gray-700">Mot de passe</label>
+        <label className="block mb-2 font-medium text-gray-700">{t('fields.password')}</label>
         <div className="relative mb-4">
           <input
             type={showPassword ? 'text' : 'password'}
@@ -153,7 +152,7 @@ export default function SignUpPage() {
             value={formData.password}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded text-gray-900 pr-10"
-            placeholder="••••••••"
+            placeholder={t('placeholders.password')}
             required
           />
           <button
@@ -161,11 +160,11 @@ export default function SignUpPage() {
             onClick={() => setShowPassword((prev) => !prev)}
             className="absolute right-2 top-2 text-sm text-gray-500 hover:text-gray-700"
           >
-            {showPassword ? 'Masquer' : 'Afficher'}
+            {showPassword ? t('actions.hide') : t('actions.show')}
           </button>
         </div>
 
-        <label className="block mb-2 font-medium text-gray-700">Confirmer le mot de passe</label>
+        <label className="block mb-2 font-medium text-gray-700">{t('fields.confirmPassword')}</label>
         <div className="relative mb-6">
           <input
             type={showConfirmPassword ? 'text' : 'password'}
@@ -173,7 +172,7 @@ export default function SignUpPage() {
             value={formData.confirmPassword}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded text-gray-900 pr-10"
-            placeholder="••••••••"
+            placeholder={t('placeholders.confirmPassword')}
             required
           />
           <button
@@ -181,7 +180,7 @@ export default function SignUpPage() {
             onClick={() => setShowConfirmPassword((prev) => !prev)}
             className="absolute right-2 top-2 text-sm text-gray-500 hover:text-gray-700"
           >
-            {showConfirmPassword ? 'Masquer' : 'Afficher'}
+            {showConfirmPassword ? t('actions.hide') : t('actions.show')}
           </button>
         </div>
 
@@ -189,7 +188,7 @@ export default function SignUpPage() {
           onClick={handleSignUp}
           className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
         >
-          Créer un compte
+          {t('actions.signUp')}
         </button>
       </div>
     </div>

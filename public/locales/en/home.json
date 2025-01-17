@@ -1,0 +1,54 @@
+{
+    "loading": "Loading...",
+    "pageTitle": "Foot Predictions",
+    "pageDescription": "Accurate predictions for your football sports bets",
+    "headerTitle": "Foot Predictions",
+    "dashboard": "Dashboard",
+    "welcome": "Welcome, {{firstName}}",
+    "user": "User",
+    "readyToExplore": "You are logged in and ready to explore our predictions.",
+    "joinUs": "Join us and boost your sports betting !",
+    "algorithmDescription": "Our algorithm analyzes millions of data points in real time to provide accurate and reliable predictions.",
+    "advancedAnalysis": "Thanks to our expertise, each prediction is based on an in-depth analysis: match history, team form, weather…",
+    "trialOffer": "Sign up for free and get a 1-week trial period.",
+    "createAccount": "Create an account",
+    "testimonialsTitle": "Testimonials",
+    "testimonial1": {
+      "text": "Thanks to Foot Predictions, I was able to significantly increase my winnings!",
+      "author": "Guillaume Lemoine"
+    },
+    "testimonial2": {
+      "text": "An exceptional service with reliable predictions and responsive support.",
+      "author": "Eddy Laurens"
+    },
+    "testimonial3": {
+      "text": "The algorithm is incredibly accurate, it's a real game changer.",
+      "author": "Vanessa Sadon"
+    },
+    "followUs": "Follow us on:",
+    "social": {
+      "facebook": {
+        "link": "https://www.facebook.com/profile.php?id=61571191483001",
+        "icon": "/icons/facebook.png",
+        "alt": "Facebook"
+      },
+      "twitter": {
+        "link": "https://x.com/footprediction2",
+        "icon": "/icons/x.png",
+        "alt": "X (Twitter)"
+      },
+      "instagram": {
+        "link": "https://www.instagram.com/foot_predictions/",
+        "icon": "/icons/instagram.png",
+        "alt": "Instagram"
+      },
+      "tiktok": {
+        "link": "https://www.tiktok.com/@footpredictions2",
+        "icon": "/icons/tiktok.png",
+        "alt": "TikTok"
+      }
+    },
+    "termsAndConditions": "Terms and Conditions",
+    "footer": "Foot Predictions. All rights reserved."
+  }
+  

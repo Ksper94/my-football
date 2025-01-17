@@ -1,0 +1,25 @@
+{
+    "loading": "Cargando...",
+    "dashboardTitle": "Panel de control",
+    "welcome": "Bienvenido, {{firstName}}",
+    "trialTitle": "Periodo de prueba",
+    "subscriptionTitle": "Tu suscripción",
+    "trialTimeRemaining": "Tiempo restante en tu período de prueba: {{days}} día(s)",
+    "timeRemaining": "Tiempo restante: {{days}} día(s)",
+    "subscriptionExpired": "Tu suscripción ha expirado",
+    "trialExpired": "Tu período de prueba ha expirado. ¡Consulta nuestros planes!",
+    "accessDenied": "Acceso denegado.",
+    "accessCheckError": "Error al verificar tu suscripción.",
+    "viewPlans": "Consulta nuestros planes",
+    "logout": "Cerrar sesión",
+    "accessApp": "Acceder a la aplicación",
+    "cancelByEmail": "Cancelar (por correo electrónico)",
+    "cancelAtEnd": "Cancelar al final del período",
+    "cancelPending": "Tu cancelación está programada para el final del período actual.",
+    "cancelError": "No se puede cancelar al final del período.",
+    "cancelSuccess": "Tu suscripción será cancelada al final del período.",
+    "loginRequired": "Debes iniciar sesión para realizar esta acción.",
+    "internalError": "Error interno. Por favor, inténtalo de nuevo.",
+    "unknownError": "Ocurrió un error desconocido."
+  }
+  

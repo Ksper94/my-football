@@ -1,0 +1,25 @@
+{
+    "loading": "Loading...",
+    "dashboardTitle": "Dashboard",
+    "welcome": "Welcome, {{firstName}}",
+    "trialTitle": "Trial Period",
+    "subscriptionTitle": "Your Subscription",
+    "trialTimeRemaining": "Time remaining in your trial period: {{days}} day(s)",
+    "timeRemaining": "Time remaining: {{days}} day(s)",
+    "subscriptionExpired": "Your subscription has expired",
+    "trialExpired": "Your trial period has expired. Check out our plans!",
+    "accessDenied": "Access denied.",
+    "accessCheckError": "Error checking your subscription.",
+    "viewPlans": "View our plans",
+    "logout": "Log out",
+    "accessApp": "Access the app",
+    "cancelByEmail": "Cancel (via email)",
+    "cancelAtEnd": "Cancel at the end of the period",
+    "cancelPending": "Your cancellation is scheduled for the end of the current period.",
+    "cancelError": "Unable to cancel at the end of the period.",
+    "cancelSuccess": "Your subscription will be canceled at the end of the period.",
+    "loginRequired": "You must be logged in to perform this action.",
+    "internalError": "Internal error. Please try again.",
+    "unknownError": "An unknown error occurred."
+  }
+  

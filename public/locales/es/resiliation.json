@@ -1,0 +1,15 @@
+{
+    "title": "Cancelación de la suscripción",
+    "intro": "¡Lamentamos verte partir! Si deseas cancelar tu suscripción, envíanos un correo electrónico a",
+    "instructions": "Para facilitar el procesamiento de tu solicitud, incluye:",
+    "details": {
+      "name": "Tu nombre completo",
+      "email": "La dirección de correo electrónico asociada a tu cuenta",
+      "plan": "El plan al que te suscribiste (mensual, trimestral, anual…)"
+    },
+    "legal": {
+      "text": "Según las regulaciones de protección al consumidor, tienes derecho a cancelar tu suscripción en cualquier momento. Sin embargo, según el artículo L.221-28 del Código del Consumidor de Francia, algunos servicios completamente proporcionados antes del final del período de retiro de 14 días pueden no ser reembolsables. Si tienes alguna pregunta, contáctanos en"
+    },
+    "returnDashboard": "Volver al Dashboard"
+  }
+  

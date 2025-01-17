@@ -1,0 +1,13 @@
+{
+    "successTitle": "Success!",
+    "successMessage": "Your subscription has been successfully created!",
+    "errorTitle": "Error",
+    "errors": {
+      "invalidSession": "Invalid or expired session. Please try again.",
+      "subscriptionFetch": "Error retrieving subscription details.",
+      "noSubscription": "No subscription found for this session. Please try again.",
+      "unexpectedError": "An unexpected error occurred."
+    },
+    "returnHome": "Return to Home"
+  }
+  

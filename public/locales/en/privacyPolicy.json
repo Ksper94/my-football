@@ -1,0 +1,50 @@
+{
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated:",
+    "sections": {
+      "introduction": {
+        "title": "1. Introduction",
+        "content": "At <strong>Foot Predictions</strong>, the privacy of your personal data is a priority. This privacy policy explains how we collect, use, and protect your personal information when you use our site."
+      },
+      "dataCollected": {
+        "title": "2. Data Collected",
+        "userProvided": {
+          "title": "2.1. Data Provided by the User",
+          "content": "When you create an account or subscribe to our services, we collect information such as: your first name, last name, email address, and other details necessary to manage your account."
+        },
+        "automaticallyCollected": {
+          "title": "2.2. Automatically Collected Data",
+          "content": "We also collect information automatically through cookies, such as your IP address, browser type, pages visited, and duration of your visit."
+        }
+      },
+      "dataUsage": {
+        "title": "3. Data Usage",
+        "content": "The data collected is used to: Provide and manage the services offered on our site. Personalize your user experience. Send marketing communications or updates about our services. Comply with legal obligations."
+      },
+      "dataSharing": {
+        "title": "4. Data Sharing",
+        "content": "Your personal data is never sold or rented to third parties. However, we may share it with: Our service providers (payments, hosting, etc.) to ensure the proper functioning of the site. Competent authorities if required by law."
+      },
+      "dataProtection": {
+        "title": "5. Data Protection",
+        "content": "We implement technical and organizational measures to protect your data from unauthorized access, loss, destruction, or alteration."
+      },
+      "userRights": {
+        "title": "6. Your Rights",
+        "content": "In accordance with GDPR, you have the following rights: Right of access, Right to rectification, Right to erasure, Right to object, Right to data portability."
+      },
+      "cookies": {
+        "title": "7. Cookies",
+        "content": "We use cookies to enhance your user experience and analyze site traffic. You can configure your browser to refuse cookies, but this may limit certain functionalities."
+      },
+      "policyChanges": {
+        "title": "8. Changes to this Policy",
+        "content": "We reserve the right to modify this privacy policy at any time. Changes will be posted on this page with an update date."
+      },
+      "contact": {
+        "title": "9. Contact",
+        "content": "For any questions or requests regarding this privacy policy, you can contact us at: services@foot-predictions.com"
+      }
+    }
+  }
+  

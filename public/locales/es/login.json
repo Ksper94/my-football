@@ -1,0 +1,15 @@
+{
+    "title": "Iniciar sesión",
+    "emailLabel": "Correo Electrónico",
+    "emailPlaceholder": "Tu correo",
+    "passwordLabel": "Contraseña",
+    "passwordPlaceholder": "••••••••",
+    "loginButton": "Iniciar sesión",
+    "missingCredentials": "Por favor, introduce tu correo y contraseña.",
+    "loginError": "Ocurrió un error durante el inicio de sesión.",
+    "showPassword": "Mostrar",
+    "hidePassword": "Ocultar",
+    "noAccount": "¿No tienes una cuenta?",
+    "signupLink": "Regístrate"
+  }
+  
