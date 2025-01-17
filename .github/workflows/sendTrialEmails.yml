@@ -1,0 +1,14 @@
+name: Send Trial Emails
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Exécution quotidienne à minuit (UTC)
+
+jobs:
+  sendEmails:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Appeler la fonction API
+        run: |
+          curl -X POST https://<YOUR_SUPABASE_URL>/api/sendEmail \
+          -H "Authorization: Bearer <YOUR_SUPABASE_SERVICE_ROLE_KEY>"
