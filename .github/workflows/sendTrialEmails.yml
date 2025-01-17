@@ -11,4 +11,4 @@ jobs:
       - name: Appeler la fonction API
         run: |
           curl -X POST https://www.foot-predictions.com/api/sendEmail \
-          -H "Authorization: Bearer <YOUR_SUPABASE_SERVICE_ROLE_KEY>"
+          -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}"
