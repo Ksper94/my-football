@@ -10,5 +10,5 @@ jobs:
     steps:
       - name: Appeler la fonction API
         run: |
-          curl -X POST https://<YOUR_SUPABASE_URL>/api/sendEmail \
+          curl -X POST https://www.foot-predictions.com/api/sendEmail \
           -H "Authorization: Bearer <YOUR_SUPABASE_SERVICE_ROLE_KEY>"

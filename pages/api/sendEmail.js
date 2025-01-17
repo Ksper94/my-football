@@ -11,72 +11,100 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Récupérer les utilisateurs inscrits il y a exactement 7 jours
+    // Récupérer les utilisateurs inscrits il y a 7 jours ou plus
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
     const { data: users, error: userError } = await supabase
-      .from('users')
-      .select('id, email, created_at, last_email_sent') // Récupère les utilisateurs avec leur email et date d'inscription
-      .lt('created_at', sevenDaysAgo) // Inscrits avant il y a 7 jours
-      .is('last_email_sent', null); // N'ont jamais reçu d'email
+      .from('auth.users')
+      .select('id, email, created_at')
+      .lt('created_at', sevenDaysAgo); // Inscrits avant il y a 7 jours
 
     if (userError) {
       console.error('Erreur lors de la récupération des utilisateurs :', userError);
       return res.status(500).json({ error: 'Erreur interne du serveur.' });
     }
 
-    // Vérifier que ces utilisateurs ne sont pas dans la table `subscriptions`
+    // Vérifier que ces utilisateurs ne sont pas dans la table `subscriptions` et n'ont pas reçu d'email
     const eligibleUsers = [];
     for (const user of users) {
       const { data: subscriptions, error: subError } = await supabase
         .from('subscriptions')
         .select('id')
-        .eq('user_id', user.id); // Vérifie si l'utilisateur a des abonnements
+        .eq('user_id', user.id);
 
-      if (subError) {
-        console.error(`Erreur lors de la vérification des abonnements pour l'utilisateur ${user.id}:`, subError);
+      const { data: metadata, error: metadataError } = await supabase
+        .from('user_metadata')
+        .select('last_email_sent')
+        .eq('id', user.id)
+        .single();
+
+      if (subError || metadataError) {
+        console.error(`Erreur pour l'utilisateur ${user.id}:`, subError || metadataError);
         continue;
       }
 
-      // Si aucune souscription trouvée, ajoute l'utilisateur à la liste
-      if (subscriptions.length === 0) {
+      // Si pas d'abonnement et aucun email envoyé, l'utilisateur est éligible
+      if (subscriptions.length === 0 && (!metadata || !metadata.last_email_sent)) {
         eligibleUsers.push(user);
       }
     }
 
-    // Envoi des emails et mise à jour du champ `last_email_sent`
+    // Envoi des emails et mise à jour de `last_email_sent`
     for (const user of eligibleUsers) {
       try {
-        // Contenu de l'email
-        const emailContent = `
-          <p>Bonjour,</p>
-          <p>Votre période d’essai gratuite de 7 jours est maintenant terminée.</p>
-          <p>Nous vous invitons à découvrir nos formules d'abonnement pour continuer à profiter de nos pronostics ultra-fiables et augmenter vos gains.</p>
-          <p>Avec Foot Predictions, vous bénéficiez de l'analyse de notre puissant algorithme pour maximiser vos chances de succès !</p>
-          <p>Abonnez-vous dès maintenant et profitez de tous les avantages :</p>
-          <ul>
-            <li>Prédictions précises basées sur des millions de données !</li>
-            <li>Accès exclusif à nos outils premium.</li>
-            <li>Support client réactif et personnalisé.</li>
-          </ul>
-          <a href="https://foot-predictions.com/pricing" style="display:inline-block; padding:10px 20px; background-color:#007bff; color:white; text-decoration:none; border-radius:5px; margin-top:10px;">Voir nos offres</a>
-          <p>Merci de votre confiance,</p>
-          <p>L’équipe Foot Predictions</p>
-        `;
-
-        // Envoi de l'email
         await sgMail.send({
           to: user.email,
           from: 'support@foot-predictions.com',
           subject: 'Votre période d’essai est terminée !',
-          html: emailContent,
+          html: `
+            <p>Bonjour,</p>
+
+            <p>Votre période d’essai gratuite de 7 jours est maintenant terminée.</p>
+
+            <p>
+              Ne laissez pas vos paris devenir un jeu de hasard ! Avec <strong>Foot Predictions</strong>, 
+              accédez à des pronostics basés sur des analyses ultra-précises 
+              grâce à notre puissant algorithme.
+            </p>
+
+            <p>
+              Voici pourquoi des milliers de parieurs nous font déjà confiance :
+            </p>
+            <ul>
+              <li>💡 <strong>Prédictions 100% basées sur des données scientifiques</strong> : Analyse de la forme des équipes, historique des matchs, météo, et bien plus !</li>
+              <li>⚡ <strong>Boostez vos gains</strong> : Fini les paris au hasard, placez vos mises avec confiance.</li>
+              <li>🔒 <strong>Accès exclusif</strong> : Bénéficiez d’outils premium et d’un support dédié.</li>
+            </ul>
+
+            <p>
+              🎯 <strong>Rejoignez-nous dès maintenant</strong> et prenez l’avantage sur les autres parieurs !
+            </p>
+
+            <p>
+              Découvrez nos formules d’abonnement adaptées à tous les budgets et commencez à maximiser vos profits dès aujourd’hui.
+            </p>
+
+            <a href="https://foot-predictions.com/pricing" 
+               style="display:inline-block; padding:15px 25px; background-color:#ff5722; color:white; font-weight:bold; text-decoration:none; border-radius:8px; margin-top:20px;">
+               Je m’abonne maintenant
+            </a>
+
+            <p>
+              Ne manquez pas cette opportunité ! Chaque jour sans Foot Predictions, c’est une opportunité de gagner que vous laissez passer.
+            </p>
+
+            <p>
+              À très bientôt,<br />
+              <strong>L’équipe Foot Predictions</strong>
+            </p>
+          `,
         });
 
         console.log(`Email envoyé à ${user.email}`);
 
-        // Met à jour le champ `last_email_sent` dans la base de données
+        // Met à jour `last_email_sent` dans la base de données
         await supabase
-          .from('users')
+          .from('user_metadata')
           .update({ last_email_sent: new Date().toISOString() })
           .eq('id', user.id);
       } catch (error) {
