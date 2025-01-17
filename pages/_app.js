@@ -6,6 +6,7 @@ import ErrorBoundary from '../components/ErrorBoundary'; // Assurez-vous que ce 
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
+import '../i18n';
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();

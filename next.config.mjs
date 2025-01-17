@@ -2,9 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   i18n: {
-    locales: ['fr', 'en', 'es'], // Langues supportées
-    defaultLocale: 'fr', // Langue par défaut
-    localeDetection: true, // Détecte automatiquement la langue du navigateur
+    locales: ['en', 'fr', 'es'], // Ajoutez toutes vos langues
+    defaultLocale: 'en',
+    localeDetection: false, // Doit être un booléen
   },
 };
 
