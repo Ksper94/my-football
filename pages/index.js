@@ -63,7 +63,7 @@ export default function Home() {
                 <p className="mb-6">{t('readyToExplore')}</p>
                 <Link href="/dashboard">
                   <span className="bg-cyan-500 text-white py-2 px-4 rounded hover:bg-cyan-400 cursor-pointer transition-colors duration-300">
-                    {t('accessDashboard')} {/* Traduction de "Accéder au tableau de bord" */}
+                    {t('dashboard')} {/* Traduction de "Accéder au tableau de bord" */}
                   </span>
                 </Link>
               </>
