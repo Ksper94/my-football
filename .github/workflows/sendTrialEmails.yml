@@ -1,14 +1,16 @@
 name: Send Trial Emails
 
 on:
+  # Déclenchement automatique tous les jours à minuit (UTC)
   schedule:
-    - cron: '0 0 * * *' # Exécution quotidienne à minuit (UTC)
+    - cron: '0 0 * * *'
 
 jobs:
   sendEmails:
     runs-on: ubuntu-latest
     steps:
-      - name: Appeler la fonction API
+      - name: Appeler l'endpoint /api/sendEmail
         run: |
-          curl -X POST https://www.foot-predictions.com/api/sendEmail \
-          -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}"
+          # --fail : force l'échec du job si le code HTTP est >= 400
+          curl --fail -X POST "https://www.foot-predictions.com/api/sendEmail" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}"
