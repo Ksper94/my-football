@@ -7,12 +7,19 @@ import { useTranslation } from 'react-i18next';
 
 export default function Home() {
   const { user, loading } = useAuth();
-  const { t } = useTranslation('home'); // Charger le namespace "home"
+
+  // Récupère t (pour traduire) et i18n (pour changer la langue)
+  const { t, i18n } = useTranslation('home');
+
+  // Petite fonction utilitaire pour basculer la langue
+  const changeLanguage = (lang) => {
+    i18n.changeLanguage(lang); // Si tu utilises Next-i18next, tu utiliserais peut-être router.push(...). 
+  };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center text-foreground transition-all duration-300">
-        <p>{t('loading')}</p> {/* Traduction de "Chargement..." */}
+        <p>{t('loading')}</p> {/* "Chargement..." */}
       </div>
     );
   }
@@ -30,6 +37,7 @@ export default function Home() {
 
         {/* Contenu principal */}
         <div className="min-h-screen bg-background text-foreground transition-all duration-300">
+          
           {/* HEADER */}
           <header
             className="bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-lg rounded-b-md py-4 px-8 flex flex-col md:flex-row justify-between items-center"
@@ -37,20 +45,51 @@ export default function Home() {
             <h1
               className="text-4xl font-bold tracking-wide hover:scale-105 transition-transform duration-300 text-cyan-400"
             >
-              {t('headerTitle')} {/* Traduction de "Foot Predictions" */}
+              {t('headerTitle')} {/* "Foot Predictions" */}
             </h1>
 
             <nav
               className="mt-4 md:mt-0 flex items-center gap-6"
               aria-label="Navigation principale"
             >
+              {/* Lien vers le tableau de bord si user connecté */}
               {user ? (
                 <Link href="/dashboard">
                   <span className="cursor-pointer text-sm uppercase tracking-wider text-cyan-400 hover:text-cyan-200 transition-colors duration-300">
-                    {t('dashboard')} {/* Traduction de "Tableau de bord" */}
+                    {t('dashboard')} {/* "Tableau de bord" */}
                   </span>
                 </Link>
               ) : null}
+              
+              {/* AJOUT DES DRAPEAUX */}
+              <div className="flex items-center gap-2">
+                {/* Bouton français */}
+                <button onClick={() => changeLanguage('fr')}>
+                  <img
+                    src="/flags/fr.png"
+                    alt="Français"
+                    className="w-5 h-5"
+                  />
+                </button>
+                
+                {/* Bouton anglais */}
+                <button onClick={() => changeLanguage('en')}>
+                  <img
+                    src="/flags/gb.png"
+                    alt="English"
+                    className="w-5 h-5"
+                  />
+                </button>
+                
+                {/* Bouton espagnol */}
+                <button onClick={() => changeLanguage('es')}>
+                  <img
+                    src="/flags/es.png"
+                    alt="Español"
+                    className="w-5 h-5"
+                  />
+                </button>
+              </div>
             </nav>
           </header>
 
@@ -63,7 +102,7 @@ export default function Home() {
                 <p className="mb-6">{t('readyToExplore')}</p>
                 <Link href="/dashboard">
                   <span className="bg-cyan-500 text-white py-2 px-4 rounded hover:bg-cyan-400 cursor-pointer transition-colors duration-300">
-                    {t('dashboard')} {/* Traduction de "Accéder au tableau de bord" */}
+                    {t('dashboard')} {/* "Accéder au tableau de bord" */}
                   </span>
                 </Link>
               </>
@@ -75,7 +114,7 @@ export default function Home() {
                 <p className="mb-8 max-w-2xl mx-auto font-bold">{t('trialOffer')}</p>
                 <Link href="/signup">
                   <span className="bg-cyan-500 text-white py-2 px-4 rounded hover:bg-cyan-400 cursor-pointer transition-colors duration-300">
-                    {t('createAccount')} {/* Traduction de "Créer un compte" */}
+                    {t('createAccount')} {/* "Créer un compte" */}
                   </span>
                 </Link>
               </>
@@ -127,7 +166,7 @@ export default function Home() {
             <div className="mt-4">
               <Link href="/cgv">
                 <a className="text-link hover:text-link-hover">
-                  {t('termsAndConditions')} {/* Traduction de "Conditions Générales de Vente" */}
+                  {t('termsAndConditions')} {/* "Conditions Générales de Vente" */}
                 </a>
               </Link>
             </div>
