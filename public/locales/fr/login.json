@@ -1,15 +1,17 @@
 {
-    "title": "Se connecter",
-    "emailLabel": "Adresse Email",
-    "emailPlaceholder": "Votre email",
+    "loginTitle": "Connexion",
+    "emailLabel": "Adresse e-mail",
+    "emailPlaceholder": "Saisissez votre adresse e-mail",
     "passwordLabel": "Mot de passe",
-    "passwordPlaceholder": "••••••••",
-    "loginButton": "Se connecter",
-    "missingCredentials": "Veuillez saisir votre email et votre mot de passe.",
-    "loginError": "Une erreur est survenue lors de la connexion.",
+    "passwordPlaceholder": "Saisissez votre mot de passe",
     "showPassword": "Afficher",
     "hidePassword": "Masquer",
+    "loginButton": "Se connecter",
     "noAccount": "Pas encore de compte ?",
-    "signupLink": "Créer un compte"
+    "signupLink": "Inscrivez-vous ici",
+    "errorEmptyFields": "Veuillez remplir l'e-mail et le mot de passe.",
+    "errorLogin": "E-mail ou mot de passe incorrect.",
+    "errorEmailNotConfirmed": "Votre adresse e-mail n'est pas encore confirmée. Veuillez la confirmer ou renvoyer l'e-mail de confirmation.",
+    "resendConfirmationButton": "Renvoyer l'e-mail de confirmation"
   }
   

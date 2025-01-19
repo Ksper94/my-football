@@ -1,15 +1,17 @@
 {
-    "title": "Login",
-    "emailLabel": "Email Address",
-    "emailPlaceholder": "Your email",
+    "loginTitle": "Login",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Enter your email",
     "passwordLabel": "Password",
-    "passwordPlaceholder": "••••••••",
-    "loginButton": "Login",
-    "missingCredentials": "Please enter your email and password.",
-    "loginError": "An error occurred during login.",
+    "passwordPlaceholder": "Enter your password",
     "showPassword": "Show",
     "hidePassword": "Hide",
-    "noAccount": "Don't have an account?",
-    "signupLink": "Sign up"
+    "loginButton": "Log in",
+    "noAccount": "No account yet?",
+    "signupLink": "Sign up here",
+    "errorEmptyFields": "Please fill in both email and password.",
+    "errorLogin": "Incorrect email or password.",
+    "errorEmailNotConfirmed": "Your email address is not yet confirmed. Please confirm your email or resend confirmation.",
+    "resendConfirmationButton": "Resend confirmation email"
   }
   

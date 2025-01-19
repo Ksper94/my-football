@@ -1,15 +1,17 @@
 {
-    "title": "Iniciar sesión",
-    "emailLabel": "Correo Electrónico",
-    "emailPlaceholder": "Tu correo",
+    "loginTitle": "Iniciar sesión",
+    "emailLabel": "Correo electrónico",
+    "emailPlaceholder": "Introduce tu correo electrónico",
     "passwordLabel": "Contraseña",
-    "passwordPlaceholder": "••••••••",
-    "loginButton": "Iniciar sesión",
-    "missingCredentials": "Por favor, introduce tu correo y contraseña.",
-    "loginError": "Ocurrió un error durante el inicio de sesión.",
+    "passwordPlaceholder": "Introduce tu contraseña",
     "showPassword": "Mostrar",
     "hidePassword": "Ocultar",
-    "noAccount": "¿No tienes una cuenta?",
-    "signupLink": "Regístrate"
+    "loginButton": "Iniciar sesión",
+    "noAccount": "¿Aún no tienes una cuenta?",
+    "signupLink": "Regístrate aquí",
+    "errorEmptyFields": "Por favor, completa el correo electrónico y la contraseña.",
+    "errorLogin": "Correo electrónico o contraseña incorrectos.",
+    "errorEmailNotConfirmed": "Tu dirección de correo electrónico todavía no está confirmada. Por favor, confírmala o reenvía el correo de confirmación.",
+    "resendConfirmationButton": "Reenviar correo de confirmación"
   }
   
