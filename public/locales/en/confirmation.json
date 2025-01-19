@@ -2,6 +2,13 @@
     "title": "Account successfully created!",
     "confirmationEmail": "A confirmation email has been sent to you. Please check your inbox.",
     "confirmationInstructions": "After clicking the confirmation link, you will be able to log in to your account.",
-    "loginButton": "Go to login page"
+    "loginButton": "Go to login page",
+  
+    "emailLabel": "If you made a mistake with your address, please correct it below:",
+    "emailPlaceholder": "Your email address",
+    "resendButton": "Resend confirmation email",
+    "invalidEmail": "Invalid email address.",
+    "resendSuccess": "The confirmation email has been resent successfully!",
+    "errorResend": "Error while sending the confirmation email, please try again."
   }
   
