@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import sgMail from '@sendgrid/mail';
+import SibApiV3Sdk from 'sib-api-v3-sdk';
 
 /**
  * CONFIGURATION
@@ -7,17 +7,22 @@ import sgMail from '@sendgrid/mail';
  * 1) Créez dans votre fichier .env.local (ou .env) :
  *    SUPABASE_URL=<url-de-votre-projet-supabase>
  *    SUPABASE_SERVICE_ROLE_KEY=<cle-service-role>
- *    SENDGRID_API_KEY=<votre-api-key-sendgrid>
+ *    BREVO_API_KEY=<votre-api-key-brevo>
  * 2) Pour Next.js, redémarrez le serveur après ajout des variables d'environnement.
  */
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+// Configuration de l'API Brevo
+let defaultClient = SibApiV3Sdk.ApiClient.instance;
+let apiKey = defaultClient.authentications['api-key'];
+apiKey.apiKey = process.env.BREVO_API_KEY;
+let apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
 /**
  * Handler principal pour l'envoi des rappels.
  *
- * On attend un appel POST sur /api/send-reminders
+ * On attend un appel POST sur /api/sendEmail
  */
 export default async function handler(req, res) {
   // On n'accepte que la méthode POST
@@ -30,28 +35,25 @@ export default async function handler(req, res) {
     const now = new Date();
 
     /**
-     * Fonction utilitaire pour envoyer l'email via SendGrid
+     * Fonction utilitaire pour envoyer l'email via Brevo
      * puis mettre à jour le champ user_metadata.<updateColumn>
      */
     const sendEmail = async (user, subject, htmlContent, updateColumn) => {
       try {
-        // 1) Envoi de l'email via SendGrid
-        await sgMail.send({
-          to: user.email,
-          from: 'support@foot-predictions.com', // Adresse de l'expéditeur
-          subject: subject,
-          html: htmlContent,
-        });
+        // 1) Envoi de l'email via Brevo
+        let sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+        sendSmtpEmail.subject = subject;
+        sendSmtpEmail.htmlContent = htmlContent;
+        sendSmtpEmail.sender = {"name":"Foot Predictions", "email":"support@foot-predictions.com"};
+        sendSmtpEmail.to = [{"email":user.email}];
+        
+        const { response } = await apiInstance.sendTransacEmail(sendSmtpEmail);
         console.log(`Email envoyé à ${user.email}`);
 
         // 2) Mise à jour du user_metadata
-        //    On récupère l'objet JSON existant (ou un objet vide s'il n'existe pas)
         const currentMetadata = user.user_metadata || {};
-
-        // On écrit la date actuelle (ISO) dans la colonne spécifiée (ex: last_email_sent, second_email_sent, etc.)
         currentMetadata[updateColumn] = now.toISOString();
 
-        // On écrase le user_metadata dans la table auth.users
         const { error: updateError } = await supabase
           .from('auth.users')
           .update({ user_metadata: currentMetadata })
@@ -309,7 +311,7 @@ export default async function handler(req, res) {
                 border-radius: 3px;
               "
             >
-              PROMO-FOOT
+          PROMO-FOOT
             </span>
           </p>
           <p style="text-align: center;">
