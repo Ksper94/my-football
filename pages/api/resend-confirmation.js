@@ -17,10 +17,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    // 1. Utiliser la méthode admin.listUsers() avec un filtre pour chercher l'utilisateur par e-mail
+    // 1. Rechercher l'utilisateur par e-mail via listUsers()
     const { data, error } = await supabaseAdmin.auth.admin.listUsers({
       filter: `email.eq.${email}`
-      // ou filter: `email.ilike.${email}` si tu veux ignorer la casse
     });
 
     if (error) {
@@ -33,26 +32,23 @@ export default async function handler(req, res) {
       return res.status(404).json({ message: 'Aucun utilisateur trouvé avec cet email' });
     }
 
-    // 2. Récupérer l'utilisateur (supposons qu'il n'y en ait qu'un)
+    // 2. Récupérer l'utilisateur
     const user = users[0];
     console.log('Utilisateur trouvé :', user.email);
 
-    // 3. Envoyer (ou renvoyer) l'email de confirmation
-    // Supabase n'a pas d'API "resend email confirmation" prête à l'emploi,
-    // mais tu peux utiliser inviteUserByEmail ou generateLink,
-    // ou encore faire un envoi custom via SendGrid/Nodemailer.
+    // 3. Envoyer l'e-mail d'invitation via inviteUserByEmail()
+    //    Cela va déclencher l'envoi du template "Invite" configuré dans la console Supabase
+    const { data: inviteData, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email);
 
-    // Ex. Méthode d'invitation:
-    // const { data: inviteData, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email);
+    if (inviteError) {
+      console.error('Erreur inviteUserByEmail:', inviteError);
+      return res.status(500).json({ message: 'Impossible de renvoyer l\'invitation.' });
+    }
 
-    // Ex. Magic link (si config passwordless) :
-    // const { data: magicData, error: magicErr } = await supabaseAdmin.auth.admin.generateLink({
-    //   type: 'magiclink',
-    //   email
-    // });
+    // inviteData contiendra par exemple l'ID de l'utilisateur invité (ou une confirmation)
+    console.log('Invitation envoyée avec succès :', inviteData);
 
-    // Ici, on simule juste un envoi
-    return res.status(200).json({ message: 'Confirmation email resent (simulation)' });
+    return res.status(200).json({ message: 'Invitation envoyée avec succès !' });
   } catch (err) {
     console.error('Erreur envoi confirmation:', err);
     return res.status(500).json({ message: 'Erreur interne du serveur.' });
