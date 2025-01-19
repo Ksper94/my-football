@@ -51,13 +51,12 @@ export default async function handler(req, res) {
         console.log(`Email envoyé à ${user.email}`);
 
         // 2) Mise à jour du user_metadata
-        const currentMetadata = user.user_metadata || {};
-        currentMetadata[updateColumn] = now.toISOString();
-
-        const { error: updateError } = await supabase
-          .from('auth.users')
-          .update({ user_metadata: currentMetadata })
-          .eq('id', user.id);
+        const { error: updateError } = await supabase.auth.admin.updateUserById(user.id, {
+          user_metadata: {
+            ...user.user_metadata,
+            [updateColumn]: now.toISOString()
+          }
+        });
 
         if (updateError) {
           console.error(`Erreur mise à jour user_metadata pour ${user.id} :`, updateError);
@@ -71,11 +70,12 @@ export default async function handler(req, res) {
      * 1) Premier rappel (après 7 jours) => last_email_sent = NULL
      */
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-    const { data: firstReminderUsers, error: firstError } = await supabase
-      .from('auth.users')
-      .select('id, email, created_at, user_metadata')
-      .lt('created_at', sevenDaysAgo)
-      .filter('user_metadata->>last_email_sent', 'is', null);
+    const { data: firstReminderUsers, error: firstError } = await supabase.auth.admin.listUsers({
+      filter: {
+        created_at: { lt: sevenDaysAgo },
+        'raw_user_meta_data->>last_email_sent': { is: null }
+      }
+    });
 
     if (firstError) {
       console.error('Erreur chargement 1er rappel:', firstError);
@@ -85,12 +85,13 @@ export default async function handler(req, res) {
      * 2) Deuxième rappel (après 14 jours) => second_email_sent = NULL && last_email_sent != NULL
      */
     const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
-    const { data: secondReminderUsers, error: secondError } = await supabase
-      .from('auth.users')
-      .select('id, email, created_at, user_metadata')
-      .lt('created_at', fourteenDaysAgo)
-      .filter('user_metadata->>second_email_sent', 'is', null)
-      .not('user_metadata->>last_email_sent', 'is', null);
+    const { data: secondReminderUsers, error: secondError } = await supabase.auth.admin.listUsers({
+      filter: {
+        created_at: { lt: fourteenDaysAgo },
+        'raw_user_meta_data->>second_email_sent': { is: null },
+        'raw_user_meta_data->>last_email_sent': { not: null }
+      }
+    });
 
     if (secondError) {
       console.error('Erreur chargement 2e rappel:', secondError);
@@ -100,12 +101,13 @@ export default async function handler(req, res) {
      * 3) Troisième rappel (après 30 jours) => third_email_sent = NULL && second_email_sent != NULL
      */
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-    const { data: thirdReminderUsers, error: thirdError } = await supabase
-      .from('auth.users')
-      .select('id, email, created_at, user_metadata')
-      .lt('created_at', thirtyDaysAgo)
-      .filter('user_metadata->>third_email_sent', 'is', null)
-      .not('user_metadata->>second_email_sent', 'is', null);
+    const { data: thirdReminderUsers, error: thirdError } = await supabase.auth.admin.listUsers({
+      filter: {
+        created_at: { lt: thirtyDaysAgo },
+        'raw_user_meta_data->>third_email_sent': { is: null },
+        'raw_user_meta_data->>second_email_sent': { not: null }
+      }
+    });
 
     if (thirdError) {
       console.error('Erreur chargement 3e rappel:', thirdError);
@@ -116,10 +118,11 @@ export default async function handler(req, res) {
      *    => last_reminder_sent < now - 30 jours
      */
     const monthlyReminderLimit = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-    const { data: monthlyReminderUsers, error: monthlyError } = await supabase
-      .from('auth.users')
-      .select('id, email, created_at, user_metadata')
-      .lt('user_metadata->>last_reminder_sent', monthlyReminderLimit);
+    const { data: monthlyReminderUsers, error: monthlyError } = await supabase.auth.admin.listUsers({
+      filter: {
+        'raw_user_meta_data->>last_reminder_sent': { lt: monthlyReminderLimit }
+      }
+    });
 
     if (monthlyError) {
       console.error('Erreur chargement rappel mensuel:', monthlyError);
@@ -128,7 +131,7 @@ export default async function handler(req, res) {
     /**
      * 1. Envoi du 1er rappel
      */
-    for (const user of firstReminderUsers || []) {
+    for (const user of firstReminderUsers?.users || []) {
       await sendEmail(
         user,
         'Votre période d’essai est terminée — continuez à gagner gros !',
@@ -137,7 +140,7 @@ export default async function handler(req, res) {
           <h2 style="color: #0066cc;">Foot Predictions - Premier Rappel</h2>
           <p>Bonjour <strong>${user.email}</strong>,</p>
           <p>
-            Votre période d’essai gratuite de 7 jours est maintenant terminée,
+            Votre période d’année de 7 jours est maintenant terminée,
             mais ce n’est que le début ! Avec <strong>Foot Predictions</strong>,
             rejoignez des milliers de parieurs qui maximisent leurs gains
             chaque semaine.
@@ -174,7 +177,7 @@ export default async function handler(req, res) {
     /**
      * 2. Envoi du 2e rappel
      */
-    for (const user of secondReminderUsers || []) {
+    for (const user of secondReminderUsers?.users || []) {
       await sendEmail(
         user,
         'Offre limitée : 50% de réduction sur votre premier mois !',
@@ -232,7 +235,7 @@ export default async function handler(req, res) {
     /**
      * 3. Envoi du 3e rappel
      */
-    for (const user of thirdReminderUsers || []) {
+    for (const user of thirdReminderUsers?.users || []) {
       await sendEmail(
         user,
         'Rejoignez les gagnants : découvrez leurs histoires !',
@@ -285,7 +288,7 @@ export default async function handler(req, res) {
     /**
      * 4. Envoi des rappels mensuels
      */
-    for (const user of monthlyReminderUsers || []) {
+    for (const user of monthlyReminderUsers?.users || []) {
       await sendEmail(
         user,
         'Un cadeau pour vous : 50% sur votre premier mois !',
