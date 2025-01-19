@@ -66,7 +66,7 @@ export default function SignUpPage() {
       });
 
       console.log('=== signUp success ===', user);
-      router.push('/confirmation');
+      router.push(`/confirmation?email=${encodeURIComponent(email)}`);
     } catch (err) {
       console.error("Erreur lors de l'inscription :", err);
       setError(err.message || t('error.generic')); // Traduction

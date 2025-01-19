@@ -1,20 +1,28 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
+import { useRouter } from 'next/router';
 
 export default function ConfirmationPage() {
   const { t } = useTranslation('confirmation'); // namespace "confirmation"
   
-  // Local state pour gérer l'email et le statut de renvoi
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [resendStatus, setResendStatus] = useState(null); // pour afficher success/error
+
+  // Au montage, si l'URL contient ?email=..., on l'utilise
+  useEffect(() => {
+    if (router.query.email) {
+      setEmail(router.query.email);
+    }
+  }, [router.query.email]);
 
   // Handler pour renvoyer l'email de confirmation
   const handleResendEmail = async (e) => {
     e.preventDefault();
     setResendStatus(null);
 
-    // Vérification minimale du format email
+    // Vérification simple format email
     const emailRegex = /\S+@\S+\.\S+/;
     if (!emailRegex.test(email)) {
       setResendStatus({ error: t('invalidEmail') });
@@ -72,13 +80,14 @@ export default function ConfirmationPage() {
         <div className="mt-6 text-left">
           <form onSubmit={handleResendEmail}>
             <label htmlFor="email" className="block mb-2 font-semibold">
-              {t('emailLabel')} {/* "Si vous vous êtes trompé d'adresse, corrigez-la ci-dessous" */}
+              {t('emailLabel')} 
+              {/* "Si vous vous êtes trompé d'adresse, corrigez-la ci-dessous" */}
             </label>
             <input
               id="email"
               type="email"
               className="border border-gray-300 rounded w-full p-2 mb-4"
-              placeholder={t('emailPlaceholder')} // "Votre adresse email"
+              placeholder={t('emailPlaceholder')} // "Votre adresse e-mail"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -88,7 +97,8 @@ export default function ConfirmationPage() {
               type="submit"
               className="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition-colors"
             >
-              {t('resendButton')} {/* "Renvoyer l'email de confirmation" */}
+              {t('resendButton')} 
+              {/* "Renvoyer l'email de confirmation" */}
             </button>
           </form>
 
