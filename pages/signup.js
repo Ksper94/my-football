@@ -61,6 +61,11 @@ export default function SignUpPage() {
             date_of_birth: dateOfBirth,
             country,
             phone_number: phoneNumber,
+            // Ajout des nouveaux champs pour le suivi des emails de rappel
+            last_email_sent: null,
+            second_email_sent: null,
+            third_email_sent: null,
+            last_reminder_sent: null
           },
         },
       });

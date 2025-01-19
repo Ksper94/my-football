@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
 
     getSession();
 
-    // Gestion en temps réel
+    // Gestion en temps réel des changements d'état d'authentification
     const { data: subscription } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         if (session?.user) {
@@ -44,11 +44,13 @@ export const AuthProvider = ({ children }) => {
       }
     );
 
+    // Nettoyage de l'abonnement lors du démontage du composant
     return () => subscription.unsubscribe();
   }, []);
 
+  // Fonction pour s'inscrire
   const signUp = useCallback(async ({ email, password, options }) => {
-    // --- On ne crée plus de trial dans la table subscriptions ---
+    // Les options incluent maintenant les nouveaux champs pour le suivi des emails de rappel
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -57,7 +59,8 @@ export const AuthProvider = ({ children }) => {
     if (error) {
       throw error;
     }
-    return data.user; // data.user aura le champ 'created_at'
+    // Retourne l'utilisateur créé, qui inclut le champ 'created_at' et les métadonnées
+    return data.user;
   }, []);
 
   const signIn = useCallback(async (email, password) => {
