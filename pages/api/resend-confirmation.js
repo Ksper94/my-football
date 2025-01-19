@@ -17,35 +17,41 @@ export default async function handler(req, res) {
   }
 
   try {
-    // 1. Vérifier si un user existe avec cet email
-    const { data: user, error } = await supabaseAdmin
-      .from('auth.users')
-      .select('*')
-      .ilike('email', email)
-      .single(); // On veut une seule ligne
+    // 1. Utiliser la méthode admin.listUsers() avec un filtre pour chercher l'utilisateur par e-mail
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers({
+      filter: `email.eq.${email}`
+      // ou filter: `email.ilike.${email}` si tu veux ignorer la casse
+    });
 
-    if (error || !user) {
-      return res.status(404).json({ message: "Aucun utilisateur trouvé avec cet email" });
+    if (error) {
+      console.error('Erreur listUsers:', error);
+      return res.status(500).json({ message: 'Erreur lors de la récupération du compte.' });
     }
 
-    // 2. Envoyer (ou renvoyer) l'email de confirmation
-    // Supabase n'a pas d'API "resend email confirmation" prête à l'emploi, 
-    // mais on peut "mettre à jour" (par ex. user) ou recréer un lien de magic link, etc.
+    const users = data?.users || [];
+    if (users.length === 0) {
+      return res.status(404).json({ message: 'Aucun utilisateur trouvé avec cet email' });
+    }
 
-    // Méthode 1 : Inviter un user => renvoie un email d'activation
-    // (non standard, vérifier la doc):
-    // const { data: inviteData, error: inviteErr } = await supabaseAdmin.auth.admin.inviteUserByEmail(email);
+    // 2. Récupérer l'utilisateur (supposons qu'il n'y en ait qu'un)
+    const user = users[0];
+    console.log('Utilisateur trouvé :', user.email);
 
-    // Méthode 2 : Envoi d'un "magic link" (si passwordless config)
+    // 3. Envoyer (ou renvoyer) l'email de confirmation
+    // Supabase n'a pas d'API "resend email confirmation" prête à l'emploi,
+    // mais tu peux utiliser inviteUserByEmail ou generateLink,
+    // ou encore faire un envoi custom via SendGrid/Nodemailer.
+
+    // Ex. Méthode d'invitation:
+    // const { data: inviteData, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email);
+
+    // Ex. Magic link (si config passwordless) :
     // const { data: magicData, error: magicErr } = await supabaseAdmin.auth.admin.generateLink({
     //   type: 'magiclink',
     //   email
     // });
 
-    // Méthode 3 : Envoi d'un email custom via SendGrid/Nodemailer
-    // ...
-
-    // Pour la démo, on va juste renvoyer "OK" simulé :
+    // Ici, on simule juste un envoi
     return res.status(200).json({ message: 'Confirmation email resent (simulation)' });
   } catch (err) {
     console.error('Erreur envoi confirmation:', err);
