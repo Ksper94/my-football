@@ -46,16 +46,12 @@ export default async function handler(req, res) {
     const fetchUsers = async (daysAgo, column) => {
       const dateLimit = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString();
 
-      const query = `
-        SELECT u.id, u.email, u.raw_user_meta_data
-        FROM auth.users AS u
-        LEFT JOIN subscriptions AS s ON u.id = s.user_id
-        WHERE u.created_at < $1
-          AND u.raw_user_meta_data->>'${column}' IS NULL
-          AND (s.status IS NULL OR s.status != 'active')
-      `;
-
-      const { data, error } = await supabase.rpc('execute_query', { query, params: [dateLimit] });
+      const { data, error } = await supabase
+        .from('auth.users')
+        .select('id, email, raw_user_meta_data')
+        .lt('created_at', dateLimit)
+        .is(`raw_user_meta_data->>${column}`, null)
+        .not('subscriptions.status', 'eq', 'active', { foreignTable: 'subscriptions' });
 
       if (error) {
         console.error(`Erreur chargement utilisateurs pour ${column}:`, error);
@@ -75,29 +71,10 @@ export default async function handler(req, res) {
         user,
         'Votre période d’essai est terminée — continuez à gagner gros !',
         `
-        <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
-          <h2 style="color: #0066cc;">Foot Predictions - Premier Rappel</h2>
-          <p>Bonjour <strong>${user.email}</strong>,</p>
-          <p>
-            Votre période d’essai gratuite de 7 jours est maintenant terminée,
-            mais ce n’est que le début ! Rejoignez les milliers de parieurs
-            qui maximisent leurs gains chaque semaine grâce à nos prédictions.
-          </p>
-          <p style="text-align: center;">
-            <a 
-              href="https://www.foot-predictions.com/pricing"
-              style="
-                background-color: #007bff; 
-                color: #fff; 
-                padding: 12px 24px; 
-                text-decoration: none; 
-                border-radius: 5px;
-                font-size: 16px;
-              "
-            >
-              Je m’abonne maintenant
-            </a>
-          </p>
+        <div>
+          <h2>Foot Predictions - Premier Rappel</h2>
+          <p>Bonjour ${user.email},</p>
+          <p>Votre période d’essai gratuite de 7 jours est maintenant terminée...</p>
         </div>
         `,
         'last_email_sent'
@@ -109,29 +86,10 @@ export default async function handler(req, res) {
         user,
         'Offre limitée : 50% de réduction sur votre premier mois !',
         `
-        <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
-          <h2 style="color: #ff5722;">Foot Predictions - Deuxième Rappel</h2>
-          <p>Bonjour <strong>${user.email}</strong>,</p>
-          <p>
-            Nous avons une offre exclusive pour vous : 
-            <strong>50% de réduction</strong> sur votre premier mois
-            avec le code : <span style="background-color: #ff5722; color: white; padding: 5px 10px; font-weight: bold;">PROMO-FOOT</span>.
-          </p>
-          <p style="text-align: center;">
-            <a 
-              href="https://www.foot-predictions.com/pricing"
-              style="
-                background-color: #ff5722; 
-                color: #fff; 
-                padding: 12px 24px; 
-                text-decoration: none; 
-                border-radius: 5px;
-                font-size: 16px;
-              "
-            >
-              J’active mon offre
-            </a>
-          </p>
+        <div>
+          <h2>Foot Predictions - Deuxième Rappel</h2>
+          <p>Bonjour ${user.email},</p>
+          <p>Profitez de 50% de réduction...</p>
         </div>
         `,
         'second_email_sent'
@@ -143,38 +101,10 @@ export default async function handler(req, res) {
         user,
         'Rejoignez les gagnants : découvrez leurs histoires !',
         `
-        <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
-          <h2 style="color: #007bff;">Foot Predictions - Troisième Rappel</h2>
-          <p>Bonjour <strong>${user.email}</strong>,</p>
-          <p>
-            Découvrez comment des milliers de parieurs ont doublé leurs gains 
-            avec nos prédictions exclusives.
-          </p>
-          <blockquote 
-            style="
-              border-left: 5px solid #007bff; 
-              padding-left: 10px; 
-              font-style: italic; 
-              margin: 1em 0;
-            "
-          >
-            « Grâce à Foot Predictions, j’ai doublé mes gains en un mois ! »
-          </blockquote>
-          <p style="text-align: center;">
-            <a 
-              href="https://www.foot-predictions.com/pricing"
-              style="
-                background-color: #007bff; 
-                color: #fff; 
-                padding: 12px 24px; 
-                text-decoration: none; 
-                border-radius: 5px;
-                font-size: 16px;
-              "
-            >
-              Je veux réussir aussi
-            </a>
-          </p>
+        <div>
+          <h2>Foot Predictions - Troisième Rappel</h2>
+          <p>Bonjour ${user.email},</p>
+          <p>Découvrez comment des milliers de parieurs...</p>
         </div>
         `,
         'third_email_sent'
@@ -186,29 +116,10 @@ export default async function handler(req, res) {
         user,
         'Un cadeau pour vous : 50% sur votre premier mois !',
         `
-        <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
-          <h2 style="color: #28a745;">Foot Predictions - Rappel Mensuel</h2>
-          <p>Bonjour <strong>${user.email}</strong>,</p>
-          <p>
-            Ne manquez pas cette opportunité : 50% de réduction sur votre
-            premier mois avec le code : 
-            <span style="background-color: #28a745; color: white; padding: 5px 10px; font-weight: bold;">PROMO-FOOT</span>.
-          </p>
-          <p style="text-align: center;">
-            <a 
-              href="https://www.foot-predictions.com/pricing"
-              style="
-                background-color: #28a745; 
-                color: #fff; 
-                padding: 12px 24px; 
-                text-decoration: none; 
-                border-radius: 5px;
-                font-size: 16px;
-              "
-            >
-              J’active mon offre
-            </a>
-          </p>
+        <div>
+          <h2>Foot Predictions - Rappel Mensuel</h2>
+          <p>Bonjour ${user.email},</p>
+          <p>Ne manquez pas cette opportunité...</p>
         </div>
         `,
         'last_reminder_sent'
