@@ -49,12 +49,14 @@ export default async function handler(req, res) {
     const fetchUsers = async (daysAgo, column) => {
       const dateLimit = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString();
 
-      const { data: users, error } = await supabase.auth.admin.listUsers();
+      const { data, error } = await supabase.auth.admin.listUsers();
       if (error) {
         console.error('Erreur lors de la récupération des utilisateurs :', error);
         return [];
       }
 
+      // Utilisation de `data.users` pour accéder aux utilisateurs
+      const users = data.users || [];
       return users.filter((user) => {
         const userMetadata = user.raw_user_meta_data || {};
         const userCreatedAt = new Date(user.created_at);
