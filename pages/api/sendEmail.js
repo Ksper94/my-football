@@ -45,42 +45,46 @@ export default async function handler(req, res) {
       }
     };
 
-    // Fonction pour récupérer les utilisateurs en fonction des critères
-    const fetchUsers = async (daysAgo, column) => {
+    // Fonction pour récupérer les utilisateurs sans abonnement actif
+    const fetchUsersWithoutActiveSubscription = async (daysAgo, column) => {
       const dateLimit = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString();
 
-      const { data, error } = await supabase.auth.admin.listUsers();
+      const { data, error } = await supabase
+        .from('auth.users')
+        .select(`
+          id,
+          email,
+          created_at,
+          raw_user_meta_data,
+          subscriptions (status)
+        `)
+        .lt('created_at', dateLimit)
+        .or(`raw_user_meta_data->>${column}.is.null,raw_user_meta_data->>${column}.eq.null`);
+
       if (error) {
-        console.error('Erreur lors de la récupération des utilisateurs :', error);
+        console.error(`Erreur lors de la récupération des utilisateurs pour ${column} :`, error);
         return [];
       }
 
-      // Utilisation de `data.users` pour accéder aux utilisateurs
-      const users = data.users || [];
-      return users.filter((user) => {
-        const userMetadata = user.raw_user_meta_data || {};
-        const userCreatedAt = new Date(user.created_at);
-        return (
-          userCreatedAt < new Date(dateLimit) &&
-          !userMetadata[column] &&
-          (!userMetadata.subscription_status || userMetadata.subscription_status !== 'active')
-        );
-      });
+      return data.filter(
+        (user) =>
+          !user.subscriptions || // Pas d'abonnement
+          user.subscriptions.every((sub) => sub.status !== 'active') // Aucun abonnement actif
+      );
     };
 
     // Récupération des utilisateurs pour chaque rappel
-    const firstReminderUsers = await fetchUsers(7, 'last_email_sent');
-    const secondReminderUsers = await fetchUsers(14, 'second_email_sent');
-    const thirdReminderUsers = await fetchUsers(30, 'third_email_sent');
-    const monthlyReminderUsers = await fetchUsers(30, 'last_reminder_sent');
+    const firstReminderUsers = await fetchUsersWithoutActiveSubscription(7, 'last_email_sent');
+    const secondReminderUsers = await fetchUsersWithoutActiveSubscription(14, 'second_email_sent');
+    const thirdReminderUsers = await fetchUsersWithoutActiveSubscription(30, 'third_email_sent');
+    const monthlyReminderUsers = await fetchUsersWithoutActiveSubscription(30, 'last_reminder_sent');
 
     // 1er rappel
     for (const user of firstReminderUsers) {
       await sendEmail(
         user,
         'Votre période d’essai est terminée — continuez à gagner gros !',
-        `
-        <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
+        `<div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
           <h2 style="color: #0066cc;">Foot Predictions - Premier Rappel</h2>
           <p>Bonjour <strong>${user.email}</strong>,</p>
           <p>
@@ -103,8 +107,7 @@ export default async function handler(req, res) {
               Je m’abonne maintenant
             </a>
           </p>
-        </div>
-        `,
+        </div>`,
         'last_email_sent'
       );
     }
@@ -114,8 +117,7 @@ export default async function handler(req, res) {
       await sendEmail(
         user,
         'Offre limitée : 50% de réduction sur votre premier mois !',
-        `
-        <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
+        `<div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
           <h2 style="color: #ff5722;">Foot Predictions - Deuxième Rappel</h2>
           <p>Bonjour <strong>${user.email}</strong>,</p>
           <p>
@@ -138,8 +140,7 @@ export default async function handler(req, res) {
               J’active mon offre
             </a>
           </p>
-        </div>
-        `,
+        </div>`,
         'second_email_sent'
       );
     }
@@ -149,8 +150,7 @@ export default async function handler(req, res) {
       await sendEmail(
         user,
         'Rejoignez les gagnants : découvrez leurs histoires !',
-        `
-        <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
+        `<div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
           <h2 style="color: #007bff;">Foot Predictions - Troisième Rappel</h2>
           <p>Bonjour <strong>${user.email}</strong>,</p>
           <p>
@@ -165,7 +165,7 @@ export default async function handler(req, res) {
               margin: 1em 0;
             "
           >
-            « Grâce à Foot Predictions, j’ai doublé mes gains en un mois ! ».
+            « Grâce à Foot Predictions, j’ai doublé mes gains en un mois ! »
           </blockquote>
           <p style="text-align: center;">
             <a 
@@ -182,8 +182,7 @@ export default async function handler(req, res) {
               Je veux réussir aussi
             </a>
           </p>
-        </div>
-        `,
+        </div>`,
         'third_email_sent'
       );
     }
@@ -193,8 +192,7 @@ export default async function handler(req, res) {
       await sendEmail(
         user,
         'Un cadeau pour vous : 50% sur votre premier mois !',
-        `
-        <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
+        `<div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
           <h2 style="color: #28a745;">Foot Predictions - Rappel Mensuel</h2>
           <p>Bonjour <strong>${user.email}</strong>,</p>
           <p>
@@ -217,8 +215,7 @@ export default async function handler(req, res) {
               J’active mon offre
             </a>
           </p>
-        </div>
-        `,
+        </div>`,
         'last_reminder_sent'
       );
     }
