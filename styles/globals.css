@@ -72,3 +72,43 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--link-hover-color); /* Couleur au survol maintenue */
   }
 }
+
+/* Styles pour le composant BettingTips */
+.betting-tips-container {
+  background-color: var(--background);
+  color: var(--foreground);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  max-width: 800px;
+  margin: 20px auto;
+}
+
+.tips-title, .warning-title {
+  @apply text-2xl font-bold text-center mb-4;
+  color: var(--foreground);
+}
+
+.tips-list, .warning-list {
+  @apply list-none p-0;
+}
+
+.tip-item, .warning-item {
+  @apply flex items-center mb-4 p-4 bg-gray-100 dark:bg-gray-800 rounded;
+}
+
+.icon {
+  @apply text-2xl mr-4;
+}
+
+.tip-text, .warning-text {
+  @apply flex-1 text-base;
+}
+
+.warning-title {
+  @apply mt-8 text-red-500 dark:text-red-400;
+}
+
+.warning-item {
+  @apply bg-red-50 dark:bg-red-900;
+}

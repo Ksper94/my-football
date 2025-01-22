@@ -4,22 +4,56 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 
-// Ajoutez ce nouveau composant pour les conseils
 const BettingTips = ({ t }) => {
   return (
-    <div className="bg-white text-gray-900 p-6 rounded-lg shadow-md mb-4 max-w-2xl">
-      <h2 className="text-xl font-bold mb-4">{t('bettingTipsTitle')}</h2>
-      <p>{t('bettingTips1')}</p>
-      <p>{t('bettingTips2')}</p>
-      <p>{t('bettingTips3')}</p>
-      <p>{t('bettingTips4')}</p>
-      <p>{t('bettingTips5')}</p>
-      <p>{t('bettingTips6')}</p>
-      <h2 className="text-xl font-bold mt-6 mb-4">{t('addictionWarningTitle')}</h2>
-      <p>{t('addictionWarning1')}</p>
-      <p>{t('addictionWarning2')}</p>
-      <p>{t('addictionWarning3')}</p>
-      <p>{t('addictionWarning4')}</p>
+    <div className="betting-tips-container">
+      <h2 className="tips-title">{t('bettingTipsTitle')}</h2>
+      <ul className="tips-list">
+        <li className="tip-item">
+          <span className="icon">📊</span>
+          <span className="tip-text">{t('bettingTips1')}</span>
+        </li>
+        <li className="tip-item">
+          <span className="icon">🎯</span>
+          <span className="tip-text">{t('bettingTips2')}</span>
+        </li>
+        <li className="tip-item">
+          <span className="icon">💰</span>
+          <span className="tip-text">{t('bettingTips3')}</span>
+        </li>
+        <li className="tip-item">
+          <span className="icon">📈</span>
+          <span className="tip-text">{t('bettingTips4')}</span>
+        </li>
+        <li className="tip-item">
+          <span className="icon">📅</span>
+          <span className="tip-text">{t('bettingTips5')}</span>
+        </li>
+        <li className="tip-item">
+          <span className="icon">❤️</span>
+          <span className="tip-text">{t('bettingTips6')}</span>
+        </li>
+      </ul>
+      
+      <h2 className="warning-title">{t('addictionWarningTitle')}</h2>
+      <ul className="warning-list">
+        <li className="warning-item">
+          <span className="icon">🛑</span>
+          <span className="warning-text">{t('addictionWarning1')}</span>
+        </li>
+        <li className="warning-item">
+          <span className="icon">⏸</span>
+          <span className="warning-text">{t('addictionWarning2')}</span>
+        </li>
+        <li className="warning-item">
+          <span className="icon">📞</span>
+          <span className="warning-text">{t('addictionWarning3')}</span>
+        </li>
+        <li className="warning-item">
+          <span className="icon">📚</span>
+          <span className="warning-text">{t('addictionWarning4')}</span>
+        </li>
+      </ul>
     </div>
   );
 };
@@ -27,7 +61,7 @@ const BettingTips = ({ t }) => {
 export default function Dashboard() {
   const { user, loading, signOut } = useAuth();
   const router = useRouter();
-  const { t } = useTranslation('dashboard'); // Charger le namespace "dashboard"
+  const { t } = useTranslation('dashboard');
 
   const [profile, setProfile] = useState(null);
   const [error, setError] = useState('');
@@ -175,7 +209,7 @@ export default function Dashboard() {
             {t('welcome', { firstName: profile.first_name || 'Utilisateur' })}
           </p>
         )}
-        <div className="bg-white text-gray-900 p-6 rounded-lg shadow-md mb-4 max-w-md">
+        <div className="bg-white text-gray-900 p-6 rounded-lg shadow-md mb-4 max-w-md dark:bg-gray-800 dark:text-gray-100">
           <p>{error || t('trialExpired')}</p>
           <Link href="/pricing">
             <span className="text-link hover:text-link-hover cursor-pointer">
@@ -201,8 +235,8 @@ export default function Dashboard() {
           {t('welcome', { firstName: profile.first_name || 'Utilisateur' })}
         </p>
       )}
-      <div className="bg-white text-gray-900 p-6 rounded-lg shadow-md mb-4 max-w-md">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+      <div className="bg-white text-gray-900 p-6 rounded-lg shadow-md mb-4 max-w-md dark:bg-gray-800 dark:text-gray-100">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2 dark:text-gray-100">
           {accessStatus === 'trial' ? t('trialTitle') : t('subscriptionTitle')}
         </h2>
         <p>{timeRemaining}</p>
@@ -223,7 +257,7 @@ export default function Dashboard() {
           <div className="mt-4 space-x-2">
             <button
               onClick={() => router.push('/resiliation')}
-              className="text-sm bg-gray-200 text-gray-800 px-3 py-2 rounded hover:bg-gray-300"
+              className="text-sm bg-gray-200 text-gray-800 px-3 py-2 rounded hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
             >
               {t('cancelByEmail')}
             </button>
@@ -236,13 +270,13 @@ export default function Dashboard() {
           </div>
         )}
         {subscription?.status === 'cancel_pending' && (
-          <p className="mt-4 text-yellow-700 font-semibold">
+          <p className="mt-4 text-yellow-700 font-semibold dark:text-yellow-400">
             {t('cancelPending')}
           </p>
         )}
       </div>
       
-      {/* Ajoutez ici le composant BettingTips */}
+      {/* Ajout du composant BettingTips */}
       <BettingTips t={t} />
       
       <button
