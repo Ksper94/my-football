@@ -17,6 +17,36 @@ function MyApp({ Component, pageProps }) {
     <AuthProvider>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        
+        {/* Ajout des scripts Google Ads */}
+        <script
+          type="text/javascript"
+          dangerouslySetInnerHTML={{
+            __html: `
+              var _iub = _iub || [];
+              _iub.csConfiguration = {
+                "siteId": 3904373,
+                "cookiePolicyId": 17856381,
+                "lang": "fr",
+                "storage": {"useSiteId": true}
+              };
+            `,
+          }}
+        />
+        <script
+          type="text/javascript"
+          src="https://cs.iubenda.com/autoblocking/3904373.js"
+        ></script>
+        <script
+          type="text/javascript"
+          src="//cdn.iubenda.com/cs/gpp/stub.js"
+        ></script>
+        <script
+          type="text/javascript"
+          src="//cdn.iubenda.com/cs/iubenda_cs.js"
+          charset="UTF-8"
+          async
+        ></script>
       </Head>
       <ErrorBoundary>
         {shouldUseLayout ? (
