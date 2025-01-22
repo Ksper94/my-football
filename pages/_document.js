@@ -22,6 +22,22 @@ class MyDocument extends Document {
           <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
           <meta name="theme-color" content="#2563eb" /> {/* Ajustez selon vos couleurs principales */}
           <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+          {/* Google Ads Global Site Tag */}
+          <script
+            async
+            src="https://www.googletagmanager.com/gtag/js?id=AW-11539275720"
+          ></script>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'AW-11539275720');
+              `,
+            }}
+          />
         </Head>
         <body>
           <Main />
