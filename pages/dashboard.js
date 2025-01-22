@@ -4,6 +4,26 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 
+// Ajoutez ce nouveau composant pour les conseils
+const BettingTips = ({ t }) => {
+  return (
+    <div className="bg-white text-gray-900 p-6 rounded-lg shadow-md mb-4 max-w-2xl">
+      <h2 className="text-xl font-bold mb-4">{t('bettingTipsTitle')}</h2>
+      <p>{t('bettingTips1')}</p>
+      <p>{t('bettingTips2')}</p>
+      <p>{t('bettingTips3')}</p>
+      <p>{t('bettingTips4')}</p>
+      <p>{t('bettingTips5')}</p>
+      <p>{t('bettingTips6')}</p>
+      <h2 className="text-xl font-bold mt-6 mb-4">{t('addictionWarningTitle')}</h2>
+      <p>{t('addictionWarning1')}</p>
+      <p>{t('addictionWarning2')}</p>
+      <p>{t('addictionWarning3')}</p>
+      <p>{t('addictionWarning4')}</p>
+    </div>
+  );
+};
+
 export default function Dashboard() {
   const { user, loading, signOut } = useAuth();
   const router = useRouter();
@@ -221,6 +241,10 @@ export default function Dashboard() {
           </p>
         )}
       </div>
+      
+      {/* Ajoutez ici le composant BettingTips */}
+      <BettingTips t={t} />
+      
       <button
         onClick={handleLogout}
         className="mt-4 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition"
