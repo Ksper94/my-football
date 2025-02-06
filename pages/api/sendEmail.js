@@ -4,7 +4,7 @@ import SibApiV3Sdk from 'sib-api-v3-sdk';
 // Configuration Supabase
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
-// Configuration Brevo
+// Configuration Brevo (ex Sendinblue)
 let defaultClient = SibApiV3Sdk.ApiClient.instance;
 let apiKey = defaultClient.authentications['api-key'];
 apiKey.apiKey = process.env.BREVO_API_KEY;
@@ -18,7 +18,7 @@ export default async function handler(req, res) {
   try {
     const now = new Date();
 
-    // Fonction pour envoyer un email
+    // 1. Fonction d'envoi d'email via Brevo
     const sendEmail = async (user, subject, htmlContent, updateColumn) => {
       try {
         let sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
@@ -30,6 +30,7 @@ export default async function handler(req, res) {
         await apiInstance.sendTransacEmail(sendSmtpEmail);
         console.log(`Email envoyé à ${user.email}`);
 
+        // Mise à jour du user_metadata pour marquer la date d'envoi
         const { error: updateError } = await supabase.auth.admin.updateUserById(user.id, {
           user_metadata: {
             ...user.raw_user_meta_data,
@@ -45,10 +46,15 @@ export default async function handler(req, res) {
       }
     };
 
-    // Fonction pour récupérer les utilisateurs sans abonnement actif
+    // 2. Fonction pour récupérer les utilisateurs sans abonnement actif
     const fetchUsersWithoutActiveSubscription = async (daysAgo, column) => {
       const dateLimit = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString();
 
+      /**
+       * On veut :
+       *  - created_at < dateLimit (compte créé il y a plus de X jours)
+       *  - raw_user_meta_data->>column IS NULL (pas encore reçu ce rappel)
+       */
       const { data, error } = await supabase
         .from('auth.users')
         .select(`
@@ -58,28 +64,31 @@ export default async function handler(req, res) {
           raw_user_meta_data,
           subscriptions (status)
         `)
-        .lt('created_at', dateLimit)
-        .or(`raw_user_meta_data->>${column}.is.null,raw_user_meta_data->>${column}.eq.null`);
+        .lt('created_at', dateLimit)                       // AND #1
+        .is(`raw_user_meta_data->>${column}`, null);        // AND #2
 
       if (error) {
         console.error(`Erreur lors de la récupération des utilisateurs pour ${column} :`, error);
         return [];
       }
 
+      // Filtrage : pas d'abonnement actif
       return data.filter(
         (user) =>
-          !user.subscriptions || // Pas d'abonnement
-          user.subscriptions.every((sub) => sub.status !== 'active') // Aucun abonnement actif
+          !user.subscriptions ||  // aucun abonnement
+          user.subscriptions.every((sub) => sub.status !== 'active')
       );
     };
 
-    // Récupération des utilisateurs pour chaque rappel
+    // 3. Récupération des utilisateurs pour chaque rappel
     const firstReminderUsers = await fetchUsersWithoutActiveSubscription(7, 'last_email_sent');
     const secondReminderUsers = await fetchUsersWithoutActiveSubscription(14, 'second_email_sent');
     const thirdReminderUsers = await fetchUsersWithoutActiveSubscription(30, 'third_email_sent');
     const monthlyReminderUsers = await fetchUsersWithoutActiveSubscription(30, 'last_reminder_sent');
 
-    // 1er rappel
+    // 4. Envoi des e-mails pour chaque catégorie d'utilisateurs
+
+    // --- 1er rappel ---
     for (const user of firstReminderUsers) {
       await sendEmail(
         user,
@@ -112,7 +121,7 @@ export default async function handler(req, res) {
       );
     }
 
-    // 2ème rappel
+    // --- 2ème rappel ---
     for (const user of secondReminderUsers) {
       await sendEmail(
         user,
@@ -145,7 +154,7 @@ export default async function handler(req, res) {
       );
     }
 
-    // 3ème rappel
+    // --- 3ème rappel ---
     for (const user of thirdReminderUsers) {
       await sendEmail(
         user,
@@ -187,7 +196,7 @@ export default async function handler(req, res) {
       );
     }
 
-    // Rappel mensuel
+    // --- Rappel mensuel ---
     for (const user of monthlyReminderUsers) {
       await sendEmail(
         user,
@@ -220,6 +229,7 @@ export default async function handler(req, res) {
       );
     }
 
+    // 5. Réponse finale
     res.status(200).json({
       message: `Emails envoyés :
         ${firstReminderUsers.length} (1er rappel),
