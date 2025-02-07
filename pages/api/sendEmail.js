@@ -1,10 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 import SibApiV3Sdk from 'sib-api-v3-sdk';
 
-// -- 1. Configuration Supabase
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+// 1. Configuration Supabase
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
-// -- 2. Configuration Brevo (ex Sendinblue)
+// 2. Configuration Brevo
 let defaultClient = SibApiV3Sdk.ApiClient.instance;
 let apiKey = defaultClient.authentications['api-key'];
 apiKey.apiKey = process.env.BREVO_API_KEY;
@@ -19,7 +22,7 @@ export default async function handler(req, res) {
     const now = new Date();
 
     // -------------------------------------------------------------------
-    //  Fonction pour envoyer un e‑mail via Brevo
+    //  A. Fonction pour envoyer un e‑mail via Brevo
     // -------------------------------------------------------------------
     const sendEmail = async (user, subject, htmlContent, updateColumn) => {
       try {
@@ -29,6 +32,7 @@ export default async function handler(req, res) {
         sendSmtpEmail.sender = { name: 'Foot Predictions', email: 'support@foot-predictions.com' };
         sendSmtpEmail.to = [{ email: user.email }];
 
+        // Envoi de l'e‑mail
         await apiInstance.sendTransacEmail(sendSmtpEmail);
         console.log(`✔️ Email envoyé à ${user.email}`);
 
@@ -39,7 +43,6 @@ export default async function handler(req, res) {
             [updateColumn]: now.toISOString(),
           },
         });
-
         if (updateError) {
           console.error(`❌ Erreur mise à jour user_metadata pour ${user.id} :`, updateError);
         }
@@ -49,74 +52,91 @@ export default async function handler(req, res) {
     };
 
     // -------------------------------------------------------------------
-    //  Fonction pour récupérer les utilisateurs sans abonnement actif
+    //  B. Récupérer utilisateurs sans abonnement actif
+    //     (en deux étapes : "users" puis "subscriptions")
     // -------------------------------------------------------------------
     const fetchUsersWithoutActiveSubscription = async (daysAgo, column) => {
       const dateLimit = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString();
 
-      // Logs pour suivre la logique
-      console.log(`\n[fetchUsersWithoutActiveSubscription] Column="${column}", daysAgo=${daysAgo}`);
-      console.log(`→ dateLimit calculée = ${dateLimit}`);
+      console.log(`\n[fetchUsersWithoutActiveSubscription] column=${column}, daysAgo=${daysAgo}`);
+      console.log(`→ dateLimit = ${dateLimit}`);
 
-      /**
-       * Conditions recherchées :
-       *   1) created_at < dateLimit   (compte créé il y a +X jours)
-       *   2) raw_user_meta_data->>column IS NULL (pas encore reçu ce rappel)
-       */
-      const { data, error } = await supabase
+      // 1) Récupérer les users qui satisfont date & clé JSON
+      const { data: userData, error: userError } = await supabase
         .from('auth.users')
         .select(`
           id,
           email,
           created_at,
-          raw_user_meta_data,
-          subscriptions (status)
+          raw_user_meta_data
         `)
-        .lt('created_at', dateLimit)            // AND #1
-        .is(`raw_user_meta_data->>${column}`, null); // AND #2
+        .lt('created_at', dateLimit)
+        .is(`raw_user_meta_data->>${column}`, null);
 
-      if (error) {
-        console.error(`❌ Erreur lors de la récupération des utilisateurs pour ${column} :`, error);
+      if (userError) {
+        console.error(`❌ Erreur récupération users pour ${column} :`, userError);
         return [];
       }
+      console.log(`→ ${userData.length} utilisateurs avant filtre abonnement.`);
 
-      console.log(`→ Nombre d'utilisateurs récupérés avant filtre abonnement: ${data.length}`);
-      data.forEach((u) => {
-        console.log(`   - ${u.email}, created_at=${u.created_at}, subscriptions=${JSON.stringify(u.subscriptions)}`);
+      if (userData.length === 0) return [];
+
+      // 2) Récupérer toutes les subscriptions liées à ces users
+      const userIds = userData.map((u) => u.id);
+      const { data: subsData, error: subsError } = await supabase
+        .from('subscriptions')
+        .select('user_id, status')
+        .in('user_id', userIds); // On cherche seulement ceux qui ont user_id dans userIds
+
+      if (subsError) {
+        console.error(`❌ Erreur récupération subscriptions pour ${column} :`, subsError);
+        // Si jamais ça plante, on renvoie userData pour éviter un blocage total
+        return userData;
+      }
+
+      console.log(`→ ${subsData.length} subscriptions récupérées.`);
+
+      // Construire une map user_id -> array of status
+      const subMap = {};
+      subsData.forEach((s) => {
+        if (!subMap[s.user_id]) {
+          subMap[s.user_id] = [];
+        }
+        subMap[s.user_id].push(s.status);
       });
 
-      // Filtre pour exclure ceux qui ont un abonnement "active"
-      const filteredUsers = data.filter(
-        (user) =>
-          !user.subscriptions ||
-          user.subscriptions.every((sub) => sub.status !== 'active')
-      );
+      // 3) Filtrer : exclure ceux qui ont un abonnement "active"
+      const filtered = userData.filter((user) => {
+        const statuses = subMap[user.id] || [];
+        // Si on trouve "active" dans statuses, on exclut
+        return !statuses.includes('active');
+      });
 
-      console.log(`→ Nombre d'utilisateurs éligibles après filtre abonnement : ${filteredUsers.length}`);
-      filteredUsers.forEach((u) => console.log(`   → Eligible: ${u.email}`));
-
-      return filteredUsers;
+      console.log(`→ ${filtered.length} utilisateurs éligibles après filtre abonnement.\n`);
+      return filtered;
     };
 
     // -------------------------------------------------------------------
-    //  3. Récupérer les utilisateurs pour chaque rappel
+    //  C. Récupération des utilisateurs pour chaque type de rappel
     // -------------------------------------------------------------------
     const firstReminderUsers   = await fetchUsersWithoutActiveSubscription(7,  'last_email_sent');
     const secondReminderUsers  = await fetchUsersWithoutActiveSubscription(14, 'second_email_sent');
     const thirdReminderUsers   = await fetchUsersWithoutActiveSubscription(30, 'third_email_sent');
     const monthlyReminderUsers = await fetchUsersWithoutActiveSubscription(30, 'last_reminder_sent');
 
-    // Logs finaux pour voir les e‑mails en mémoire
-    console.log('\n[main] firstReminderUsers   =', firstReminderUsers.map(u => u.email));
-    console.log('[main] secondReminderUsers  =', secondReminderUsers.map(u => u.email));
-    console.log('[main] thirdReminderUsers   =', thirdReminderUsers.map(u => u.email));
-    console.log('[main] monthlyReminderUsers =', monthlyReminderUsers.map(u => u.email));
+    // -------------------------------------------------------------------
+    //  D. Logs finaux
+    // -------------------------------------------------------------------
+    console.log('[MAIN] firstReminderUsers   =', firstReminderUsers.map(u => u.email));
+    console.log('[MAIN] secondReminderUsers  =', secondReminderUsers.map(u => u.email));
+    console.log('[MAIN] thirdReminderUsers   =', thirdReminderUsers.map(u => u.email));
+    console.log('[MAIN] monthlyReminderUsers =', monthlyReminderUsers.map(u => u.email));
 
     // -------------------------------------------------------------------
-    //  4. Envoi des e‑mails
+    //  E. Envoi des e‑mails pour chaque catégorie d'utilisateurs
     // -------------------------------------------------------------------
 
-    // --- 1er rappel ---
+    // 1er rappel
     for (const user of firstReminderUsers) {
       await sendEmail(
         user,
@@ -149,7 +169,7 @@ export default async function handler(req, res) {
       );
     }
 
-    // --- 2ème rappel ---
+    // 2e rappel
     for (const user of secondReminderUsers) {
       await sendEmail(
         user,
@@ -182,7 +202,7 @@ export default async function handler(req, res) {
       );
     }
 
-    // --- 3ème rappel ---
+    // 3e rappel
     for (const user of thirdReminderUsers) {
       await sendEmail(
         user,
@@ -224,7 +244,7 @@ export default async function handler(req, res) {
       );
     }
 
-    // --- Rappel mensuel ---
+    // Rappel mensuel
     for (const user of monthlyReminderUsers) {
       await sendEmail(
         user,
@@ -258,7 +278,7 @@ export default async function handler(req, res) {
     }
 
     // -------------------------------------------------------------------
-    //  5. Réponse finale
+    //  Réponse finale
     // -------------------------------------------------------------------
     res.status(200).json({
       message: `Emails envoyés :
@@ -267,7 +287,6 @@ export default async function handler(req, res) {
         ${thirdReminderUsers.length} (3ème rappel),
         ${monthlyReminderUsers.length} (mensuels).`,
     });
-
   } catch (error) {
     console.error('❌ Erreur générale :', error);
     res.status(500).json({ error: 'Erreur interne du serveur.' });
