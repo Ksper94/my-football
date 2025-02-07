@@ -7,7 +7,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-// 2. Configuration Brevo
+// 2. Configuration Brevo (ex Sendinblue)
 let defaultClient = SibApiV3Sdk.ApiClient.instance;
 let apiKey = defaultClient.authentications['api-key'];
 apiKey.apiKey = process.env.BREVO_API_KEY;
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
         // Mise à jour du user_metadata pour noter la date d'envoi
         const { error: updateError } = await supabase.auth.admin.updateUserById(user.id, {
           user_metadata: {
-            ...user.raw_user_meta_data,
+            ...user.user_metadata,
             [updateColumn]: now.toISOString(),
           },
         });
@@ -52,51 +52,75 @@ export default async function handler(req, res) {
     };
 
     // -------------------------------------------------------------------
-    //  B. Récupérer utilisateurs sans abonnement actif
-    //     (en deux étapes : "users" puis "subscriptions")
+    //  B. Récupérer utilisateurs sans abonnement actif (via admin.listUsers)
     // -------------------------------------------------------------------
+    /**
+     * On va :
+     *   1) Lister tous les utilisateurs (ou la première page).
+     *   2) Filtrer en mémoire par :
+     *       - Créé il y a plus de "daysAgo" jours
+     *       - user_metadata[column] n'existe pas ou est null
+     *   3) Récupérer leurs abonnements (table "subscriptions") séparément
+     *   4) Exclure ceux qui ont un abonnement "active"
+     */
     const fetchUsersWithoutActiveSubscription = async (daysAgo, column) => {
-      const dateLimit = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString();
+      const dateLimit = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000);
 
       console.log(`\n[fetchUsersWithoutActiveSubscription] column=${column}, daysAgo=${daysAgo}`);
-      console.log(`→ dateLimit = ${dateLimit}`);
+      console.log(`→ dateLimit (JS Date) = ${dateLimit.toISOString()}`);
 
-      // 1) Récupérer les users qui satisfont date & clé JSON
-      const { data: userData, error: userError } = await supabase
-        .from('auth.users')
-        .select(`
-          id,
-          email,
-          created_at,
-          raw_user_meta_data
-        `)
-        .lt('created_at', dateLimit)
-        .is(`raw_user_meta_data->>${column}`, null);
+      // 1) Lister les utilisateurs via admin.listUsers
+      const { data, error } = await supabase.auth.admin.listUsers({
+        page: 1,        // Page 1
+        perPage: 10000, // Récupère jusqu'à 10 000 utilisateurs
+      });
 
-      if (userError) {
-        console.error(`❌ Erreur récupération users pour ${column} :`, userError);
+      if (error) {
+        console.error(`❌ Erreur listUsers() pour ${column} :`, error);
         return [];
       }
-      console.log(`→ ${userData.length} utilisateurs avant filtre abonnement.`);
 
-      if (userData.length === 0) return [];
+      if (!data || !data.users) {
+        console.log('Aucun utilisateur retourné par listUsers()');
+        return [];
+      }
 
-      // 2) Récupérer toutes les subscriptions liées à ces users
-      const userIds = userData.map((u) => u.id);
+      // data.users est un tableau de { id, email, user_metadata, created_at, ... }
+      let users = data.users;
+      console.log(`→ Nombre total d'utilisateurs listés : ${users.length}`);
+
+      // 2) Filtrer en mémoire
+      //    - created_at < dateLimit
+      //    - user.user_metadata?.[column] == null
+      users = users.filter((u) => {
+        const userCreatedAt = new Date(u.created_at);
+        const isOldEnough = userCreatedAt < dateLimit;
+
+        const metaValue = u.user_metadata?.[column];
+        // On considère qu'aucune clé ou valeur null => pas encore envoyé
+        const isNullOrUndefined = metaValue === null || metaValue === undefined;
+
+        return isOldEnough && isNullOrUndefined;
+      });
+
+      console.log(`→ ${users.length} utilisateurs après filtre "date & metadata null"`);
+
+      if (users.length === 0) return [];
+
+      // 3) Récupérer leurs abonnements depuis la table "subscriptions"
+      const userIds = users.map((u) => u.id);
       const { data: subsData, error: subsError } = await supabase
         .from('subscriptions')
         .select('user_id, status')
-        .in('user_id', userIds); // On cherche seulement ceux qui ont user_id dans userIds
+        .in('user_id', userIds);
 
       if (subsError) {
         console.error(`❌ Erreur récupération subscriptions pour ${column} :`, subsError);
-        // Si jamais ça plante, on renvoie userData pour éviter un blocage total
-        return userData;
+        // En cas d'erreur, on renvoie quand même la liste filtrée (date & metadata)
+        return users;
       }
 
-      console.log(`→ ${subsData.length} subscriptions récupérées.`);
-
-      // Construire une map user_id -> array of status
+      // Construire un map: user_id -> array of status
       const subMap = {};
       subsData.forEach((s) => {
         if (!subMap[s.user_id]) {
@@ -105,15 +129,14 @@ export default async function handler(req, res) {
         subMap[s.user_id].push(s.status);
       });
 
-      // 3) Filtrer : exclure ceux qui ont un abonnement "active"
-      const filtered = userData.filter((user) => {
-        const statuses = subMap[user.id] || [];
-        // Si on trouve "active" dans statuses, on exclut
+      // 4) Exclure ceux qui ont un abonnement "active"
+      const final = users.filter((u) => {
+        const statuses = subMap[u.id] || [];
         return !statuses.includes('active');
       });
 
-      console.log(`→ ${filtered.length} utilisateurs éligibles après filtre abonnement.\n`);
-      return filtered;
+      console.log(`→ ${final.length} utilisateurs éligibles après filtre "abonnement actif".\n`);
+      return final;
     };
 
     // -------------------------------------------------------------------
