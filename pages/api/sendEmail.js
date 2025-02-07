@@ -29,7 +29,7 @@ export default async function handler(req, res) {
         let sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
         sendSmtpEmail.subject = subject;
         sendSmtpEmail.htmlContent = htmlContent;
-        sendSmtpEmail.sender = { name: 'Foot Predictions', email: 'support@foot-predictions.com' };
+        sendSmtpEmail.sender = { name: 'Foot Predictions', email: 'services@foot-predictions.com' };
         sendSmtpEmail.to = [{ email: user.email }];
 
         // Envoi de l'e‑mail
